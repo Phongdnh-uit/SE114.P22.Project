@@ -69,7 +69,7 @@ public class JwtUtil {
         return null;
     }
 
-    public static String getCurrentUserEmail() {
+    public static String getCurrentUserCredentials() {
         SecurityContext context = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(context.getAuthentication())).orElseThrow(
                 () -> new ResourceNotFoundException("User not found")

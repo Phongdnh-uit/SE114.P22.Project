@@ -9,6 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>,
@@ -16,6 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long>,
     boolean existsByUsername(@NotBlank String username);
     boolean existsByEmail(@Email String email);
     boolean existsByPhone(String phone);
-
     List<User> findUserByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(@NotBlank String username, @Email String email);
+    Optional<User> findByPhone(String phone);
 }

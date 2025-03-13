@@ -4,10 +4,7 @@ import com.se114p12.backend.dto.request.LoginRequestDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.service.UserService;
 import com.se114p12.backend.util.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -55,7 +52,7 @@ public class AuthController {
 
         String refreshToken = jwtUtil.generateRefreshToken(loginRequestDTO.getUsername());
 
-        // save refresh token to database ??
+        userService.setUserRefreshToken(loginRequestDTO.getUsername(), refreshToken);
 
         return ResponseEntity.ok().body(Map.of(
                 "accessToken", accessToken,
@@ -66,13 +63,13 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(
              @RequestBody String refreshToken) {
         Jwt jwt = jwtUtil.checkValidity(refreshToken);
-        String email = jwt.getSubject();
+        String phone = jwt.getSubject();
 
-        String accessToken = jwtUtil.generateAccessToken(email);
+        String accessToken = jwtUtil.generateAccessToken(phone);
 
-        String newRefreshToken = jwtUtil.generateRefreshToken(email);
+        String newRefreshToken = jwtUtil.generateRefreshToken(phone);
 
-        // save new refresh token to database ??
+        userService.setUserRefreshToken(phone, refreshToken);
 
         return ResponseEntity.ok().body(Map.of(
                 "accessToken", accessToken,
@@ -80,8 +77,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody String refreshToken) {
-        // delete refresh token from database ??
+    public ResponseEntity<?> logout() {
+
+        String phone = JwtUtil.getCurrentUserCredentials();
+
+        userService.setUserRefreshToken(phone, null);
+
         return ResponseEntity.ok().body("Logout successfully");
     }
 

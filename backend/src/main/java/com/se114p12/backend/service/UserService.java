@@ -2,6 +2,7 @@ package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.domain.enums.UserStatus;
+import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.UserRepository;
@@ -48,6 +49,24 @@ public class UserService {
 
     public List<User> searchUsers(String keyword) {
         return userRepository.findUserByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword);
+    }
+
+    public User register(RegisterRequestDTO registerRequestDTO) {
+        User user = new User();
+        user.setFullname(registerRequestDTO.getFullname());
+        user.setUsername(registerRequestDTO.getUsername());
+        user.setPassword(registerRequestDTO.getPassword());
+        user.setEmail(registerRequestDTO.getEmail());
+        user.setPhone(registerRequestDTO.getPhone());
+        user.setStatus(UserStatus.PENDING);
+        return userRepository.save(user);
+    }
+
+    public void setUserRefreshToken(String phone, String token) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setRefreshToken(token);
+        userRepository.save(user);
     }
 
     // Private helper methods
