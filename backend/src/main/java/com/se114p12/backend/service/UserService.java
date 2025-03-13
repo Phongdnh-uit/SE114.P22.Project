@@ -2,6 +2,7 @@ package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.domain.enums.UserStatus;
+import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.UserRepository;
@@ -67,5 +68,27 @@ public class UserService {
             throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
+    }
+
+    public User register(RegisterRequestDTO registerRequestDTO) {
+        if (userRepository.existsByUsername(registerRequestDTO.getUsername())) {
+            throw new DataConflictException("Username already exists");
+        }
+
+        if (userRepository.existsByEmail(registerRequestDTO.getEmail())) {
+            throw new DataConflictException("Email already exists");
+        }
+
+        if (userRepository.existsByPhone(registerRequestDTO.getPhone())) {
+            throw new DataConflictException("Phone already exists");
+        }
+        User user = new User();
+        user.setFullname(registerRequestDTO.getFullname());
+        user.setUsername(registerRequestDTO.getUsername());
+        user.setPassword(registerRequestDTO.getPassword());
+        user.setEmail(registerRequestDTO.getEmail());
+        user.setPhone(registerRequestDTO.getPhone());
+        user.setStatus(UserStatus.PENDING);
+        return create(user);
     }
 }
