@@ -1,6 +1,7 @@
 package com.se114p12.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Entity(name = "products")
@@ -26,6 +28,10 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
     private ProductCategory category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Variation> variations;
 
     @Column(nullable = false, length = 255)
     @NotBlank
