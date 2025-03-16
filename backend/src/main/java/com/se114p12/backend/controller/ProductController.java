@@ -1,0 +1,30 @@
+package com.se114p12.backend.controller;
+
+import com.se114p12.backend.domain.Product;
+import com.se114p12.backend.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+    private final ProductService productService;
+    public ProductController(ProductService productService) { this.productService = productService; }
+
+    @GetMapping
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+        return ResponseEntity.ok(productService.create(product));
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product productDetails) {
+        return ResponseEntity.ok(productService.update(id, productDetails));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
