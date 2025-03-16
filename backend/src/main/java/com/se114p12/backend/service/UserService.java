@@ -6,6 +6,8 @@ import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.util.TypeUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +15,17 @@ import java.util.List;
 @Service
 public class UserService {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
     public User create(User user) {
         validateUserUniqueness(user, null);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.PENDING);
         return userRepository.save(user);
     }
@@ -55,18 +60,39 @@ public class UserService {
         User user = new User();
         user.setFullname(registerRequestDTO.getFullname());
         user.setUsername(registerRequestDTO.getUsername());
-        user.setPassword(registerRequestDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhone(registerRequestDTO.getPhone());
         user.setStatus(UserStatus.PENDING);
         return userRepository.save(user);
     }
 
-    public void setUserRefreshToken(String phone, String token) {
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        user.setRefreshToken(token);
-        userRepository.save(user);
+    public void setUserRefreshToken(String username, String token) {
+        if (TypeUtil.checkUsernameType(username) == 1) {
+            userRepository.findByPhone(username)
+                    .ifPresentOrElse(user -> {
+                        user.setRefreshToken(token);
+                        userRepository.save(user);
+                    }, () -> {
+                        throw new ResourceNotFoundException("User not found");
+                    });
+        } else if (TypeUtil.checkUsernameType(username) == 2) {
+            userRepository.findByEmail(username)
+                    .ifPresentOrElse(user -> {
+                        user.setRefreshToken(token);
+                        userRepository.save(user);
+                    }, () -> {
+                        throw new ResourceNotFoundException("User not found");
+                    });
+        } else {
+            userRepository.findByUsername(username)
+                    .ifPresentOrElse(user -> {
+                        user.setRefreshToken(token);
+                        userRepository.save(user);
+                    }, () -> {
+                        throw new ResourceNotFoundException("User not found");
+                    });
+        }
     }
 
     // Private helper methods

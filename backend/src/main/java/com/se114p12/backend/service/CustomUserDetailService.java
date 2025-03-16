@@ -2,6 +2,7 @@ package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.util.TypeUtil;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,16 +22,14 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String phoneRegex = "^(03|05|07|08|09)[0-9]{8}$\n";
-        String emailRegex = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$\n";
-        if (username.matches(phoneRegex)) {
+        if (TypeUtil.checkUsernameType(username) == 1) {
             User user =  userRepository.findByPhone(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getPhone())
                     .password(user.getPassword())
                     .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
                     .build();
-        } else if (username.matches(emailRegex)) {
+        } else if (TypeUtil.checkUsernameType(username) == 1) {
             User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
