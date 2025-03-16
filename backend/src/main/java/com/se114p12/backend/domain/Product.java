@@ -3,7 +3,6 @@ package com.se114p12.backend.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Data
 @Entity(name = "products")
@@ -23,9 +21,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "category_id", nullable = false)
-//    private Category category;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = true)
+    private ProductCategory category;
 
     @Column(nullable = false, length = 255)
     @NotBlank
@@ -40,7 +38,6 @@ public class Product {
     private String detailDescription;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    @NotBlank
     private BigDecimal originalPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "product_categories")
@@ -26,6 +27,9 @@ public class ProductCategory {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> product;
 
 //    @PrePersist
 //    public void prePersist() {
