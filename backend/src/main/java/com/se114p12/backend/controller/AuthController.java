@@ -78,7 +78,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-
         String phone = JwtUtil.getCurrentUserCredentials();
 
         userService.setUserRefreshToken(phone, null);
