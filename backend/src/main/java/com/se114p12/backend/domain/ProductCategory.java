@@ -1,5 +1,7 @@
 package com.se114p12.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.se114p12.backend.util.JwtUtil;
 import jakarta.persistence.*;
@@ -16,7 +18,6 @@ public class ProductCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     @NotBlank
@@ -29,6 +30,7 @@ public class ProductCategory {
     private String updatedBy;
 
     @OneToMany(mappedBy = "category")
+    @JsonManagedReference
     private List<Product> product;
 
 //    @PrePersist

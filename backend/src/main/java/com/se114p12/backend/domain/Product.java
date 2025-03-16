@@ -1,5 +1,6 @@
 package com.se114p12.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +23,8 @@ public class Product {
     private Long productId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = true)
+    @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     private ProductCategory category;
 
     @Column(nullable = false, length = 255)
