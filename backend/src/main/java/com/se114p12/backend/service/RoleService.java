@@ -35,10 +35,8 @@ public class RoleService {
         }
 
         existingRole.setName(roleDetails.getName());
-//        existingRole.setDescription(roleDetails.getDescription());
-//        existingRole.setActive(roleDetails.getActive());
-//        existingRole.setUpdatedAt(Instant.now());
-//        existingRole.setUpdatedBy(roleDetails.getUpdatedBy());
+        existingRole.setDescription(roleDetails.getDescription());
+        existingRole.setActive(roleDetails.getActive());
 
         return roleRepository.save(existingRole);
     }

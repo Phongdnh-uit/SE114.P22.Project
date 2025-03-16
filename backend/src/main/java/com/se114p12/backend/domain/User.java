@@ -54,5 +54,10 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String refreshToken;
 
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }
