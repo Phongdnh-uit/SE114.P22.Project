@@ -5,6 +5,7 @@ import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.RoleRepository;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -48,8 +49,8 @@ public class RoleService {
         roleRepository.deleteById(id);
     }
 
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    public List<Role> getAllRoles(Pageable pageable) {
+        return roleRepository.findAll(pageable).getContent();
     }
 
     public Role getRoleById(Long id) {
