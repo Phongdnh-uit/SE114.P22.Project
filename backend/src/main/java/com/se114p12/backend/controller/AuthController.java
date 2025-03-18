@@ -4,6 +4,8 @@ import com.se114p12.backend.dto.request.LoginRequestDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.service.UserService;
 import com.se114p12.backend.util.JwtUtil;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "Auth Module")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {

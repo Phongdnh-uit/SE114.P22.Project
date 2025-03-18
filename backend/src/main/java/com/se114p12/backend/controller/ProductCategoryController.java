@@ -3,11 +3,14 @@ package com.se114p12.backend.controller;
 import com.se114p12.backend.domain.ProductCategory;
 import com.se114p12.backend.service.ProductCategoryService;
 import com.se114p12.backend.vo.PageVO;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Product Category Module")
 @RequestMapping("/api/v1/product-categories")
 @RestController
 public class ProductCategoryController {

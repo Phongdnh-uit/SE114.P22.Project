@@ -2,12 +2,16 @@ package com.se114p12.backend.controller;
 
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.service.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "User Module")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
