@@ -1,7 +1,6 @@
 package com.se114p12.backend.controller;
 
 import com.se114p12.backend.domain.VariationOption;
-import com.se114p12.backend.service.ProductService;
 import com.se114p12.backend.service.VariationOptionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/variation-options")
-public class VaritationOptionController {
+public class VariationOptionController {
     private final VariationOptionService variationOptionService;
-    public VaritationOptionController(VariationOptionService variationOptionService) {
+    public VariationOptionController(VariationOptionService variationOptionService) {
         this.variationOptionService = variationOptionService;
     }
 
