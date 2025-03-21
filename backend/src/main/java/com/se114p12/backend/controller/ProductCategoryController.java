@@ -29,7 +29,7 @@ public class ProductCategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductCategoryById(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
         return ResponseEntity.ok().body(productCategoryService.findById(id));
     }
 
@@ -40,7 +40,7 @@ public class ProductCategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProductCategory(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody ProductCategory productCategory) {
         return ResponseEntity.ok().body(productCategoryService.update(id, productCategory));
     }

@@ -1,5 +1,6 @@
 package com.se114p12.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.se114p12.backend.domain.enums.UserStatus;
 import jakarta.persistence.*;
@@ -54,6 +55,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String refreshToken;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 

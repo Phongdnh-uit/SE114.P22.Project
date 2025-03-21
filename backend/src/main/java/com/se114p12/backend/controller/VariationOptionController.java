@@ -21,13 +21,13 @@ public class VariationOptionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VariationOption> updateVariationOption(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody VariationOption variationOption) {
         return ResponseEntity.ok(variationOptionService.update(id, variationOption));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVariationOption(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVariationOption(@PathVariable("id") Long id) {
         variationOptionService.delete(id);
         return ResponseEntity.ok().build();
     }
