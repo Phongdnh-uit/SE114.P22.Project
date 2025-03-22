@@ -5,6 +5,8 @@ import com.se114p12.backend.service.RoleService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ public class RoleController {
     public RoleController(RoleService roleService) { this.roleService = roleService; }
 
     @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles(Pageable pageable) {
+    public ResponseEntity<List<Role>> getAllRoles(@ParameterObject Pageable pageable) {
         pageable = pageable.isPaged() ? pageable : Pageable.unpaged();
         return ResponseEntity.ok(roleService.getAllRoles(pageable));
     }

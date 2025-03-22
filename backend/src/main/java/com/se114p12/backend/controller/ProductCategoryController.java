@@ -6,6 +6,8 @@ import com.se114p12.backend.vo.PageVO;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class ProductCategoryController {
 
     @GetMapping
     public ResponseEntity<PageVO<?>> getAllProductCategories(
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         return ResponseEntity.ok().body(productCategoryService.getAll(pageable.isPaged() ? pageable : Pageable.unpaged()));
     }
 

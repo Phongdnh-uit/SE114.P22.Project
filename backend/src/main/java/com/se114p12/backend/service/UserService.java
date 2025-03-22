@@ -7,6 +7,10 @@ import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.UserRepository;
 import com.se114p12.backend.util.TypeUtil;
+import com.se114p12.backend.vo.PageVO;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +48,16 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public PageVO<User> getAllUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        return PageVO.<User>builder()
+        .page(userPage.getNumber())
+        .size(userPage.getSize())
+        .numberOfElements(userPage.getNumberOfElements())
+        .totalPages(userPage.getTotalPages())
+        .totalElements(userPage.getTotalElements())
+        .content(userPage.getContent())
+        .build();
     }
 
     public User getUserById(Long id) {

@@ -2,9 +2,12 @@ package com.se114p12.backend.controller;
 
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.service.UserService;
+import com.se114p12.backend.vo.PageVO;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,8 @@ public class UserController {
     public UserController(UserService userService) { this.userService = userService; }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<PageVO<?>> getAllUsers(@ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @GetMapping("/{id}")
