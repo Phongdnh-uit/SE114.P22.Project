@@ -36,6 +36,7 @@ public class ProductCategoryService {
     }
 
     public ProductCategory create(ProductCategory productCategory) {
+        productCategory.setId(null);
         if (productCategoryRepository.existsByName(productCategory.getName())) {
             throw new ResourceNotFoundException("Product category already exists");
         }

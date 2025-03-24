@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>,
-        PagingAndSortingRepository<User, Long>, JpaSpecificationExecutor<User> {
+        JpaSpecificationExecutor<User> {
     boolean existsByUsername(@NotBlank String username);
     boolean existsByEmail(@Email String email);
     boolean existsByPhone(String phone);

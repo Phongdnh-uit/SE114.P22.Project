@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long>,
-        PagingAndSortingRepository<ProductCategory,Long>, JpaSpecificationExecutor<ProductCategory> {
+        JpaSpecificationExecutor<ProductCategory> {
     boolean existsByName(@NotBlank String name);
 }

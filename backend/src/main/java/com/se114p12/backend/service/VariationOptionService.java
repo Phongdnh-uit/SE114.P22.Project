@@ -15,6 +15,7 @@ public class VariationOptionService {
     }
 
     public VariationOption create(VariationOption variationOption) {
+        variationOption.setId(null);
         validateUniqueValueWithinVariation(
                 variationOption.getValue(),
                 variationOption.getVariation().getId()

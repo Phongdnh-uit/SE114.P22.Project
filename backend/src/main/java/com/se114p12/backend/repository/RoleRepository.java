@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface RoleRepository extends JpaRepository<Role, Long>,
-        PagingAndSortingRepository<Role, Long>, JpaSpecificationExecutor<Role> {
+        JpaSpecificationExecutor<Role> {
     boolean existsByName(String name);
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface VariationRepository extends JpaRepository<Variation, Long>, JpaSpecificationExecutor<Variation> {
+public interface VariationRepository extends JpaRepository<Variation, Long>,
+        JpaSpecificationExecutor<Variation> {
     boolean existsByName(String name);
 }

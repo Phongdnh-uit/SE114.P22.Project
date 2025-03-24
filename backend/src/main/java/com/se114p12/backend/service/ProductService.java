@@ -20,7 +20,7 @@ public class ProductService {
     }
 
     public Product create(Product product) {
-
+        product.setProductId(null);
         if (product.getCategory() == null || product.getCategory().getId() == null) {
             throw new IllegalArgumentException("Category ID is required.");
         }

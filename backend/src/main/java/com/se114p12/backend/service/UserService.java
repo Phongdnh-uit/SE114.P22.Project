@@ -24,6 +24,7 @@ public class UserService {
     }
 
     public User create(User user) {
+        user.setId(null);
         validateUserUniqueness(user, null);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.PENDING);

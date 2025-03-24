@@ -22,12 +22,14 @@ public class VariationService {
     }
 
     public Variation update(Long id, @NotNull Variation variation) {
-        if (!variationRepository.existsById(id)) {
-            throw new IllegalArgumentException("Variation with the given ID does not exist.");
+        Variation existingVariation = variationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Variation with the given ID does not exist."));
+
+        if (variation.getName() != null) {
+            existingVariation.setName(variation.getName());
         }
 
-        variation.setName(variation.getName());
-        return variationRepository.save(variation);
+        return variationRepository.save(existingVariation);
     }
 
     public void delete(Long id) {

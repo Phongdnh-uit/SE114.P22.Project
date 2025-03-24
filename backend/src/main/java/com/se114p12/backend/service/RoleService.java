@@ -21,6 +21,7 @@ public class RoleService {
     }
 
     public Role create(@NotNull Role role) {
+        role.setId(null);
         checkRoleNameUniqueness(role.getName());
         role.setActive(true); // Default to active upon creation
         role.setCreatedAt(Instant.now());

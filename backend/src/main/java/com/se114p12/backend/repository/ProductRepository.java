@@ -8,7 +8,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, Long>,
+        JpaSpecificationExecutor<Product> {
     boolean existsByName(String name);
     boolean existsByShortDescription(String description);
 
