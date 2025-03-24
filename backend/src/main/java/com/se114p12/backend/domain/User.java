@@ -1,5 +1,6 @@
 package com.se114p12.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.se114p12.backend.domain.enums.UserStatus;
 import jakarta.persistence.*;
@@ -26,8 +27,8 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank
     private String password;
 
     @Email
@@ -54,6 +55,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String refreshToken;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
