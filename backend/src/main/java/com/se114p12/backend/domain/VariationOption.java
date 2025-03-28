@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "variation_options")
@@ -24,4 +26,8 @@ public class VariationOption {
     @JoinColumn(name = "variation_id", nullable = true)
     @JsonBackReference
     private Variation variation;
+
+    @OneToMany(mappedBy = "variationOption", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ProductConfiguration> productConfigurations;
 }

@@ -33,6 +33,10 @@ public class Product {
     @JsonManagedReference
     private List<Variation> variations;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ProductItem> productItems;
+
     @Column(nullable = false, length = 255)
     @NotBlank
     private String name;
