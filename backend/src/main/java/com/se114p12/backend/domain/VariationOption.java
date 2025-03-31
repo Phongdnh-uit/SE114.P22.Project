@@ -27,7 +27,6 @@ public class VariationOption {
     @JsonBackReference
     private Variation variation;
 
-    @OneToMany(mappedBy = "variationOption", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<ProductConfiguration> productConfigurations;
+    @ManyToMany(mappedBy = "variationOptions")
+    private List<ProductItem> productItems;
 }
