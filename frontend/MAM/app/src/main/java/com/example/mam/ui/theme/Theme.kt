@@ -74,6 +74,7 @@ fun MAMTheme(
         content = content
     )
 }
+
 @Composable
 fun Modifier.outerShadow(
     color: Color = Color.Black,

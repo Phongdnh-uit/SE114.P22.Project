@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MAMTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Greeting()
+                    SignInScreen()
                 }
             }
         }
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier) {
+fun SignInScreen(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,6 +89,7 @@ fun Greeting(modifier: Modifier = Modifier) {
             )
         )
         Column(
+            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .outerShadow(
@@ -118,6 +119,6 @@ fun Greeting(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-        Greeting()
+fun Preview() {
+        SignInScreen()
 }
