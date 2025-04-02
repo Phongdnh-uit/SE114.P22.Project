@@ -1,17 +1,38 @@
 package com.example.mam.ui.theme
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.BlurMaskFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
@@ -22,20 +43,45 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mam.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = OrangeDefault,
+    secondary = BrownDefault,
+    tertiary = Momo,
+    background = BlackDefault,
+    surface = BrownDark,
+    onPrimary = WhiteDefault,
+    onSecondary = WhiteDefault,
+    onBackground = GreyDefault,
+    onSurface = WhiteDefault
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = OrangeDefault,
+    secondary = OrangeLight,
+    tertiary = BrownLight,
+    background = WhiteDefault,
+    surface = GreyDefault,
+    onPrimary = BlackDefault,
+    onSecondary = BlackDefault,
+    onBackground = BlackDefault,
+    onSurface = BlackDefault
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -47,10 +93,12 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+
 object Variables {
     val HeadlineMediumSize = 28.sp
     val HeadlineMediumLineHeight = 36.sp
 }
+
 @Composable
 fun MAMTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -74,7 +122,7 @@ fun MAMTheme(
         content = content
     )
 }
-
+//Shadow
 @Composable
 fun Modifier.outerShadow(
     color: Color = Color.Black,
@@ -113,6 +161,7 @@ fun Modifier.outerShadow(
         }
     }
 )
+
 @Composable
 fun Modifier.innerShadow(
     color: Color = Color.Black,
@@ -181,3 +230,106 @@ fun Modifier.innerShadow(
         frameworkPaint.maskFilter = null
     }
 }
+//end Shadow
+
+//Component
+@Composable
+fun EditField(
+    @StringRes label: Int,
+    value: String,
+    keyboardOptions: KeyboardOptions,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        label = {
+            Text(
+                stringResource(label),
+                color = BrownDefault,
+                fontWeight = FontWeight.Bold)},
+        value = value,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = OrangeLight,  // Màu nền khi focus
+            unfocusedContainerColor = OrangeLight, // Màu nền khi không focus
+            focusedIndicatorColor = BrownDefault,  // Màu viền khi focus
+            unfocusedIndicatorColor = BrownDefault,  // Màu viền khi không focus
+            focusedTextColor = BrownDefault,       // Màu chữ khi focus
+            unfocusedTextColor = BrownDefault,      // Màu chữ khi không focus
+            cursorColor = BrownDefault             // Màu con trỏ nhập liệu
+        ),
+        shape = RoundedCornerShape(20.dp),
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        singleLine = true,
+        modifier = modifier,
+    )
+}
+@Composable
+fun PasswordField(
+    @StringRes label: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            Text(
+                text = stringResource(label),
+                color = BrownDefault,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = OrangeLight,
+            unfocusedContainerColor = OrangeLight,
+            focusedIndicatorColor = BrownDefault,
+            unfocusedIndicatorColor = BrownDefault,
+            focusedTextColor = BrownDefault,
+            unfocusedTextColor = BrownDefault,
+            cursorColor = BrownDefault
+        ),
+        shape = RoundedCornerShape(20.dp),
+        singleLine = true,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(
+                    painter = if (passwordVisible) painterResource(R.drawable.eye_outline) else painterResource(R.drawable.eye_off_outline),
+                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                    tint = BrownDefault
+                )
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction =  ImeAction.Done),
+        modifier = modifier
+    )
+}
+
+@Composable
+fun UnderlinedClickableText(
+    text: String,
+    targetActivity: Class<out ComponentActivity>,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val annotatedText = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = BrownDefault, textDecoration = TextDecoration.Underline)) {
+            append(text)
+        }
+    }
+
+    ClickableText(
+        text = annotatedText,
+        modifier = modifier,
+        onClick = {
+            val intent = Intent(context, targetActivity)
+            context.startActivity(intent)
+        }
+    )
+}
+//end Component
