@@ -1,0 +1,106 @@
+package com.example.mam.ui.component
+
+import androidx.annotation.StringRes
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import com.example.mam.R
+import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.OrangeLight
+
+@Composable
+fun EditField(
+    @StringRes label: Int,
+    value: String,
+    keyboardOptions: KeyboardOptions,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        label = {
+            Text(
+                stringResource(label),
+                color = BrownDefault,
+                fontWeight = FontWeight.Bold)
+        },
+        value = value,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = OrangeLight,  // Màu nền khi focus
+            unfocusedContainerColor = OrangeLight, // Màu nền khi không focus
+            focusedIndicatorColor = BrownDefault,  // Màu viền khi focus
+            unfocusedIndicatorColor = BrownDefault,  // Màu viền khi không focus
+            focusedTextColor = BrownDefault,       // Màu chữ khi focus
+            unfocusedTextColor = BrownDefault,      // Màu chữ khi không focus
+            cursorColor = BrownDefault             // Màu con trỏ nhập liệu
+        ),
+        shape = RoundedCornerShape(20.dp),
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        singleLine = true,
+        modifier = modifier,
+    )
+}
+@Composable
+fun PasswordField(
+    @StringRes label: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            Text(
+                text = stringResource(label),
+                color = BrownDefault,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = OrangeLight,
+            unfocusedContainerColor = OrangeLight,
+            focusedIndicatorColor = BrownDefault,
+            unfocusedIndicatorColor = BrownDefault,
+            focusedTextColor = BrownDefault,
+            unfocusedTextColor = BrownDefault,
+            cursorColor = BrownDefault
+        ),
+        shape = RoundedCornerShape(20.dp),
+        singleLine = true,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(
+                    painter = if (passwordVisible) painterResource(R.drawable.eye_outline) else painterResource(
+                        R.drawable.eye_off_outline),
+                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                    tint = BrownDefault
+                )
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction =  ImeAction.Done),
+        modifier = modifier
+    )
+}

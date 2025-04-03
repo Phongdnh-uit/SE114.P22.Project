@@ -1,36 +1,23 @@
 package com.example.mam
 
-import android.graphics.BlurMaskFilter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -49,7 +35,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mam.ui.theme.*
+import com.example.mam.ui.component.EditField
+import com.example.mam.ui.component.InnerShadowFilledButton
+import com.example.mam.ui.component.PasswordField
+import com.example.mam.ui.component.UnderlinedClickableText
+import com.example.mam.ui.component.outerShadow
+import com.example.mam.ui.theme.BlackDefault
+import com.example.mam.ui.theme.MAMTheme
+import com.example.mam.ui.theme.OrangeDefault
+import com.example.mam.ui.theme.OrangeLight
+import com.example.mam.ui.theme.Variables
+import com.example.mam.ui.theme.WhiteDefault
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,9 +117,10 @@ fun SignInScreen(modifier: Modifier = Modifier) {
         ) {
             Spacer(Modifier.height(10.dp))
             Column(
+                verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
+                horizontalAlignment = Alignment.Start,
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight()
+                    .fillMaxWidth(0.7f)
             ) {
                 EditField(
                     label = R.string.so_dien_thoai,
@@ -133,19 +130,34 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                         imeAction = ImeAction.Next
                     ),
                     onValueChange = { sdtInput = it },
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth()
                 )
                 PasswordField(
                     label = R.string.mat_khau,
                     value = mkInput,
                     onValueChange = { mkInput = it },
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth()
                 )
                 UnderlinedClickableText(
-                    text = "Đổi mật khẩu",
+                    text = "Quên mật khẩu",
                     targetActivity = MainActivity::class.java,
-
+                    modifier = Modifier.fillMaxWidth()
                     )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .wrapContentHeight()
+            ){
+                InnerShadowFilledButton(
+                    text = "Đăng nhập",
+                    onClick = {
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(50.dp)
+                )
             }
             Spacer(Modifier.height(10.dp))
         }
