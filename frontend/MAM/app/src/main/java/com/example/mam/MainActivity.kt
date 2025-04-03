@@ -35,12 +35,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.mam.ui.component.BasicOutlinedButton
 import com.example.mam.ui.component.EditField
 import com.example.mam.ui.component.InnerShadowFilledButton
 import com.example.mam.ui.component.PasswordField
 import com.example.mam.ui.component.UnderlinedClickableText
+import com.example.mam.ui.component.innerShadow
 import com.example.mam.ui.component.outerShadow
 import com.example.mam.ui.theme.BlackDefault
+import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
@@ -96,12 +99,11 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .outerShadow(
-                    color = BlackDefault,
+                    color = GreyDark,
                     bordersRadius = 50.dp,
-                    blurRadius = 10.dp,
+                    blurRadius = 4.dp,
                     offsetX = 0.dp,
-                    offsetY = (-2).dp,
-                    spread = 0.dp,
+                    offsetY = -4.dp,
                 )
                 .fillMaxWidth()
                 .height(330.dp)
@@ -120,7 +122,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(0.8f)
             ) {
                 EditField(
                     label = R.string.so_dien_thoai,
@@ -146,19 +148,33 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(0.8f)
                     .wrapContentHeight()
             ){
+                BasicOutlinedButton(
+                    text = "Đăng ký",
+                    onClick = {
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.3f)
+                        .height(40.dp)
+                )
                 InnerShadowFilledButton(
                     text = "Đăng nhập",
                     onClick = {
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(50.dp)
+                        .fillMaxWidth(0.9f)
+                        .height(40.dp)
                 )
             }
+            UnderlinedClickableText(
+                text = "Điều khoản và Chính sách",
+                targetActivity = MainActivity::class.java,
+                modifier = Modifier
+            )
             Spacer(Modifier.height(10.dp))
         }
     }

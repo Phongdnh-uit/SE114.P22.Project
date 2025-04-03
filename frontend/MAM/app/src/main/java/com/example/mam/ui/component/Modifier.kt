@@ -69,12 +69,12 @@ fun Modifier.innerShadow(
     drawContent()
 
     val rect = Rect(Offset.Zero, size)
-    val paint = Paint()
+    val paint = Paint().apply {
+        this.color = color.copy(alpha = 0.7f)
+        isAntiAlias = true }
 
     drawIntoCanvas {
 
-        paint.color = color.copy(alpha = 0.7f)
-        paint.isAntiAlias = true
         it.saveLayer(rect, paint)
         it.drawRoundRect(
             left = rect.left,
