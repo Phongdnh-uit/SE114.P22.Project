@@ -1,4 +1,4 @@
-package com.example.mam.ui.component
+package com.example.mam.Screen.component
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
