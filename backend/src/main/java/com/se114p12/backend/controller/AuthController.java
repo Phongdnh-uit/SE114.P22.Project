@@ -7,6 +7,7 @@ import com.se114p12.backend.util.JwtUtil;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,17 +21,12 @@ import java.util.Map;
 @Tag(name = "Auth Module")
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtUtil jwtUtil;
-
-    public AuthController(UserService userService, AuthenticationManagerBuilder authenticationManagerBuilder, JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.jwtUtil = jwtUtil;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {

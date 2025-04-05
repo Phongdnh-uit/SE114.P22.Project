@@ -7,6 +7,7 @@ import com.se114p12.backend.vo.PageVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Product Category Module")
 @RequestMapping("/api/v1/product-categories")
 @RestController
+@RequiredArgsConstructor
 public class ProductCategoryController {
-
     private final ProductCategoryService productCategoryService;
-
-    public ProductCategoryController(ProductCategoryService productCategoryService) {
-        this.productCategoryService = productCategoryService;
-    }
 
     @GetMapping
     public ResponseEntity<PageVO<?>> getAllProductCategories(

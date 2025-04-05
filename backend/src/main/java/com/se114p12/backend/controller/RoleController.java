@@ -6,6 +6,7 @@ import com.se114p12.backend.service.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,9 @@ import java.util.List;
 @Tag(name = "Role Module")
 @RestController
 @RequestMapping("/api/v1/roles")
+@RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
-
-    public RoleController(RoleService roleService) { this.roleService = roleService; }
 
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles(@ParameterObject Pageable pageable) {

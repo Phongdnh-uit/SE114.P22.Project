@@ -3,6 +3,7 @@ package com.se114p12.backend.controller;
 import com.se114p12.backend.domain.ProductItem;
 import com.se114p12.backend.service.ProductItemService;
 import com.se114p12.backend.vo.PageVO;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@Tag(name = "Product Item Module")
 @RestController
 @RequestMapping("/api/v1/product-items")
 @RequiredArgsConstructor
