@@ -38,4 +38,4 @@ out/
 
 
 ### .env ###
-application-*.properties
+application-dev.properties
