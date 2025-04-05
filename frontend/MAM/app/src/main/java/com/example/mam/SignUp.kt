@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.ui.component.EditField
+import com.example.mam.ui.component.EditFieldType1
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
@@ -120,17 +121,8 @@ fun SignUpScreen(){
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Họ và tên",
-                    style = TextStyle(
-                        fontSize = Variables.BodySizeMedium,
-                        lineHeight = 22.4.sp,
-                        fontWeight = FontWeight(Variables.BodyFontWeightRegular),
-                        color = BrownDefault,
-                    )
-                )
-                EditField(
-                    label = R.string.ho_ten,
+                EditFieldType1(
+                    label = "Họ tên",
                     value = hotenInput,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(

@@ -2,7 +2,9 @@ package com.example.mam.ui.component
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -96,6 +98,7 @@ fun EditFieldType1(
             ),
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = value,
             colors = TextFieldDefaults.colors(
@@ -111,7 +114,9 @@ fun EditFieldType1(
             onValueChange = onValueChange,
             keyboardOptions = keyboardOptions,
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
         )
     }
 }
