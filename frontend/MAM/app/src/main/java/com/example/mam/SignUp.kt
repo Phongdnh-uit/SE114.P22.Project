@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -119,11 +120,59 @@ fun SignUpScreen(){
                 .padding(start = 40.dp, top = 40.dp, end = 40.dp, bottom = 40.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 EditFieldType1(
                     label = "Họ tên",
                     value = hotenInput,
+                    backgroundColor = WhiteDefault,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    radius = 8.dp,
+                    onValueChange = { hotenInput = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                EditFieldType1(
+                    label = "Số điện thoại",
+                    value = sdtInput,
+                    backgroundColor = WhiteDefault,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    radius = 8.dp,
+                    onValueChange = { hotenInput = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                EditFieldType1(
+                    label = "Email",
+                    value = emailInput,
+                    backgroundColor = WhiteDefault,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    radius = 8.dp,
+                    onValueChange = { hotenInput = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                EditFieldType1(
+                    label = "Tên người dùng",
+                    value = tenUserInput,
+                    backgroundColor = WhiteDefault,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    radius = 8.dp,
+                    onValueChange = { hotenInput = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                EditFieldType1(
+                    label = "Mật khẩu",
+                    value = Input,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
