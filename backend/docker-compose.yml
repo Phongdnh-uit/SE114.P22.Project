@@ -1,6 +1,6 @@
 version: '3.8'
 
-services: 
+services:
   db:
     image: mysql:8
     container_name: mysql-db
@@ -18,8 +18,8 @@ services:
   api:
     build: .
     container_name: mobile_api
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mobile-be?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
@@ -29,7 +29,20 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - /home/dang-phong/Desktop/MyProject/storage:/app/uploads
+      - /home/phongdev/app/storage:/app/uploads
+    networks:
+      - app_network
+
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-reverse
+    ports:
+      - "80:80"
+    volumes:
+      - /home/phongdev/app/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
     networks:
       - app_network
 
