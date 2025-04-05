@@ -36,9 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mam.ui.component.BasicOutlinedButton
+import com.example.mam.ui.component.CircleIconButton
 import com.example.mam.ui.component.EditField
 import com.example.mam.ui.component.InnerShadowFilledButton
 import com.example.mam.ui.component.PasswordField
+import com.example.mam.ui.component.QuantitySelectionButton
 import com.example.mam.ui.component.UnderlinedClickableText
 import com.example.mam.ui.component.innerShadow
 import com.example.mam.ui.component.outerShadow
@@ -47,6 +49,7 @@ import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
+import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 
@@ -70,6 +73,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
     val sdt = sdtInput
     var mkInput by remember { mutableStateOf("") }
     val mk = mkInput
+    var so by remember { mutableStateOf(0) }
 
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -108,7 +112,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .height(330.dp)
                 .background(
-                    color = OrangeLight,
+                    color = OrangeLighter,
                     shape = RoundedCornerShape(
                         topStart = 50.dp,
                         topEnd = 50.dp,
@@ -175,6 +179,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 targetActivity = MainActivity::class.java,
                 modifier = Modifier
             )
+            QuantitySelectionButton(count = so, onValueChange = {so = it})
             Spacer(Modifier.height(10.dp))
         }
     }

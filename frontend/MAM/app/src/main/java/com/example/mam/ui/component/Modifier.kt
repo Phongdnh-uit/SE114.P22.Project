@@ -12,17 +12,20 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mam.ui.theme.BlackDefault
+import com.example.mam.ui.theme.GreyDark
+import com.example.mam.ui.theme.GreyDefault
 
 @Composable
 fun Modifier.outerShadow(
-    color: Color = Color.Black,
-    bordersRadius: Dp = 0.dp,
-    blurRadius: Dp = 0.dp,
-    offsetY: Dp = 0.dp,
+    color: Color = GreyDark,
+    bordersRadius: Dp = 25.dp,
+    blurRadius: Dp = 4.dp,
+    offsetY: Dp = 4.dp,
     offsetX: Dp = 0.dp,
     spread: Dp = 0f.dp,
     modifier: Modifier = Modifier
@@ -58,10 +61,10 @@ fun Modifier.outerShadow(
 
 @Composable
 fun Modifier.innerShadow(
-    color: Color = BlackDefault,
-    bordersRadius: Dp = 0.dp,
-    blurRadius: Dp = 0.dp,
-    offsetY: Dp = 0.dp,
+    color: Color = GreyDark,
+    bordersRadius: Dp = 25.dp,
+    blurRadius: Dp = 4.dp,
+    offsetY: Dp = 4.dp,
     offsetX: Dp = 0.dp,
     spread: Dp = 0.dp
 ) = drawWithContent {

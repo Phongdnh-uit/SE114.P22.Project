@@ -43,8 +43,8 @@ fun EditField(
         },
         value = value,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = OrangeLight,  // Màu nền khi focus
-            unfocusedContainerColor = OrangeLight, // Màu nền khi không focus
+            focusedContainerColor = OrangeLight.copy(alpha = 0f),  // Màu nền khi focus
+            unfocusedContainerColor = OrangeLight.copy(alpha = 0f), // Màu nền khi không focus
             focusedIndicatorColor = BrownDefault,  // Màu viền khi focus
             unfocusedIndicatorColor = BrownDefault,  // Màu viền khi không focus
             focusedTextColor = BrownDefault,       // Màu chữ khi focus
@@ -77,8 +77,8 @@ fun PasswordField(
             )
         },
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = OrangeLight,
-            unfocusedContainerColor = OrangeLight,
+            focusedContainerColor = OrangeLight.copy(alpha = 0f),
+            unfocusedContainerColor = OrangeLight.copy(alpha = 0f),
             focusedIndicatorColor = BrownDefault,
             unfocusedIndicatorColor = BrownDefault,
             focusedTextColor = BrownDefault,
@@ -91,8 +91,8 @@ fun PasswordField(
         trailingIcon = {
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                 Icon(
-                    painter = if (passwordVisible) painterResource(R.drawable.eye_outline) else painterResource(
-                        R.drawable.eye_off_outline),
+                    painter = if (passwordVisible) painterResource(R.drawable.ic_eye_outline) else painterResource(
+                        R.drawable.ic_eye_off_outline),
                     contentDescription = if (passwordVisible) "Hide password" else "Show password",
                     tint = BrownDefault
                 )
