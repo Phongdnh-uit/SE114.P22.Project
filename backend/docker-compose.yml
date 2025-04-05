@@ -4,7 +4,6 @@ services:
   db:
     image: mysql:8
     container_name: mysql-db
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mobile-be
@@ -19,16 +18,18 @@ services:
   api:
     build: .
     container_name: mobile_api
-    restart: always
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mobile-be?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      FILE_UPLOAD_DIR: /app/uploads
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - /home/dang-phong/Desktop/MyProject/storage:/app/uploads
     networks:
       - app_network
 
