@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,13 +22,53 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mam.R
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
+import com.example.mam.ui.theme.OrangeLighter
 
 @Composable
 fun EditField(
+    @StringRes label: Int,
+    value: String,
+    backgroundColor: Color = OrangeLighter.copy(alpha = 0f),
+    foregroundColor: Color = BrownDefault,
+    textColor: Color = BrownDefault,
+    radius: Dp = 20.dp,
+    keyboardOptions: KeyboardOptions,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        label = {
+            Text(
+                stringResource(label),
+                color = textColor,
+                fontWeight = FontWeight.Bold)
+        },
+        value = value,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = backgroundColor,  // Màu nền khi focus
+            unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
+            focusedIndicatorColor = foregroundColor,  // Màu viền khi focus
+            unfocusedIndicatorColor = foregroundColor,  // Màu viền khi không focus
+            focusedTextColor = textColor,       // Màu chữ khi focus
+            unfocusedTextColor = textColor,      // Màu chữ khi không focus
+            cursorColor = textColor             // Màu con trỏ nhập liệu
+        ),
+        shape = RoundedCornerShape(radius),
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        singleLine = true,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun AnotherInputField(
     @StringRes label: Int,
     value: String,
     keyboardOptions: KeyboardOptions,
@@ -43,8 +84,8 @@ fun EditField(
         },
         value = value,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = OrangeLight,  // Màu nền khi focus
-            unfocusedContainerColor = OrangeLight, // Màu nền khi không focus
+            focusedContainerColor = OrangeLight.copy(alpha = 0f),  // Màu nền khi focus
+            unfocusedContainerColor = OrangeLight.copy(alpha = 0f), // Màu nền khi không focus
             focusedIndicatorColor = BrownDefault,  // Màu viền khi focus
             unfocusedIndicatorColor = BrownDefault,  // Màu viền khi không focus
             focusedTextColor = BrownDefault,       // Màu chữ khi focus
@@ -58,6 +99,7 @@ fun EditField(
         modifier = modifier,
     )
 }
+
 @Composable
 fun PasswordField(
     @StringRes label: Int,
