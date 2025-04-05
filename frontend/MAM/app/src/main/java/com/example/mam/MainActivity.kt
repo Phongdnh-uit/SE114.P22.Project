@@ -35,15 +35,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mam.ui.component.BasicOutlinedButton
-import com.example.mam.ui.component.CircleIconButton
-import com.example.mam.ui.component.EditField
-import com.example.mam.ui.component.InnerShadowFilledButton
-import com.example.mam.ui.component.PasswordField
-import com.example.mam.ui.component.QuantitySelectionButton
-import com.example.mam.ui.component.UnderlinedClickableText
-import com.example.mam.ui.component.innerShadow
-import com.example.mam.ui.component.outerShadow
+import com.example.mam.Screen.component.BasicOutlinedButton
+import com.example.mam.Screen.component.CircleIconButton
+import com.example.mam.Screen.component.EditField
+import com.example.mam.Screen.component.InnerShadowFilledButton
+import com.example.mam.Screen.component.PasswordField
+import com.example.mam.Screen.component.QuantitySelectionButton
+import com.example.mam.Screen.component.UnderlinedClickableText
+import com.example.mam.Screen.component.innerShadow
+import com.example.mam.Screen.component.outerShadow
 import com.example.mam.ui.theme.BlackDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
@@ -60,133 +60,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             MAMTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SignInScreen()
+
                 }
             }
         }
     }
 }
 
-@Composable
-fun SignInScreen(modifier: Modifier = Modifier) {
-    var sdtInput by remember { mutableStateOf("") }
-    val sdt = sdtInput
-    var mkInput by remember { mutableStateOf("") }
-    val mk = mkInput
-    var so by remember { mutableStateOf(0) }
-
-    Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = OrangeDefault)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.mam_ffffff),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Text(
-            text = stringResource(R.string.dang_nhap),
-            style = TextStyle(
-                fontSize = Variables.HeadlineMediumSize,
-                lineHeight = Variables.HeadlineMediumLineHeight,
-                fontWeight = FontWeight(700),
-                color = WhiteDefault,
-                textAlign = TextAlign.Center,
-            )
-        )
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .outerShadow(
-                    color = GreyDark,
-                    bordersRadius = 50.dp,
-                    blurRadius = 4.dp,
-                    offsetX = 0.dp,
-                    offsetY = -4.dp,
-                )
-                .fillMaxWidth()
-                .height(330.dp)
-                .background(
-                    color = OrangeLighter,
-                    shape = RoundedCornerShape(
-                        topStart = 50.dp,
-                        topEnd = 50.dp,
-                        bottomStart = 0.dp,
-                        bottomEnd = 0.dp
-                    )
-                )
-        ) {
-            Spacer(Modifier.height(10.dp))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-            ) {
-                EditField(
-                    label = "Số điện thoại",
-                    value = sdtInput,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    onValueChange = { sdtInput = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                PasswordField(
-                    label = "Mật khẩu",
-                    value = mkInput,
-                    onValueChange = { mkInput = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                UnderlinedClickableText(
-                    text = "Quên mật khẩu",
-                    targetActivity = MainActivity::class.java,
-                    modifier = Modifier.fillMaxWidth()
-                    )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .wrapContentHeight()
-            ){
-                BasicOutlinedButton(
-                    text = "Đăng ký",
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .height(40.dp)
-                )
-                InnerShadowFilledButton(
-                    text = "Đăng nhập",
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(40.dp)
-                )
-            }
-            UnderlinedClickableText(
-                text = "Điều khoản và Chính sách",
-                targetActivity = MainActivity::class.java,
-                modifier = Modifier
-            )
-            QuantitySelectionButton(count = so, onValueChange = {so = it})
-            Spacer(Modifier.height(10.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-        SignInScreen()
-}

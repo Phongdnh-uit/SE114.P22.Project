@@ -37,8 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mam.ui.component.EditField
-import com.example.mam.ui.component.EditFieldType1
+import com.example.mam.Screen.component.EditField
+import com.example.mam.Screen.component.EditFieldType1
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme

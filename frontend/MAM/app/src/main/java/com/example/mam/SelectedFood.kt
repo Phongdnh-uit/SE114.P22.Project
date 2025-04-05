@@ -27,7 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mam.ui.component.outerShadow
+import com.example.mam.Screen.component.outerShadow
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
 import com.example.mam.ui.theme.OrangeDefault
