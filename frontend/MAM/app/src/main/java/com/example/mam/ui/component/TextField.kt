@@ -1,6 +1,8 @@
 package com.example.mam.ui.component
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -17,11 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mam.R
@@ -29,10 +33,12 @@ import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
+import com.example.mam.ui.theme.Variables
+import com.example.mam.ui.theme.WhiteDefault
 
 @Composable
 fun EditField(
-    @StringRes label: Int,
+    label: String,
     value: String,
     backgroundColor: Color = OrangeLighter.copy(alpha = 0f),
     foregroundColor: Color = BrownDefault,
@@ -45,7 +51,7 @@ fun EditField(
     OutlinedTextField(
         label = {
             Text(
-                stringResource(label),
+                label,
                 color = textColor,
                 fontWeight = FontWeight.Bold)
         },
@@ -68,41 +74,51 @@ fun EditField(
 }
 
 @Composable
-fun AnotherInputField(
-    @StringRes label: Int,
+fun EditFieldType1(
+    label: String,
     value: String,
+    backgroundColor: Color = WhiteDefault,
+    foregroundColor: Color = BrownDefault,
+    textColor: Color = BrownDefault,
+    radius: Dp = 8.dp,
     keyboardOptions: KeyboardOptions,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        label = {
-            Text(
-                stringResource(label),
-                color = BrownDefault,
-                fontWeight = FontWeight.Bold)
-        },
-        value = value,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = OrangeLight.copy(alpha = 0f),  // Màu nền khi focus
-            unfocusedContainerColor = OrangeLight.copy(alpha = 0f), // Màu nền khi không focus
-            focusedIndicatorColor = BrownDefault,  // Màu viền khi focus
-            unfocusedIndicatorColor = BrownDefault,  // Màu viền khi không focus
-            focusedTextColor = BrownDefault,       // Màu chữ khi focus
-            unfocusedTextColor = BrownDefault,      // Màu chữ khi không focus
-            cursorColor = BrownDefault             // Màu con trỏ nhập liệu
-        ),
-        shape = RoundedCornerShape(20.dp),
-        onValueChange = onValueChange,
-        keyboardOptions = keyboardOptions,
-        singleLine = true,
-        modifier = modifier,
-    )
+    Column(modifier = modifier){
+        Text(
+            label,
+            style = TextStyle(
+                fontSize = Variables.BodySizeMedium,
+                fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                color = textColor,
+                textAlign = TextAlign.Start
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = value,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = backgroundColor,  // Màu nền khi focus
+                unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
+                focusedIndicatorColor = foregroundColor,  // Màu viền khi focus
+                unfocusedIndicatorColor = foregroundColor,  // Màu viền khi không focus
+                focusedTextColor = textColor,       // Màu chữ khi focus
+                unfocusedTextColor = textColor,      // Màu chữ khi không focus
+                cursorColor = textColor             // Màu con trỏ nhập liệu
+            ),
+            shape = RoundedCornerShape(radius),
+            onValueChange = onValueChange,
+            keyboardOptions = keyboardOptions,
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @Composable
 fun PasswordField(
-    @StringRes label: Int,
+    label: String,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -113,7 +129,7 @@ fun PasswordField(
         onValueChange = onValueChange,
         label = {
             Text(
-                text = stringResource(label),
+                text = label,
                 color = BrownDefault,
                 fontWeight = FontWeight.Bold
             )

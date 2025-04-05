@@ -129,7 +129,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.8f)
             ) {
                 EditField(
-                    label = R.string.so_dien_thoai,
+                    label = "Số điện thoại",
                     value = sdtInput,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
@@ -139,7 +139,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordField(
-                    label = R.string.mat_khau,
+                    label = "Mật khẩu",
                     value = mkInput,
                     onValueChange = { mkInput = it },
                     modifier = Modifier.fillMaxWidth()
