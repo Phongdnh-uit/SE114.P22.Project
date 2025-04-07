@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="orange_default">#FC5835</color>
+    <color name="orange_lighter">#FEF4E5</color>
+    <color name="white_default">#FFFFFF</color>
+    <color name="black_default">#1E1E1E</color>
+    <color name="grey_default">#ECECEC</color>
+    <color name="brown_dark">#1C0905</color>
+    <color name="purple_dark">#2E4058</color>
+    <color name="orange_light">#FFE4BC</color>
+    <color name="brown_default">#952B14</color>
+    <color name="brown_light">#EFB7AA</color>
+    <color name="momo">#D82D8B</color>
+</resources>
