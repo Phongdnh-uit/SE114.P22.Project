@@ -1,12 +1,15 @@
 package com.se114p12.backend.controller;
 
 import com.se114p12.backend.domain.ProductItem;
+import com.se114p12.backend.dto.request.ProductItemRequestDTO;
 import com.se114p12.backend.service.ProductItemService;
 import com.se114p12.backend.vo.PageVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -30,22 +33,15 @@ public class ProductItemController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<ProductItem> createProductItem(@RequestBody ProductItemRequest request) {
-        ProductItem createdItem = productItemService.createProductItem(request.getProductItem(), request.getVariationOptionIds());
-        return ResponseEntity.ok(createdItem);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductItem> createProductItem(@Valid @ModelAttribute ProductItemRequestDTO dto) {
+        ProductItem created = productItemService.createProductItem(dto);
+        return ResponseEntity.ok(created);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductItem(@PathVariable("id") Long id) {
         productItemService.deleteProductItem(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // DTO để nhận dữ liệu từ request
-    @Data
-    public static class ProductItemRequest {
-        private ProductItem productItem;
-        private List<Long> variationOptionIds;
     }
 }

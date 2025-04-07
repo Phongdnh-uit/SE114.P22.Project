@@ -1,6 +1,8 @@
 package com.se114p12.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -31,5 +33,6 @@ public class ProductItem {
             joinColumns = @JoinColumn(name = "product_item_id"),
             inverseJoinColumns = @JoinColumn(name = "variation_option_id")
     )
+    @JsonIgnore
     private List<VariationOption> variationOptions;
 }
