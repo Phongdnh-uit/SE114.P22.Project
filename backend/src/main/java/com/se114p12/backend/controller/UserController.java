@@ -6,6 +6,7 @@ import com.se114p12.backend.vo.PageVO;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,9 @@ import java.util.List;
 @Tag(name = "User Module")
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
-
-    public UserController(UserService userService) { this.userService = userService; }
 
     @GetMapping
     public ResponseEntity<PageVO<?>> getAllUsers(@ParameterObject Pageable pageable) {

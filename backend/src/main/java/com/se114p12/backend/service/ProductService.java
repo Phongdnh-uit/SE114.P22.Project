@@ -3,11 +3,13 @@ package com.se114p12.backend.service;
 import com.se114p12.backend.domain.Product;
 import com.se114p12.backend.domain.ProductCategory;
 import com.se114p12.backend.repository.ProductRepository;
+import com.se114p12.backend.vo.PageVO;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -17,6 +19,18 @@ public class ProductService {
     public ProductService(ProductRepository productRepository, ProductCategoryService productCategoryService) {
         this.productRepository = productRepository;
         this.productCategoryService = productCategoryService;
+    }
+
+    public PageVO<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
+        Page<Product> productPage = productRepository.findByCategory_Id(categoryId, pageable);
+        return PageVO.<Product>builder()
+                .content(productPage.getContent())
+                .page(productPage.getNumber())
+                .size(productPage.getSize())
+                .totalElements(productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .numberOfElements(productPage.getNumberOfElements())
+                .build();
     }
 
     public Product create(Product product) {

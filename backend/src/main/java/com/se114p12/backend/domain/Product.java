@@ -15,7 +15,8 @@ import java.time.Instant;
 import java.util.List;
 
 @Data
-@Entity(name = "products")
+@Entity
+@Table(name = "products")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

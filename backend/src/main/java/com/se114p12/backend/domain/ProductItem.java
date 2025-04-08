@@ -1,6 +1,8 @@
 package com.se114p12.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -25,6 +27,12 @@ public class ProductItem {
     @Column(length = 500)
     private String imageUrl;
 
-    @OneToMany(mappedBy = "productItem", cascade = CascadeType.ALL)
-    private List<ProductConfiguration> configurations;
+    @ManyToMany
+    @JoinTable(
+            name = "product_item_variation_option",
+            joinColumns = @JoinColumn(name = "product_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "variation_option_id")
+    )
+    @JsonIgnore
+    private List<VariationOption> variationOptions;
 }
