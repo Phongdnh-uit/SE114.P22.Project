@@ -6,9 +6,9 @@ import com.se114p12.backend.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
+import lombok.Data;
 
 @Data
 @Entity
@@ -24,6 +24,7 @@ public class User {
     private String fullname;
 
     @NotBlank
+    @Pattern(regexp = "^[a-zA-Z]+\\d*$", message = "Username must contains letters and numbers and must begin with a letter")
     @Column(unique = true)
     private String username;
 
@@ -52,7 +53,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String updatedBy;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private String refreshToken;
 
     @JsonIgnore
