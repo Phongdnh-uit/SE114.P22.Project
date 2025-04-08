@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DisplayMode.Companion.Input
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.Screen.component.EditField
 import com.example.mam.Screen.component.EditFieldType1
+import com.example.mam.Screen.component.OuterShadowFilledButton
+import com.example.mam.Screen.component.UnderlinedClickableText
+import com.example.mam.Screen.component.outerShadow
+import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.MAMTheme
@@ -89,6 +96,8 @@ fun SignUpScreen(){
     ) {
         Text(
             text = stringResource(R.string.dang_ky),
+            modifier = Modifier
+                .padding(top = 20.dp),
             style = TextStyle(
                 fontSize = Variables.HeadlineMediumSize,
                 lineHeight = Variables.HeadlineMediumLineHeight,
@@ -107,6 +116,13 @@ fun SignUpScreen(){
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .width(390.dp)
+                .outerShadow(
+                    color = GreyDark,
+                    bordersRadius = 50.dp,
+                    blurRadius = 5.dp,
+                    offsetX = 0.dp,
+                    offsetY = -4.dp,
+                )
                 .height(774.dp)
                 .background(
                     color = OrangeLighter,
@@ -120,6 +136,7 @@ fun SignUpScreen(){
                 .padding(start = 40.dp, top = 40.dp, end = 40.dp, bottom = 40.dp)
         ) {
             Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 EditFieldType1(
@@ -172,7 +189,7 @@ fun SignUpScreen(){
                 )
                 EditFieldType1(
                     label = "Mật khẩu",
-                    value = Input,
+                    value = mkInput,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
@@ -182,6 +199,49 @@ fun SignUpScreen(){
                     onValueChange = { hotenInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
+                EditFieldType1(
+                    label = "Xác nhận mật khẩu",
+                    value = mkNhapLaiInput,
+                    backgroundColor = WhiteDefault,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    radius = 8.dp,
+                    onValueChange = { hotenInput = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+            }
+            Column (
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OuterShadowFilledButton(
+                    text = "Đăng Ký",
+                    blurRadius = 0.dp,
+                    offsetX = 5.dp,
+                    offsetY = 4.dp,
+                    spread = 0.dp,
+                    onClick = { },
+                    modifier = Modifier
+                        .width(182.dp)
+                        .height(40.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = "Bạn đã có tài khoản?",
+                        color = BrownDark,
+                    )
+                    UnderlinedClickableText(
+                        text = "Đăng nhập ngay",
+                        color = OrangeDefault,
+                        targetActivity = MainActivity::class.java,
+                        modifier = Modifier
+                    )
+                }
             }
         }
     }
