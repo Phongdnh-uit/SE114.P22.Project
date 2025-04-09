@@ -46,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.R
@@ -60,13 +62,14 @@ import com.example.mam.ui.theme.WhiteDefault
 @Composable
 fun UnderlinedClickableText(
     text: String,
+    color: Color = BrownDefault,
     targetActivity: Class<out ComponentActivity>,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     val annotatedText = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = BrownDefault, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)) {
+        withStyle(style = SpanStyle(color = color, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)) {
             append(text)
         }
     }
@@ -127,7 +130,14 @@ fun InnerShadowFilledButton(
 @Composable
 fun OuterShadowFilledButton(
     text: String,
-    icon: ImageVector?= null,
+    fontSize: TextUnit = 16.sp,
+    borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
+    shadowColor: Color = BrownDark,
+    blurRadius: Dp = 4.dp,
+    offsetX: Dp = 0.dp,
+    offsetY: Dp = 4.dp,
+    spread: Dp = 0.dp,
+    @DrawableRes icon: Int?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
@@ -135,15 +145,16 @@ fun OuterShadowFilledButton(
     val isPressed = interactionSource.collectIsPressedAsState().value
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
+        border = borderStroke,
         onClick = onClick,
         modifier = modifier.then(
             if (!isPressed) Modifier.outerShadow(
-                color = GreyDark,
+                color = shadowColor,
                 bordersRadius = 25.dp,
-                blurRadius = 4.dp,
-                offsetX = 0.dp,
-                offsetY = (4).dp,
-                spread = 0.dp,
+                blurRadius = blurRadius,
+                offsetX = offsetX,
+                offsetY = offsetY,
+                spread = spread,
             ) else Modifier
         ),
         interactionSource = interactionSource,
@@ -159,6 +170,7 @@ fun OuterShadowFilledButton(
         }
         Text(
             text = text,
+            fontSize = fontSize,
             color = WhiteDefault
         )
     }
@@ -291,8 +303,6 @@ fun QuantitySelectionButton(
                         .defaultMinSize(minWidth = 30.dp)
                 )
             }
-
-
             // Nút Tăng (+)
             CircleIconButton(
                 icon = Icons.Filled.Add, // Thay bằng icon phù hợp

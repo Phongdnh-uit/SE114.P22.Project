@@ -130,6 +130,58 @@ fun EditFieldType1(
 }
 
 @Composable
+fun PasswordField1(
+    label: String,
+    value: String,
+    backgroundColor: Color = WhiteDefault,
+    foregroundColor: Color = BrownDefault,
+    textColor: Color = BrownDefault,
+    radius: Dp = 8.dp,
+    keyboardOptions: KeyboardOptions,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            Text(
+                text = label,
+                color = BrownDefault,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = backgroundColor,
+            unfocusedContainerColor = backgroundColor,
+            focusedIndicatorColor = foregroundColor,
+            unfocusedIndicatorColor = foregroundColor,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor,
+            cursorColor = textColor
+        ),
+        shape = RoundedCornerShape(radius),
+        singleLine = true,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(
+                    painter = if (passwordVisible) painterResource(R.drawable.ic_eye_outline) else painterResource(
+                        R.drawable.ic_eye_off_outline),
+                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                    tint = BrownDefault
+                )
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction =  ImeAction.Done),
+        modifier = modifier
+    )
+}
+
+@Composable
 fun PasswordField(
     label: String,
     value: String,
