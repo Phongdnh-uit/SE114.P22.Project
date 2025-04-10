@@ -167,8 +167,7 @@ fun PasswordField1(
         trailingIcon = {
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                 Icon(
-                    painter = if (passwordVisible) painterResource(R.drawable.ic_eye_outline) else painterResource(
-                        R.drawable.ic_eye_off_outline),
+                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                     contentDescription = if (passwordVisible) "Hide password" else "Show password",
                     tint = BrownDefault
                 )

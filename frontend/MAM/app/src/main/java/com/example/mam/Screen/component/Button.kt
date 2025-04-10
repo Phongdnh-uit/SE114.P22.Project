@@ -137,7 +137,7 @@ fun OuterShadowFilledButton(
     offsetX: Dp = 0.dp,
     offsetY: Dp = 4.dp,
     spread: Dp = 0.dp,
-    @DrawableRes icon: Int?= null,
+    icon: ImageVector ?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
