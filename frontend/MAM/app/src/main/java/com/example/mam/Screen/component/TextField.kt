@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.BrownDefaults
 import com.example.mam.ui.theme.Transparent
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
