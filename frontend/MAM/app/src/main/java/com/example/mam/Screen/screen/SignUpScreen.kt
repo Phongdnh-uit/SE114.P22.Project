@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
@@ -108,11 +110,13 @@ fun SignUpScreen(){
                         bottomEnd = 0.dp
                     )
                 )
-                .padding(40.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(top = 10.dp)
+                    .wrapContentHeight(),
             ) {
                 EditFieldType1(
                     label = "Họ tên",
@@ -161,6 +165,7 @@ fun SignUpScreen(){
                 PasswordFieldType1(
                     label = "Mật khẩu",
                     value = mkInput,
+                    subLabel = "Mật khẩu có ít nhất 6 chữ số",
                     backgroundColor = WhiteDefault,
                     onValueChange = { mkInput = it },
                     modifier = Modifier.fillMaxWidth()
@@ -168,6 +173,7 @@ fun SignUpScreen(){
                 PasswordFieldType1(
                     label = "Xác nhận mật khẩu",
                     value = mkNhapLaiInput,
+                    errorLabel = "Mật khẩu chưa đúng!",
                     backgroundColor = WhiteDefault,
                     imeAction = ImeAction.Done,
                     onValueChange = { mkNhapLaiInput = it },
