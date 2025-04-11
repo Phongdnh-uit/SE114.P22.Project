@@ -20,9 +20,14 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -40,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.R
@@ -54,13 +62,14 @@ import com.example.mam.ui.theme.WhiteDefault
 @Composable
 fun UnderlinedClickableText(
     text: String,
+    color: Color = BrownDefault,
     targetActivity: Class<out ComponentActivity>,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     val annotatedText = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = BrownDefault, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)) {
+        withStyle(style = SpanStyle(color = color, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)) {
             append(text)
         }
     }
@@ -78,7 +87,7 @@ fun UnderlinedClickableText(
 @Composable
 fun InnerShadowFilledButton(
     text: String,
-    @DrawableRes icon: Int?= null,
+    icon: ImageVector?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
@@ -105,7 +114,7 @@ fun InnerShadowFilledButton(
     ){
         icon?.let {
             Icon(
-                painter = painterResource(id = icon),
+                imageVector = icon,
                 contentDescription = null,
                 tint = WhiteDefault,
                 modifier = Modifier.size(30.dp).padding(end = 8.dp)
@@ -121,7 +130,14 @@ fun InnerShadowFilledButton(
 @Composable
 fun OuterShadowFilledButton(
     text: String,
-    @DrawableRes icon: Int?= null,
+    fontSize: TextUnit = 16.sp,
+    //borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
+    shadowColor: Color = BrownDark,
+    blurRadius: Dp = 4.dp,
+    offsetX: Dp = 0.dp,
+    offsetY: Dp = 4.dp,
+    spread: Dp = 0.dp,
+    icon: ImageVector ?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
@@ -129,15 +145,16 @@ fun OuterShadowFilledButton(
     val isPressed = interactionSource.collectIsPressedAsState().value
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
+        //border = borderStroke,
         onClick = onClick,
         modifier = modifier.then(
             if (!isPressed) Modifier.outerShadow(
-                color = GreyDark,
+                color = shadowColor,
                 bordersRadius = 25.dp,
-                blurRadius = 4.dp,
-                offsetX = 0.dp,
-                offsetY = (4).dp,
-                spread = 0.dp,
+                blurRadius = blurRadius,
+                offsetX = offsetX,
+                offsetY = offsetY,
+                spread = spread,
             ) else Modifier
         ),
         interactionSource = interactionSource,
@@ -145,7 +162,7 @@ fun OuterShadowFilledButton(
     ){
         icon?.let {
             Icon(
-                painter = painterResource(id = icon),
+                imageVector = icon,
                 contentDescription = null,
                 tint = WhiteDefault,
                 modifier = Modifier.size(30.dp).padding(end = 8.dp)
@@ -153,6 +170,7 @@ fun OuterShadowFilledButton(
         }
         Text(
             text = text,
+            fontSize = fontSize,
             color = WhiteDefault
         )
     }
@@ -161,7 +179,7 @@ fun OuterShadowFilledButton(
 @Composable
 fun BasicOutlinedButton(
     text: String,
-    @DrawableRes icon: Int?= null,
+    icon: ImageVector ?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
@@ -177,7 +195,7 @@ fun BasicOutlinedButton(
     ){
         icon?.let {
             Icon(
-                painter = painterResource(id = icon),
+                imageVector = icon,
                 contentDescription = null,
                 tint = BrownDefault,
                 modifier = Modifier.size(30.dp).padding(end = 8.dp)
@@ -194,15 +212,17 @@ fun BasicOutlinedButton(
 fun CircleIconButton(
     backgroundColor: Color ?= null,
     foregroundColor: Color ?= null,
-    @DrawableRes icon: Int,
+    icon: ImageVector,
     shadow: String ?= null,
     onClick: () -> Unit,
     modifier: Modifier,
 ){
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
-    Button(
-        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor ?: OrangeDefault),
+    IconButton (
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = backgroundColor ?: OrangeDefault
+        ),
         onClick = onClick,
         modifier = modifier.size(50.dp)
             .then(
@@ -227,12 +247,11 @@ fun CircleIconButton(
                     )
                 }
                 else Modifier
-        ),
+            ),
         interactionSource = interactionSource,
-        contentPadding = PaddingValues(5.dp)
     ){
         Icon(
-            painter = painterResource(id = icon),
+            imageVector = icon,
             contentDescription = null,
             tint = foregroundColor ?: WhiteDefault,
             modifier = Modifier.size(40.dp)
@@ -258,7 +277,7 @@ fun QuantitySelectionButton(
         ) {
             // Nút Giảm (-)
             CircleIconButton(
-                icon = R.drawable.ic_minus, // Thay bằng icon phù hợp
+                icon = Icons.Filled.Remove, // Thay bằng icon phù hợp
                 onClick = { if (count > 0) onValueChange(count - 1) },
                 modifier = Modifier
             )
@@ -284,11 +303,9 @@ fun QuantitySelectionButton(
                         .defaultMinSize(minWidth = 30.dp)
                 )
             }
-
-
             // Nút Tăng (+)
             CircleIconButton(
-                icon = R.drawable.ic_plus, // Thay bằng icon phù hợp
+                icon = Icons.Filled.Add, // Thay bằng icon phù hợp
                 onClick = { onValueChange(count + 1) },
                 modifier = Modifier
             )
