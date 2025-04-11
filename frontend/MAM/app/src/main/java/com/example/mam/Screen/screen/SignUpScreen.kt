@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +46,7 @@ import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
+import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 
@@ -66,30 +71,21 @@ fun SignUpScreen(){
     val mkNhapLai = mkNhapLaiInput
 
     Column(
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(color = OrangeDefault)
+            .padding(WindowInsets.safeDrawing.asPaddingValues())
+            .padding(WindowInsets.ime.asPaddingValues()),
     ) {
         Text(
             text = stringResource(R.string.dang_ky),
             modifier = Modifier
                 .padding(top = 20.dp),
-            style = TextStyle(
-                fontSize = Variables.HeadlineMediumSize,
-                lineHeight = Variables.HeadlineMediumLineHeight,
-                fontWeight = FontWeight(700),
-                color = WhiteDefault,
-                textAlign = TextAlign.Center,
-                shadow = Shadow(
-                    color = GreyDark,
-                    blurRadius = 4f,
-                    offset = Offset(0f, 4f),
-                )
-            )
+            style = Typography.titleLarge
+
         )
-        Spacer(modifier = Modifier.height(20.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,7 +94,7 @@ fun SignUpScreen(){
                 .outerShadow(
                     color = GreyDark,
                     bordersRadius = 50.dp,
-                    blurRadius = 5.dp,
+                    blurRadius = 4.dp,
                     offsetX = 0.dp,
                     offsetY = -4.dp,
                 )
@@ -112,7 +108,7 @@ fun SignUpScreen(){
                         bottomEnd = 0.dp
                     )
                 )
-                .padding(start = 40.dp, top = 40.dp, end = 40.dp, bottom = 40.dp)
+                .padding(40.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
