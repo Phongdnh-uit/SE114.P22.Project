@@ -7,4 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface CartRepository extends JpaRepository<Cart, Long>, JpaSpecificationExecutor<Cart> {
     boolean existsByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
+
+    boolean existsByUserId(Long userId);
 }

@@ -1,14 +1,17 @@
 package com.se114p12.backend.service;
 
+import com.se114p12.backend.domain.Cart;
 import com.se114p12.backend.domain.User;
 import com.se114p12.backend.domain.enums.UserStatus;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
+import com.se114p12.backend.repository.CartRepository;
 import com.se114p12.backend.repository.UserRepository;
 import com.se114p12.backend.util.TypeUtil;
 import com.se114p12.backend.vo.PageVO;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,23 +20,26 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final CartRepository cartRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-    }
-
-    public User create(User user) {
-        user.setId(null);
-        validateUserUniqueness(user, null);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus(UserStatus.PENDING);
-        return userRepository.save(user);
-    }
+//    public User create(User user) {
+//        user.setId(null);
+//        validateUserUniqueness(user, null);
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        user.setStatus(UserStatus.PENDING);
+//
+//        User createdUser = userRepository.save(user);
+//
+//        // Tạo cart cho user mới
+//        cartService.createForUser(createdUser.getId());
+//
+//        return createdUser;
+//    }
 
     public User update(Long id, User user) {
         User existingUser = findUserById(id);
@@ -77,8 +83,16 @@ public class UserService {
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhone(registerRequestDTO.getPhone());
         user.setStatus(UserStatus.PENDING);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Tạo cart sau khi đăng ký
+        Cart cart = new Cart();
+        cart.setUser(savedUser);
+        cartRepository.save(cart);
+
+        return savedUser;
     }
+
 
     public void setUserRefreshToken(String username, String token) {
         if (TypeUtil.checkUsernameType(username) == 1) {

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Cart Module")
-@RequestMapping("api/v1/carts")
+@RequestMapping("/api/v1/carts")
 @RestController
 @RequiredArgsConstructor
 public class CartController {
@@ -29,7 +29,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteCart(@Valid @PathVariable("id") Long id) {
         if (!cartService.existsByIdAndUserId(id, null)) {
             return ResponseEntity.notFound().build();
         }

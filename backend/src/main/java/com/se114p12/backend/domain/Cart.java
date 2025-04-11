@@ -2,7 +2,6 @@ package com.se114p12.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.Instant;
@@ -16,13 +15,20 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "user_id")
-    private Long userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant createdAt;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant updatedAt;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String updatedBy;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

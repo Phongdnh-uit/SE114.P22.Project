@@ -25,6 +25,7 @@ public class ProductItemService {
     private final ProductRepository productRepository;
     private final ProductItemRepository productItemRepository;
     private final VariationOptionRepository variationOptionRepository;
+    private final StorageService storageService;
 
     public PageVO<ProductItem> getAllProductItems(Pageable pageable) {
         Page<ProductItem> productItemPage = productItemRepository.findAll(pageable);
@@ -66,21 +67,13 @@ public class ProductItemService {
             }
         }
 
-        // Xử lý ảnh
+        // Xử lý ảnh qua Storage Service
         String imageUrl = "";
         MultipartFile image = dto.getImage();
         if (image != null && !image.isEmpty()) {
-            try {
-                String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-                Path uploadDir = Paths.get("uploads");
-                if (!Files.exists(uploadDir)) Files.createDirectories(uploadDir);
-                Path imagePath = uploadDir.resolve(filename);
-                Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-                imageUrl = "/uploads/" + filename;
-            } catch (IOException e) {
-                throw new RuntimeException("Không thể lưu ảnh", e);
-            }
+            imageUrl = "/uploads/product-items/" + storageService.store(image, "product-items");
         }
+
 
         // Tạo ProductItem mới
         ProductItem productItem = new ProductItem();

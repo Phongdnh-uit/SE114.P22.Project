@@ -1,7 +1,5 @@
 package com.se114p12.backend.dto.request;
 
-import com.se114p12.backend.domain.Product;
-import com.se114p12.backend.domain.VariationOption;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 

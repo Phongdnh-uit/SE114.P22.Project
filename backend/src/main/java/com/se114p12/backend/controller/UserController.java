@@ -37,10 +37,10 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUsers(search));
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.create(user));
-    }
+//    @PostMapping
+//    public ResponseEntity<User> createUser(@RequestBody User user) {
+//        return ResponseEntity.ok(userService.create(user));
+//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @Validated @RequestBody User userDetails) {

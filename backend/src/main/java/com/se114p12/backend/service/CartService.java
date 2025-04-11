@@ -4,24 +4,33 @@ import com.se114p12.backend.domain.Cart;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.CartRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
-
-    public CartService(CartRepository cartRepository) {
-        this.cartRepository = cartRepository;
-    }
 
     public Cart getCartById(Long id) {
         return cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found with ID: " + id));
     }
 
+//    public Cart createForUser(Long userId) {
+//        if (cartRepository.existsByUserId(userId)) {
+//            throw new DataConflictException("Cart already exists for this user");
+//        }
+//
+//        Cart cart = new Cart();
+//        cart.setUser(userService.getUserById(userId));
+//
+//        return cartRepository.save(cart);
+//    }
+
     public Cart create(Cart cart) {
-        if (existsByIdAndUserId(cart.getId(), cart.getUserId())) {
-            throw new DataConflictException("This cart already exists");
+        if (cartRepository.existsByUserId(cart.getUser().getId())) {
+            throw new DataConflictException("User already has a cart");
         }
         return cartRepository.save(cart);
     }
