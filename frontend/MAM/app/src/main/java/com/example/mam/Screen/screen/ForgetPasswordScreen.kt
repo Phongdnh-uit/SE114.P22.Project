@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,10 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mam.Screen.component.CircleIconButton
 import com.example.mam.Screen.component.OuterShadowFilledButton
 import com.example.mam.Screen.component.PasswordFieldType1
 import com.example.mam.Screen.component.outerShadow
+import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
@@ -36,13 +39,7 @@ import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 
 @Composable
-fun ChangePasswordScreen(modifier: Modifier = Modifier) {
-    var mkCuInput by remember { mutableStateOf("") }
-    val mkCu = mkCuInput
-    var mkMoiInput by remember { mutableStateOf("") }
-    val mkMoi = mkMoiInput
-    var mkMoiNhapLaiInput by remember { mutableStateOf("") }
-    val mkMoiNhapLai = mkMoiNhapLaiInput
+fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start,
@@ -55,11 +52,11 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
                     size = 50.dp
                 )
             )
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(70.dp),
+                .height(70.dp)
         ) {
             // Icon nằm trái
             CircleIconButton(
@@ -74,7 +71,7 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
             )
             // Text nằm giữa
             Text(
-                text = "Đổi mật khẩu",
+                text = "Quên mật khẩu",
                 style = TextStyle(
                     fontSize = Variables.HeadlineMediumSize,
                     lineHeight = Variables.HeadlineMediumLineHeight,
@@ -104,44 +101,31 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
                     )
                 )
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .wrapContentHeight()
-            ) {
-                Spacer(modifier = Modifier.height(10.dp))
-                PasswordFieldType1(
-                    label = "Mật khẩu cũ",
-                    value = mkCuInput,
-                    backgroundColor = WhiteDefault,
-                    onValueChange = { mkCuInput = it },
-                    modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Chúng tôi sẽ gửi mã OTP đến \nsố điện thoại của bạn",
+                style = TextStyle(
+                    fontSize = Variables.BodySizeMedium,
+                    lineHeight = 22.4.sp,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = BrownDefault,
+                    textAlign = TextAlign.Center,
+                    )
+            )
+            Text(
+                text = "+84 904 599 204",
+                style = TextStyle(
+                    fontSize = Variables.BodySizeMedium,
+                    lineHeight = 22.4.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrownDefault,
+                    textAlign = TextAlign.Center,
                 )
-                PasswordFieldType1(
-                    label = "Mật khẩu mới",
-                    value = mkMoiInput,
-                    backgroundColor = WhiteDefault,
-                    onValueChange = { mkMoiInput = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                PasswordFieldType1(
-                    label = "Xác nhận mật khẩu mới",
-                    value = mkMoiNhapLaiInput,
-                    backgroundColor = WhiteDefault,
-                    onValueChange = { mkMoiNhapLaiInput = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OuterShadowFilledButton(
-                    text = "Xác nhận",
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(40.dp)
-                )
-                Spacer(modifier = Modifier.height(20.dp))
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ){
             }
         }
     }
@@ -149,6 +133,6 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewChangePasswordScreen() {
-    ChangePasswordScreen()
+fun PreviewForgetPasswordScreen() {
+    ForgetPasswordScreen()
 }
