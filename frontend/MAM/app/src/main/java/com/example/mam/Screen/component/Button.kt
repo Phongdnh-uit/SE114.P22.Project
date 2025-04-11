@@ -131,7 +131,7 @@ fun InnerShadowFilledButton(
 fun OuterShadowFilledButton(
     text: String,
     fontSize: TextUnit = 16.sp,
-    borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
+    //borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
     shadowColor: Color = BrownDark,
     blurRadius: Dp = 4.dp,
     offsetX: Dp = 0.dp,
@@ -145,7 +145,7 @@ fun OuterShadowFilledButton(
     val isPressed = interactionSource.collectIsPressedAsState().value
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
-        border = borderStroke,
+        //border = borderStroke,
         onClick = onClick,
         modifier = modifier.then(
             if (!isPressed) Modifier.outerShadow(

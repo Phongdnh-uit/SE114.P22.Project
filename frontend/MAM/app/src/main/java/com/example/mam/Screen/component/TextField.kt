@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -66,6 +67,10 @@ fun EditField(
                 fontWeight = FontWeight.Bold)
         },
         value = value,
+        textStyle = TextStyle(
+            fontSize = Variables.BodySizeMedium, // <-- Chỉnh font size ở đây
+            color = textColor // Đảm bảo màu chữ vẫn đúng
+        ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = backgroundColor,  // Màu nền khi focus
             unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
@@ -90,7 +95,7 @@ fun EditFieldType1(
     backgroundColor: Color = WhiteDefault,
     foregroundColor: Color = BrownDefault,
     textColor: Color = BrownDefault,
-    radius: Dp = 8.dp,
+    radius: Dp = 20.dp,
     keyboardOptions: KeyboardOptions,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -109,6 +114,10 @@ fun EditFieldType1(
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = value,
+            textStyle = TextStyle(
+                fontSize = Variables.BodySizeMedium, // <-- Chỉnh font size ở đây
+                color = textColor // Đảm bảo màu chữ vẫn đúng
+            ),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = backgroundColor,  // Màu nền khi focus
                 unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
@@ -122,68 +131,71 @@ fun EditFieldType1(
             onValueChange = onValueChange,
             keyboardOptions = keyboardOptions,
             singleLine = true,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .height(40.dp),
         )
     }
 }
 
 @Composable
-fun PasswordField1(
+fun PasswordFieldType1(
     label: String,
     value: String,
     backgroundColor: Color = WhiteDefault,
     foregroundColor: Color = BrownDefault,
     textColor: Color = BrownDefault,
-    radius: Dp = 8.dp,
-    keyboardOptions: KeyboardOptions,
+    radius: Dp = 20.dp,
+    imeAction: ImeAction = ImeAction.Next,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label,
-                color = BrownDefault,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = backgroundColor,
-            unfocusedContainerColor = backgroundColor,
-            focusedIndicatorColor = foregroundColor,
-            unfocusedIndicatorColor = foregroundColor,
-            focusedTextColor = textColor,
-            unfocusedTextColor = textColor,
-            cursorColor = textColor
-        ),
-        shape = RoundedCornerShape(radius),
-        singleLine = true,
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = {
-            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                Icon(
-                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                    tint = BrownDefault
-                )
-            }
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction =  ImeAction.Done),
-        modifier = modifier
-    )
+    Column(modifier = modifier) {
+        Text(
+            label,
+            style = TextStyle(
+                fontSize = Variables.BodySizeMedium,
+                fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                color = textColor,
+                textAlign = TextAlign.Start
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = TextStyle(
+                fontSize = Variables.BodySizeMedium, // <-- Chỉnh font size ở đây
+                color = textColor // Đảm bảo màu chữ vẫn đúng
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = backgroundColor,  // Màu nền khi focus
+                unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
+                focusedIndicatorColor = foregroundColor,  // Màu viền khi focus
+                unfocusedIndicatorColor = foregroundColor,  // Màu viền khi không focus
+                focusedTextColor = textColor,       // Màu chữ khi focus
+                unfocusedTextColor = textColor,      // Màu chữ khi không focus
+                cursorColor = textColor
+            ),
+            shape = RoundedCornerShape(radius),
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction =  imeAction),
+            modifier = modifier
+                .fillMaxWidth()
+        )
+    }
 }
 
 @Composable
 fun PasswordField(
     label: String,
     value: String,
+    backgroundColor: Color = Transparent,
+    foregroundColor: Color = BrownDefault,
+    textColor: Color = BrownDefault,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -191,6 +203,10 @@ fun PasswordField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
+        textStyle = TextStyle(
+            fontSize = Variables.BodySizeMedium, // <-- Chỉnh font size ở đây
+            color = textColor // Đảm bảo màu chữ vẫn đúng
+        ),
         label = {
             Text(
                 text = label,
@@ -199,13 +215,13 @@ fun PasswordField(
             )
         },
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = OrangeLight.copy(alpha = 0f),
-            unfocusedContainerColor = OrangeLight.copy(alpha = 0f),
-            focusedIndicatorColor = BrownDefault,
-            unfocusedIndicatorColor = BrownDefault,
-            focusedTextColor = BrownDefault,
-            unfocusedTextColor = BrownDefault,
-            cursorColor = BrownDefault
+            focusedContainerColor = backgroundColor,  // Màu nền khi focus
+            unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
+            focusedIndicatorColor = foregroundColor,  // Màu viền khi focus
+            unfocusedIndicatorColor = foregroundColor,  // Màu viền khi không focus
+            focusedTextColor = textColor,       // Màu chữ khi focus
+            unfocusedTextColor = textColor,      // Màu chữ khi không focus
+            cursorColor = textColor
         ),
         shape = RoundedCornerShape(20.dp),
         singleLine = true,

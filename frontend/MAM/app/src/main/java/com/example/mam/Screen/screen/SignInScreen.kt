@@ -34,6 +34,7 @@ import com.example.mam.R
 import com.example.mam.Screen.component.BasicOutlinedButton
 import com.example.mam.Screen.component.EditField
 import com.example.mam.Screen.component.InnerShadowFilledButton
+import com.example.mam.Screen.component.OuterShadowFilledButton
 import com.example.mam.Screen.component.PasswordField
 import com.example.mam.Screen.component.UnderlinedClickableText
 import com.example.mam.Screen.component.outerShadow
@@ -128,14 +129,13 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             ){
                 BasicOutlinedButton(
                     text = "Đăng ký",
-                    icon = ImageVector.vectorResource(id = R.drawable.ic_google),
                     onClick = {
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.3f)
                         .height(40.dp)
                 )
-                InnerShadowFilledButton(
+                OuterShadowFilledButton(
                     text = "Đăng nhập",
                     onClick = {
                     },

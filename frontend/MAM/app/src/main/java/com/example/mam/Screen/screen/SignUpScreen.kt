@@ -1,15 +1,11 @@
-package com.example.mam
+package com.example.mam.Screen.screen
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.DisplayMode.Companion.Input
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,42 +25,26 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.mam.Screen.component.EditField
+import com.example.mam.MainActivity
+import com.example.mam.R
 import com.example.mam.Screen.component.EditFieldType1
 import com.example.mam.Screen.component.OuterShadowFilledButton
+import com.example.mam.Screen.component.PasswordFieldType1
 import com.example.mam.Screen.component.UnderlinedClickableText
 import com.example.mam.Screen.component.outerShadow
 import com.example.mam.ui.theme.BrownDark
-import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
-import com.example.mam.ui.theme.MAMTheme
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 
-class SignUp : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MAMTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    SignUpScreen()
-                }
-            }
-        }
-    }
-}
 @Composable
 fun SignUpScreen(){
     var hotenInput by remember { mutableStateOf("") }
@@ -111,11 +89,12 @@ fun SignUpScreen(){
                 )
             )
         )
+        Spacer(modifier = Modifier.height(20.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .width(390.dp)
+                .fillMaxWidth()
                 .outerShadow(
                     color = GreyDark,
                     bordersRadius = 50.dp,
@@ -123,7 +102,7 @@ fun SignUpScreen(){
                     offsetX = 0.dp,
                     offsetY = -4.dp,
                 )
-                .height(774.dp)
+                .fillMaxHeight()
                 .background(
                     color = OrangeLighter,
                     shape = RoundedCornerShape(
@@ -147,7 +126,6 @@ fun SignUpScreen(){
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    radius = 8.dp,
                     onValueChange = { hotenInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -159,8 +137,7 @@ fun SignUpScreen(){
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    radius = 8.dp,
-                    onValueChange = { hotenInput = it },
+                    onValueChange = { sdtInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
                 EditFieldType1(
@@ -171,8 +148,7 @@ fun SignUpScreen(){
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    radius = 8.dp,
-                    onValueChange = { hotenInput = it },
+                    onValueChange = { emailInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
                 EditFieldType1(
@@ -183,32 +159,22 @@ fun SignUpScreen(){
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    radius = 8.dp,
-                    onValueChange = { hotenInput = it },
+                    onValueChange = { tenUserInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
-                EditFieldType1(
+                PasswordFieldType1(
                     label = "Mật khẩu",
                     value = mkInput,
                     backgroundColor = WhiteDefault,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    radius = 8.dp,
-                    onValueChange = { hotenInput = it },
+                    onValueChange = { mkInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
-                EditFieldType1(
+                PasswordFieldType1(
                     label = "Xác nhận mật khẩu",
                     value = mkNhapLaiInput,
                     backgroundColor = WhiteDefault,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    radius = 8.dp,
-                    onValueChange = { hotenInput = it },
+                    imeAction = ImeAction.Done,
+                    onValueChange = { mkNhapLaiInput = it },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -219,10 +185,6 @@ fun SignUpScreen(){
             ) {
                 OuterShadowFilledButton(
                     text = "Đăng Ký",
-                    blurRadius = 0.dp,
-                    offsetX = 5.dp,
-                    offsetY = 4.dp,
-                    spread = 0.dp,
                     onClick = { },
                     modifier = Modifier
                         .width(182.dp)
