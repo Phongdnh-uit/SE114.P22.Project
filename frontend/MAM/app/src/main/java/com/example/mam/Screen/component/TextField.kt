@@ -31,7 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mam.ui.theme.BrownDefault
-import com.example.mam.ui.theme.GreyLight
+import com.example.mam.ui.theme.ErrorColor
+import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.Transparent
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
@@ -80,6 +81,8 @@ fun EditField(
 @Composable
 fun EditFieldType1(
     label: String,
+    subLabel: String = "",
+    errorLabel: String = "",
     value: String,
     backgroundColor: Color = WhiteDefault,
     foregroundColor: Color = BrownDefault,
@@ -100,6 +103,19 @@ fun EditFieldType1(
             ),
             modifier = Modifier.fillMaxWidth()
         )
+        if(!subLabel.isEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                subLabel,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeSmall,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = GreyDark,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = value,
@@ -123,6 +139,19 @@ fun EditFieldType1(
             modifier = modifier
                 .fillMaxWidth()
         )
+        if(!errorLabel.isEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                errorLabel,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeSmall,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = ErrorColor,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -130,6 +159,8 @@ fun EditFieldType1(
 fun PasswordFieldType1(
     label: String,
     value: String,
+    subLabel: String = "",
+    errorLabel: String = "",
     backgroundColor: Color = WhiteDefault,
     foregroundColor: Color = BrownDefault,
     textColor: Color = BrownDefault,
@@ -149,6 +180,19 @@ fun PasswordFieldType1(
             ),
             modifier = Modifier.fillMaxWidth()
         )
+        if(!subLabel.isEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                subLabel,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeSmall,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = GreyDark,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = value,
@@ -175,6 +219,19 @@ fun PasswordFieldType1(
             modifier = modifier
                 .fillMaxWidth()
         )
+        if(!errorLabel.isEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                errorLabel,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeSmall,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = ErrorColor,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -199,7 +256,7 @@ fun PasswordField(
         label = {
             Text(
                 text = label,
-                color = BrownDefault,
+                color = textColor,
                 fontWeight = FontWeight.Bold
             )
         },
@@ -220,7 +277,7 @@ fun PasswordField(
                 Icon(
                     imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                     contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                    tint = BrownDefault
+                    tint = textColor
                 )
             }
         },

@@ -45,7 +45,7 @@ fun Modifier.outerShadow(
                     (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
             }
 
-            frameworkPaint.color = color.copy(alpha = 0.7f).toArgb()
+            frameworkPaint.color = color.copy(alpha = 0.3f).toArgb()
             it.drawRoundRect(
                 left = leftPixel,
                 top = topPixel,
@@ -73,7 +73,7 @@ fun Modifier.innerShadow(
 
     val rect = Rect(Offset.Zero, size)
     val paint = Paint().apply {
-        this.color = color.copy(alpha = 0.7f)
+        this.color = color.copy(alpha = 0.3f)
         isAntiAlias = true }
 
     drawIntoCanvas {
