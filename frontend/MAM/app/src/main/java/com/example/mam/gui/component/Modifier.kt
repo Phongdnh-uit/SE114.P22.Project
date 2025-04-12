@@ -1,4 +1,4 @@
-package com.example.mam.Screen.component
+package com.example.mam.gui.component
 
 import android.graphics.BlurMaskFilter
 import android.graphics.PorterDuff
@@ -12,13 +12,11 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mam.ui.theme.BlackDefault
 import com.example.mam.ui.theme.GreyDark
-import com.example.mam.ui.theme.GreyDefault
 
 @Composable
 fun Modifier.outerShadow(
@@ -45,7 +43,7 @@ fun Modifier.outerShadow(
                     (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
             }
 
-            frameworkPaint.color = color.copy(alpha = 0.7f).toArgb()
+            frameworkPaint.color = color.copy(alpha = 0.3f).toArgb()
             it.drawRoundRect(
                 left = leftPixel,
                 top = topPixel,
@@ -73,7 +71,7 @@ fun Modifier.innerShadow(
 
     val rect = Rect(Offset.Zero, size)
     val paint = Paint().apply {
-        this.color = color.copy(alpha = 0.7f)
+        this.color = color.copy(alpha = 0.3f)
         isAntiAlias = true }
 
     drawIntoCanvas {
