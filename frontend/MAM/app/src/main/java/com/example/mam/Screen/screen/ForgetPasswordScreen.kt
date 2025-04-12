@@ -1,5 +1,6 @@
 package com.example.mam.Screen.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,10 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -28,12 +25,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.Screen.component.CircleIconButton
-import com.example.mam.Screen.component.OuterShadowFilledButton
-import com.example.mam.Screen.component.PasswordFieldType1
+import com.example.mam.Screen.component.OtpInputField
 import com.example.mam.Screen.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
+import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
@@ -101,7 +98,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                     )
                 )
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = "Chúng tôi sẽ gửi mã OTP đến \nsố điện thoại của bạn",
                 style = TextStyle(
@@ -122,10 +119,21 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center,
                 )
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(bottom = 16.dp)
-            ){
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = OrangeLight,
+                        shape = RoundedCornerShape(
+                            size = 40.dp
+                        )
+                    )
+            ) {
+                OtpInputField(
+                    otpLength = 4,
+                    onOtpComplete = { otp ->
+                        Log.d("OTP", "Mã người dùng nhập: $otp")
+                    }
+                )
             }
         }
     }
