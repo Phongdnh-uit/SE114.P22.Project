@@ -20,11 +20,12 @@ class SignInViewModel :ViewModel(){
             currentState.copy(
                 username = username,
                 password = password
+
             )
         }
         viewModelScope.launch {
             try {
-                val request = SignInRequest("admin0173", "admin0173@")
+                val request = SignInRequest(username, password)
                 val response = RetrofitClient.api.login(request)
                 Log.d("LOGIN", "AccessToken: ${response.accessToken}")
                 Log.d("LOGIN", "RefreshToken: ${response.refreshToken}")

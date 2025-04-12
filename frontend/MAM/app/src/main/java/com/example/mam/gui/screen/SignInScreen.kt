@@ -52,9 +52,9 @@ fun SignInScreen(
     onTermsClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var sdtInput by remember { mutableStateOf("") }
+    var sdtInput by remember { mutableStateOf("admin0173") }
     val sdt = sdtInput
-    var mkInput by remember { mutableStateOf("") }
+    var mkInput by remember { mutableStateOf("admin0173@") }
     val mk = mkInput
     val scrollState = rememberScrollState()
     Column(
