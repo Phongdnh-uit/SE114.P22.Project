@@ -1,17 +1,14 @@
-package com.example.mam.Screen.screen
+package com.example.mam.gui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordFieldType1
 import com.example.mam.gui.component.outerShadow
-
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
@@ -45,7 +40,7 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
     var mkMoiNhapLaiInput by remember { mutableStateOf("") }
     val mkMoiNhapLai = mkMoiNhapLaiInput
     Column(
-        verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start,
         modifier = modifier
             .fillMaxWidth()
@@ -57,23 +52,13 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
                 )
             )
     ){
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp),
+            verticalAlignment = Alignment.CenterVertically, // Thêm dòng này để căn giữa theo chiều dọc
+            horizontalArrangement = Arrangement.Center
         ) {
-            // Icon nằm trái
-            CircleIconButton(
-                backgroundColor = OrangeLighter,
-                foregroundColor = OrangeDefault,
-                icon = Icons.Filled.Close,
-                shadow = "outer",
-                onClick = {},
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 16.dp) // padding nếu cần
-            )
-            // Text nằm giữa
             Text(
                 text = "Đổi mật khẩu",
                 style = TextStyle(
@@ -82,8 +67,7 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
                     fontWeight = FontWeight(700),
                     color = WhiteDefault,
                     textAlign = TextAlign.Center,
-                ),
-                modifier = Modifier.align(Alignment.Center)
+                )
             )
         }
         Column(
@@ -142,7 +126,6 @@ fun ChangePasswordScreen(modifier: Modifier = Modifier) {
                         .fillMaxWidth(0.5f)
                         .height(40.dp)
                 )
-                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.mam.Screen.screen
+package com.example.mam.gui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,18 +7,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,29 +26,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mam.MainActivity
 import com.example.mam.R
-import com.example.mam.Screen.component.EditFieldType1
-import com.example.mam.Screen.component.OuterShadowFilledButton
-import com.example.mam.Screen.component.PasswordFieldType1
-import com.example.mam.Screen.component.UnderlinedClickableText
-import com.example.mam.Screen.component.outerShadow
+import com.example.mam.gui.component.EditFieldType1
+import com.example.mam.gui.component.OuterShadowFilledButton
+import com.example.mam.gui.component.PasswordFieldType1
+import com.example.mam.gui.component.UnderlinedClickableText
+import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
-import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 
 @Composable
@@ -72,14 +64,16 @@ fun SignUpScreen(){
     var mkNhapLaiInput by remember { mutableStateOf("") }
     val mkNhapLai = mkNhapLaiInput
 
+    val scrollState = rememberScrollState()
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(color = OrangeDefault)
-            .padding(WindowInsets.safeDrawing.asPaddingValues())
-            .padding(WindowInsets.ime.asPaddingValues()),
+            .padding(WindowInsets.statusBars.asPaddingValues())
+            //.padding(WindowInsets.ime.asPaddingValues())
+            .verticalScroll(scrollState),
     ) {
         Text(
             text = stringResource(R.string.dang_ky),
@@ -100,7 +94,7 @@ fun SignUpScreen(){
                     offsetX = 0.dp,
                     offsetY = -4.dp,
                 )
-                .fillMaxHeight()
+                .weight(1f)
                 .background(
                     color = OrangeLighter,
                     shape = RoundedCornerShape(
@@ -123,7 +117,7 @@ fun SignUpScreen(){
                     value = hotenInput,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
                     onValueChange = { hotenInput = it },
@@ -145,7 +139,7 @@ fun SignUpScreen(){
                     value = emailInput,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
                     ),
                     onValueChange = { emailInput = it },
@@ -156,7 +150,7 @@ fun SignUpScreen(){
                     value = tenUserInput,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
                     onValueChange = { tenUserInput = it },
@@ -193,19 +187,23 @@ fun SignUpScreen(){
                         .height(40.dp)
                 )
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Bạn đã có tài khoản?",
                         color = BrownDark,
+                        modifier = Modifier
+
                     )
                     UnderlinedClickableText(
                         text = "Đăng nhập ngay",
                         color = OrangeDefault,
-                        targetActivity = MainActivity::class.java,
-                        modifier = Modifier
+                        onClick = {},
+                        modifier = Modifier.padding(0.dp)
                     )
                 }
+                Spacer(Modifier.height(10.dp))
             }
         }
     }
