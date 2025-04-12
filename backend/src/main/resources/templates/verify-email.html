@@ -1,0 +1,140 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác Thực Email</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f1f8ff;
+        margin: 0;
+        padding: 0;
+        color: #555555;
+      }
+
+      .email-container {
+        width: 100%;
+        padding: 40px 20px;
+        background-color: #f1f8ff;
+        text-align: center;
+      }
+
+      .email-content {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .email-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .email-header h1 {
+        font-size: 32px;
+        color: #333333;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+      }
+
+      .email-header img {
+        max-width: 120px;
+        margin-bottom: 30px;
+      }
+
+      .email-body {
+        font-size: 18px;
+        color: #555555;
+        line-height: 1.8;
+        margin-bottom: 30px;
+      }
+
+      .email-body p {
+        margin-bottom: 20px;
+      }
+
+      .verify-button {
+        display: inline-block;
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 15px 30px;
+        font-size: 18px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 50px;
+        margin-top: 30px;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        transition:
+          background-color 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .verify-button:hover {
+        background-color: #218838;
+        transform: translateY(-4px);
+      }
+
+      .email-footer {
+        font-size: 14px;
+        color: #888888;
+        margin-top: 30px;
+        text-align: center;
+      }
+
+      .email-footer a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .email-footer p {
+        margin-top: 20px;
+      }
+
+      .highlight-text {
+        font-weight: bold;
+        color: #28a745;
+      }
+
+      .icon {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-content">
+        <div class="email-header">
+          <h1>Xác Thực Email</h1>
+        </div>
+        <div class="email-body">
+          <p>Chào <strong>${name}</strong>,</p>
+          <p>
+            Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký, vui
+            lòng xác thực email của bạn bằng cách nhấn vào nút dưới đây:
+          </p>
+          <a href="${verifyLink}" class="verify-button">Xác Thực Email</a>
+          <p class="highlight-text">
+            Lưu ý: Đường link xác thực này sẽ hết hạn sau 24 giờ kể từ khi bạn
+            nhận được email này.
+          </p>
+          <p>
+            Nếu bạn không yêu cầu đăng ký tài khoản, vui lòng bỏ qua email này.
+          </p>
+        </div>
+        <div class="email-footer">
+          <p>&copy; 2025 MĂM. Mọi quyền lợi được bảo lưu.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

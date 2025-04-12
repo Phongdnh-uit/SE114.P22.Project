@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -21,4 +23,8 @@ public class OrderDetail {
 
   @NotNull private BigDecimal price;
   private String note;
+
+  @ManyToOne
+  @JoinColumn(name = "product_item_id")
+  private ProductItem productItem;
 }
