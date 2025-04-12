@@ -12,7 +12,5 @@ public class ProductItemRequestDTO {
 
     private BigDecimal price;
 
-    private MultipartFile image;
-
     private List<Long> variationOptionIds;
 }

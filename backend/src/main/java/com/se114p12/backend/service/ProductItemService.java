@@ -67,19 +67,10 @@ public class ProductItemService {
             }
         }
 
-        // Xử lý ảnh qua Storage Service
-        String imageUrl = "";
-        MultipartFile image = dto.getImage();
-        if (image != null && !image.isEmpty()) {
-            imageUrl = "/uploads/product-items/" + storageService.store(image, "product-items");
-        }
-
-
         // Tạo ProductItem mới
         ProductItem productItem = new ProductItem();
         productItem.setProduct(product);
         productItem.setPrice(dto.getPrice());
-        productItem.setImageUrl(imageUrl);
         productItem.setVariationOptions(new ArrayList<>(uniqueVariations.values()));
 
         return productItemRepository.save(productItem);

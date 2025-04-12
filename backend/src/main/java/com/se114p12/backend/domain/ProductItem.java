@@ -24,9 +24,6 @@ public class ProductItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(length = 500)
-    private String imageUrl;
-
     @ManyToMany
     @JoinTable(
             name = "product_item_variation_option",

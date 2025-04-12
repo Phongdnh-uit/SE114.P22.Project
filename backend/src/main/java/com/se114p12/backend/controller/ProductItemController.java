@@ -33,8 +33,8 @@ public class ProductItemController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductItem> createProductItem(@Valid @ModelAttribute ProductItemRequestDTO dto) {
+    @PostMapping
+    public ResponseEntity<ProductItem> createProductItem(@Valid @RequestBody ProductItemRequestDTO dto) {
         ProductItem created = productItemService.createProductItem(dto);
         return ResponseEntity.ok(created);
     }

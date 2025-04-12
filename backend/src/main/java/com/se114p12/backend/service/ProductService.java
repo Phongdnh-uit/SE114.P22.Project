@@ -2,24 +2,24 @@ package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.Product;
 import com.se114p12.backend.domain.ProductCategory;
+import com.se114p12.backend.dto.request.ProductRequestDTO;
 import com.se114p12.backend.repository.ProductRepository;
 import com.se114p12.backend.vo.PageVO;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductCategoryService productCategoryService;
-
-    public ProductService(ProductRepository productRepository, ProductCategoryService productCategoryService) {
-        this.productRepository = productRepository;
-        this.productCategoryService = productCategoryService;
-    }
+    private final StorageService storageService;
 
     public PageVO<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
         Page<Product> productPage = productRepository.findByCategory_Id(categoryId, pageable);
@@ -33,39 +33,52 @@ public class ProductService {
                 .build();
     }
 
-    public Product create(Product product) {
-        product.setProductId(null);
-        if (product.getCategory() == null || product.getCategory().getId() == null) {
-            throw new IllegalArgumentException("Category ID is required.");
+    public Product create(ProductRequestDTO dto) {
+        ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+        if (category == null) {
+            throw new IllegalArgumentException("Category not found.");
         }
 
-        ProductCategory category = productCategoryService.findById(product.getCategory().getId());
-        product.setCategory(category);
+        Product product = Product.builder()
+                .category(category)
+                .name(dto.getName())
+                .shortDescription(dto.getShortDescription())
+                .detailDescription(dto.getDetailDescription())
+                .originalPrice(dto.getOriginalPrice())
+                .createdAt(Instant.now())
+                .isAvailable(true)
+                .build();
 
-        product.setCreatedAt(Instant.now());
-        product.setIsAvailable(true);
+        product.setImageUrl(processImage(dto.getImage(), "product-items"));
+
         return productRepository.save(product);
     }
 
+    public Product update(Long id, @NotNull ProductRequestDTO dto) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product with the given ID does not exist."));
 
-    public Product update(Long id, @NotNull Product product) {
-        if (!productRepository.existsById(id)) {
-            throw new IllegalArgumentException("Product with the given ID does not exist.");
+        existingProduct.setName(dto.getName());
+        existingProduct.setShortDescription(dto.getShortDescription());
+        existingProduct.setDetailDescription(dto.getDetailDescription());
+        existingProduct.setOriginalPrice(dto.getOriginalPrice());
+        existingProduct.setUpdatedAt(Instant.now());
+
+        if (dto.getCategoryId() != 0) {
+            ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+            existingProduct.setCategory(category);
         }
-        product.setUpdatedAt(Instant.now());
-        product.setProductId(id); // Ensure the ID is consistent with the path parameter.
-        return productRepository.save(product);
+
+        existingProduct.setImageUrl(processImage(dto.getImage(), "product-items"));
+
+        return productRepository.save(existingProduct);
     }
 
     public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new IllegalArgumentException("Product with the given ID does not exist.");
-        }
         productRepository.deleteById(id);
     }
 
-    private boolean isDuplicateProduct(Product product) {
-        return productRepository.existsByName(product.getName()) ||
-                productRepository.existsByShortDescription(product.getShortDescription());
+    private String processImage(MultipartFile image, String folder) {
+        return (image != null && !image.isEmpty()) ? "/uploads/" + folder + "/" + storageService.store(image, folder) : null;
     }
 }
