@@ -124,7 +124,7 @@ fun SignInScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 UnderlinedClickableText(
-                    text = "Quên mật khẩu",
+                    link = "Quên mật khẩu",
                     onClick = onForgotClicked,
                     modifier = Modifier
                         .align(Alignment.Start)
@@ -154,7 +154,7 @@ fun SignInScreen(
                 )
             }
             UnderlinedClickableText(
-                text = "Điều khoản và Chính sách",
+                link = "Điều khoản và Chính sách",
                 onClick = onTermsClicked,
                 modifier = Modifier
             )
