@@ -123,10 +123,9 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .background(
                         color = OrangeLight,
-                        shape = RoundedCornerShape(
-                            size = 40.dp
-                        )
+                        shape = RoundedCornerShape( 40.dp )
                     )
+                    .padding( start = 14.dp, end = 14.dp)
             ) {
                 OtpInputField(
                     otpLength = 4,

@@ -322,7 +322,7 @@ fun OtpInputField(
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(vertical = 16.dp)
+        modifier = Modifier.padding(vertical = 5.dp)
     ) {
         for (i in 0 until otpLength) {
             BasicTextField(

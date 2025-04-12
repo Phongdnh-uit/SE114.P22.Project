@@ -72,7 +72,7 @@ fun UnderlinedClickableText(
         onClick = onClick
     )
     {
-        Text(text= annotatedText)
+        Text(text = annotatedText)
     }
 }
 
