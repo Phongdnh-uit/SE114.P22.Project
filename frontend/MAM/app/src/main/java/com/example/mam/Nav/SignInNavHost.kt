@@ -38,9 +38,8 @@ fun SignInSignUpNavHost(
         composable(route = SignInSignUpScreen.Login.name) {
             SignInScreen(
                 onSignInClicked = {
-
-                    phonenumber, password ->
-                    signInVM.CheckSignIn(phonenumber = phonenumber, password = password)
+                    username, password ->
+                    signInVM.CheckSignIn(username = username, password = password)
                 },
                 onSignUpClicked = {
                     coroutineScope.launch {

@@ -1,11 +1,10 @@
-package com.example.mam.Screen.screen
+package com.example.mam.gui.screen
 
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mam.Screen.component.OtpInputField
+import com.example.mam.gui.component.OtpInputField
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -107,7 +106,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                     fontWeight = FontWeight(Variables.BodyFontWeightRegular),
                     color = BrownDefault,
                     textAlign = TextAlign.Center,
-                    )
+                )
             )
             Text(
                 text = "+84 904 599 204",

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -52,28 +53,41 @@ import com.example.mam.ui.theme.WhiteDefault
 
 @Composable
 fun UnderlinedClickableText(
-    text: String,
+    text: String = "",
+    link: String,
     color: Color = BrownDefault,
+    linkColor: Color = OrangeDefault,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
-    val textcolor = if(isPressed) OrangeDefault else color
     val annotatedText = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = textcolor, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)) {
+        withStyle(style = SpanStyle(color = color)) {
             append(text)
         }
+        // Đánh dấu phần cần click
+        pushStringAnnotation(tag = "CLICK", annotation = "clicked")
+        withStyle(style = SpanStyle(
+            color = linkColor,
+            textDecoration = TextDecoration.Underline,
+            fontWeight = FontWeight.Bold
+        )) {
+            append(link)
+        }
+        pop()
     }
-    TextButton(
-        interactionSource = interactionSource,
-        modifier = modifier,
-        onClick = onClick
+
+    ClickableText(
+        text = annotatedText,
+        onClick = { offset ->
+            annotatedText.getStringAnnotations(tag = "CLICK", start = offset, end = offset)
+                .firstOrNull()?.let {
+                    onClick()
+                }
+        },
+
+        // style mặc định cho đoạn text
     )
-    {
-        Text(text = annotatedText)
-    }
 }
 
 @Composable

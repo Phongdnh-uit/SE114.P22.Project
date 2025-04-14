@@ -167,7 +167,7 @@ fun SignUpScreen(){
                 PasswordFieldType1(
                     label = "Xác nhận mật khẩu",
                     value = mkNhapLaiInput,
-                    errorLabel = "Mật khẩu chưa đúng!",
+                    errorLabel = if (mk != mkNhapLai) "Mật khẩu chưa đúng!" else "",
                     backgroundColor = WhiteDefault,
                     imeAction = ImeAction.Done,
                     onValueChange = { mkNhapLaiInput = it },
@@ -190,15 +190,11 @@ fun SignUpScreen(){
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Bạn đã có tài khoản?",
-                        color = BrownDark,
-                        modifier = Modifier
 
-                    )
                     UnderlinedClickableText(
-                        text = "Đăng nhập ngay",
-                        color = OrangeDefault,
+                        text = "Bạn đã có tài khoản? ",
+                        link = "Đăng nhập ngay",
+                        linkColor = OrangeDefault,
                         onClick = {},
                         modifier = Modifier.padding(0.dp)
                     )
