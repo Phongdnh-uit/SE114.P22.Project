@@ -2,6 +2,7 @@ package com.example.mam.gui.screen
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mam.gui.component.OtpInputField
 import com.example.mam.gui.component.CircleIconButton
+import com.example.mam.gui.component.OtpInputWithCountdown
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
@@ -62,6 +64,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                 shadow = "outer",
                 onClick = {},
                 modifier = Modifier
+                    .focusable(false)
                     .align(Alignment.CenterStart)
                     .padding(start = 16.dp) // padding nếu cần
             )
@@ -83,6 +86,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
+                .focusable(false)
                 .outerShadow(
                     color = GreyDark,
                     bordersRadius = 50.dp,
@@ -125,11 +129,15 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                         shape = RoundedCornerShape( 40.dp )
                     )
                     .padding( start = 14.dp, end = 14.dp)
+                    .focusable(false)
             ) {
-                OtpInputField(
+                OtpInputWithCountdown(
                     otpLength = 4,
                     onOtpComplete = { otp ->
-                        Log.d("OTP", "Mã người dùng nhập: $otp")
+                        // Xử lý khi OTP hoàn thành
+                    },
+                    onResendClick = {
+                        // Xử lý gửi lại OTP
                     }
                 )
             }
