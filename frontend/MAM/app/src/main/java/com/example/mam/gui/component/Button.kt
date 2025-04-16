@@ -2,6 +2,9 @@ package com.example.mam.gui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -282,6 +285,8 @@ fun CircleIconButton(
         enabled = isEnable,
         onClick = onClick,
         modifier = modifier
+            .size(50.dp)
+            .focusable(false)
             .then(
                 if (isEnable) Modifier.bounceClick()
                 else Modifier
