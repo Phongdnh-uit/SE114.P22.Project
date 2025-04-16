@@ -145,9 +145,9 @@ fun SignInScreen(
                         .height(40.dp)
                 )
                 OuterShadowFilledButton(
-                    text = "Đăng nhập",
-                    onClick = { onSignInClicked(sdt, mk) },
-                    isEnable = (mkInput.isNotEmpty() && sdtInput.isNotEmpty()),
+                        text = "Đăng nhập",
+                        onClick = { onSignInClicked(sdt, mk) },
+                        isEnable = (mkInput.isNotEmpty() && sdtInput.isNotEmpty()),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .height(40.dp),

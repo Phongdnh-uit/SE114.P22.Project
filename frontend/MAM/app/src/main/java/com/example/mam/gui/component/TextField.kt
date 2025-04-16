@@ -1,5 +1,6 @@
 package com.example.mam.gui.component
 
+import android.view.KeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -303,11 +305,12 @@ fun PasswordField(
 }
 @Composable
 fun OtpInputField(
-    modifier: Modifier = Modifier,
     otpLength: Int = 4,
-    onOtpComplete: (String) -> Unit
+    onOtpChange: (String) -> Unit, // Thêm callback khi OTP thay đổi
+    onOtpComplete: (String) -> Unit,
+    resetTrigger: Boolean = false // Thêm trigger để reset
 ) {
-    val otpValues = remember { mutableStateListOf(*Array(otpLength) { "" }) }
+    val otpValues = remember(resetTrigger) { mutableStateListOf(*Array(otpLength) { "" }) }
     val focusRequesters = remember { List(otpLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
 
@@ -325,8 +328,12 @@ fun OtpInputField(
                         otpValues[index] = newValue
 
                         // Chuyển focus sang ô tiếp theo khi nhập
-                        if (newValue.isNotEmpty() && index < otpLength - 1) {
-                            focusRequesters[index + 1].requestFocus()
+                        if (newValue.isNotEmpty()) {
+                            if (index < otpLength - 1) {
+                                focusRequesters[index + 1].requestFocus()
+                            } else {
+                                focusManager.clearFocus()
+                            }
                         }
 
                         // Xử lý backspace
@@ -339,6 +346,12 @@ fun OtpInputField(
                             focusManager.clearFocus()
                             onOtpComplete(otpValues.joinToString(""))
                         }
+                        val currentOtp = otpValues.joinToString("")
+                        onOtpChange(currentOtp) // Gọi callback khi OTP thay đổi
+
+                        if (currentOtp.length == otpLength) {
+                            onOtpComplete(currentOtp)
+                        }
                     }
                 },
                 modifier = Modifier
@@ -349,7 +362,26 @@ fun OtpInputField(
                         shape = CircleShape
                     )
                     .background(WhiteDefault, CircleShape)
-                    .focusRequester(focusRequesters[index]),
+                    .focusRequester(focusRequesters[index])
+                    .onKeyEvent { event ->
+                        if (event.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL) {
+                            // Xử lý backspace chính xác
+                            if (otpValues[index].isEmpty()) {
+                                if (index > 0) {
+                                    focusRequesters[index - 1].requestFocus()
+                                    otpValues[index - 1] = "" // Xóa giá trị ô trước
+                                    true
+                                } else {
+                                    false
+                                }
+                            } else {
+                                otpValues[index] = "" // Xóa giá trị ô hiện tại
+                                true
+                            }
+                        } else {
+                            false
+                        }
+                    },
                 textStyle = TextStyle(
                     fontSize = Variables.BodySizeMedium,
                     textAlign = TextAlign.Center,
@@ -377,8 +409,6 @@ fun OtpInputField(
 
 @Composable
 fun OtpInputWithCountdown(
-    otpLength: Int,
-    onOtpComplete: (String) -> Unit,
     onResendClick: () -> Unit
 ){
     var remainingTime by remember { mutableStateOf(30) }
@@ -391,31 +421,27 @@ fun OtpInputWithCountdown(
         isCountdownActive = false
     }
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ){
-        OtpInputField(
-            otpLength = otpLength,
-            onOtpComplete = onOtpComplete,
-            modifier = Modifier.padding(bottom = 16.dp)
+        Text(
+            text = "${formatTime(remainingTime)}",
+            style = TextStyle(
+                fontSize = Variables.BodySizeMedium,
+                color = BrownDefault
+            )
         )
-
-        if(isCountdownActive){
-            Text(
-                text = "${formatTime(remainingTime)}",
-                style = TextStyle(
-                    fontSize = Variables.BodySizeMedium,
-                    color = BrownDefault
-                )
-            )
-        } else{
-            UnderlinedClickableText(
-                text = "Chưa nhận mã OTP ?",
-                link = "Gửi OTP",
-                linkColor = OrangeDefault,
-                onClick = onResendClick,
-                modifier = Modifier.padding(0.dp)
-            )
-        }
+        UnderlinedClickableText(
+            text = "Chưa nhận mã OTP ?",
+            link = "Gửi OTP",
+            linkColor = OrangeDefault,
+            onClick = {
+                remainingTime = 30
+                isCountdownActive = true
+                onResendClick() // Gọi callback reset OTP
+            },
+            modifier = Modifier.padding(0.dp)
+        )
     }
 }
 
