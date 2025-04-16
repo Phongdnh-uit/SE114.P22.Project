@@ -20,10 +20,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,13 +29,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
+import com.example.mam.ViewModel.SignUpViewModel
+import com.example.mam.data.SignUpState
 import com.example.mam.gui.component.EditFieldType1
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordFieldType1
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
-import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
@@ -45,28 +45,16 @@ import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 
 @Composable
-fun SignUpScreen(){
-    var hotenInput by remember { mutableStateOf("") }
-    val hoten = hotenInput
-
-    var sdtInput by remember { mutableStateOf("") }
-    val sdt = sdtInput
-
-    var emailInput by remember { mutableStateOf("") }
-    val email = emailInput
-
-    var tenUserInput by remember { mutableStateOf("") }
-    val tenUser = tenUserInput
-
-    var mkInput by remember { mutableStateOf("") }
-    val mk = mkInput
-
-    var mkNhapLaiInput by remember { mutableStateOf("") }
-    val mkNhapLai = mkNhapLaiInput
-
+fun SignUpScreen(
+    onSignInClicked: () -> Unit = {},
+    onSignUpClicked: () -> Unit = {},
+    modifier: Modifier = Modifier
+){
+    val signUpVM: SignUpViewModel = viewModel()
+    val signUpState: SignUpState by signUpVM.signUpState.collectAsState()
     val scrollState = rememberScrollState()
     Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +68,6 @@ fun SignUpScreen(){
             modifier = Modifier
                 .padding(top = 20.dp),
             style = Typography.titleLarge
-
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
@@ -114,63 +101,63 @@ fun SignUpScreen(){
             ) {
                 EditFieldType1(
                     label = "Họ tên",
-                    value = hotenInput,
+                    value = signUpState.name,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { hotenInput = it },
+                    onValueChange = { signUpVM.setName(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 EditFieldType1(
                     label = "Số điện thoại",
-                    value = sdtInput,
+                    value = signUpState.phoneNumber,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { sdtInput = it },
+                    onValueChange = { signUpVM.setPhoneNumber(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 EditFieldType1(
                     label = "Email",
-                    value = emailInput,
+                    value = signUpState.email,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { emailInput = it },
+                    onValueChange = { signUpVM.setEmail(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 EditFieldType1(
                     label = "Tên người dùng",
-                    value = tenUserInput,
+                    value = signUpState.name,
                     backgroundColor = WhiteDefault,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { tenUserInput = it },
+                    onValueChange = { signUpVM.setUserName(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordFieldType1(
                     label = "Mật khẩu",
-                    value = mkInput,
+                    value = signUpState.password,
                     subLabel = "Mật khẩu có ít nhất 6 chữ số",
                     backgroundColor = WhiteDefault,
-                    onValueChange = { mkInput = it },
+                    onValueChange = { signUpVM.setPassword(it)},
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordFieldType1(
                     label = "Xác nhận mật khẩu",
-                    value = mkNhapLaiInput,
-                    errorLabel = if (mk != mkNhapLai) "Mật khẩu chưa đúng!" else "",
+                    value = signUpState.repeatPassword,
+                    errorLabel = if (signUpVM.isRepeatPasswordValid()) "Mật khẩu chưa đúng!" else "",
                     backgroundColor = WhiteDefault,
                     imeAction = ImeAction.Done,
-                    onValueChange = { mkNhapLaiInput = it },
+                    onValueChange = { signUpVM.setRepeatPassword(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -181,7 +168,8 @@ fun SignUpScreen(){
             ) {
                 OuterShadowFilledButton(
                     text = "Đăng Ký",
-                    onClick = { },
+                    isEnable = signUpVM.isSignUpButtonEnable(),
+                    onClick = onSignUpClicked,
                     modifier = Modifier
                         .width(182.dp)
                         .height(40.dp)
@@ -195,7 +183,7 @@ fun SignUpScreen(){
                         text = "Bạn đã có tài khoản? ",
                         link = "Đăng nhập ngay",
                         linkColor = OrangeDefault,
-                        onClick = {},
+                        onClick = onSignInClicked,
                         modifier = Modifier.padding(0.dp)
                     )
                 }

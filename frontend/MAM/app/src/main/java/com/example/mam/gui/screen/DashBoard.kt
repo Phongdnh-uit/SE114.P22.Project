@@ -58,7 +58,7 @@ fun DashBoard(
                         modifier = Modifier.background(OrangeDefault)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            painter = painterResource(id = R.drawable.ic_mam_foreground),
                             contentDescription = "MAM"
                         )
                     }

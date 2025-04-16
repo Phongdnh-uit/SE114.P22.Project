@@ -2,8 +2,6 @@ package com.example.mam.gui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,16 +23,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +59,6 @@ fun UnderlinedClickableText(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val annotatedText = buildAnnotatedString {
         withStyle(style = SpanStyle(color = color)) {
             append(text)
@@ -77,14 +75,18 @@ fun UnderlinedClickableText(
         pop()
     }
 
+
     ClickableText(
         text = annotatedText,
+        style = TextStyle(
+            textAlign = TextAlign.Center),
         onClick = { offset ->
             annotatedText.getStringAnnotations(tag = "CLICK", start = offset, end = offset)
                 .firstOrNull()?.let {
                     onClick()
                 }
         },
+        modifier = modifier
 
         // style mặc định cho đoạn text
     )
@@ -94,30 +96,34 @@ fun UnderlinedClickableText(
 fun InnerShadowFilledButton(
     text: String,
     icon: ImageVector?= null,
+    image: Int ?= null,
     isEnable: Boolean = true,
     onClick: () -> Unit,
     modifier: Modifier
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
+    val isPressed = remember { mutableStateOf(false) }
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
         enabled = isEnable,
-        onClick = onClick,
+        onClick = {
+            isPressed.value = true
+            onClick()
+        },
         modifier = modifier
+            .bounceClick()
             .then(
-            if (!isPressed && isEnable) Modifier.innerShadow(
-                color = GreyDark,
-                bordersRadius = 25.dp,
-                blurRadius = 4.dp,
-                offsetX = 0.dp,
-                offsetY = 4.dp,
-                spread = 0.dp,
-            )
+            if (isEnable) Modifier
+                .innerShadow(
+                    color = GreyDark,
+                    bordersRadius = 25.dp,
+                    blurRadius = 4.dp,
+                    offsetX = 0.dp,
+                    offsetY = 4.dp,
+                    spread = 0.dp,
+                )
                 .clip(RoundedCornerShape(25.dp))
             else Modifier
         ),
-        interactionSource = interactionSource,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
     ){
         icon?.let {
@@ -125,7 +131,18 @@ fun InnerShadowFilledButton(
                 imageVector = icon,
                 contentDescription = null,
                 tint = WhiteDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+        image?.let {
+            Icon(
+                painter = painterResource(image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
             )
         }
         Text(
@@ -147,18 +164,21 @@ fun OuterShadowFilledButton(
     offsetY: Dp = 4.dp,
     spread: Dp = 0.dp,
     icon: ImageVector ?= null,
+    image: Int ?= null,
     onClick: () -> Unit,
     modifier: Modifier
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
+//    val isPressed = remember { mutableStateOf(false) }
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
         //border = borderStroke,
         onClick = onClick,
         enabled = isEnable,
-        modifier = modifier.then(
-            if (!isPressed && isEnable) Modifier.outerShadow(
+        modifier = modifier
+            .then(
+            if (isEnable) Modifier
+                .bounceClick()
+                .outerShadow(
                 color = shadowColor,
                 bordersRadius = 25.dp,
                 blurRadius = blurRadius,
@@ -167,7 +187,6 @@ fun OuterShadowFilledButton(
                 spread = spread,
             ) else modifier
         ),
-        interactionSource = interactionSource,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
     ){
         icon?.let {
@@ -175,7 +194,18 @@ fun OuterShadowFilledButton(
                 imageVector = icon,
                 contentDescription = null,
                 tint = WhiteDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+        image?.let {
+            Icon(
+                painter = painterResource(image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
             )
         }
         Text(
@@ -191,36 +221,46 @@ fun BasicOutlinedButton(
     text: String,
     foregroundColor: Color = BrownDefault,
     icon: ImageVector ?= null,
+    image: Int ?= null,
     isEnable: Boolean = true,
     onClick: () -> Unit,
     modifier: Modifier
 ){
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
-    val bordercolor = if (isEnable && !isPressed) foregroundColor else WhiteDefault
-    val foreground = if (!isPressed) foregroundColor else WhiteDefault
-        val background = if (!isPressed) Transparent else OrangeDefault
+    val bordercolor = if (isEnable) foregroundColor else WhiteDefault
     OutlinedButton(
-        colors = ButtonDefaults.buttonColors(containerColor = background),
+        colors = ButtonDefaults.buttonColors(containerColor = Transparent),
         border = BorderStroke( width = 2.dp, color = bordercolor),
         enabled = isEnable,
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.then(
+            if(isEnable) Modifier.bounceClick()
+            else Modifier
+        ),
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-        interactionSource = interactionSource
+//        interactionSource = interactionSource
     ){
         icon?.let {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = BrownDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+        image?.let {
+            Icon(
+                painter = painterResource(image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
             )
         }
         Text(
             text = text,
-            color = foreground
+            color = foregroundColor
         )
     }
 }
@@ -235,27 +275,31 @@ fun CircleIconButton(
     onClick: () -> Unit,
     modifier: Modifier,
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
     IconButton (
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = backgroundColor ?: OrangeDefault
         ),
         enabled = isEnable,
         onClick = onClick,
-        modifier = modifier.size(50.dp)
+        modifier = modifier
             .then(
-                if (shadow.equals("inner")){
-                    Modifier.innerShadow(
-                        color = GreyDark,
-                        bordersRadius = 25.dp,
-                        blurRadius = 4.dp,
-                        offsetX = 0.dp,
-                        offsetY = 4.dp,
-                        spread = 0.dp,
-                    ).clip(RoundedCornerShape(25.dp))
-                }
-                else if(shadow.equals("outer")){
+                if (isEnable) Modifier.bounceClick()
+                else Modifier
+            )
+            .size(50.dp)
+            .then(
+                if (shadow.equals("inner")) {
+                    Modifier
+                        .innerShadow(
+                            color = GreyDark,
+                            bordersRadius = 25.dp,
+                            blurRadius = 4.dp,
+                            offsetX = 0.dp,
+                            offsetY = 4.dp,
+                            spread = 0.dp,
+                        )
+                        .clip(RoundedCornerShape(25.dp))
+                } else if (shadow.equals("outer")) {
                     Modifier.outerShadow(
                         color = GreyDark,
                         bordersRadius = 25.dp,
@@ -264,10 +308,8 @@ fun CircleIconButton(
                         offsetY = 4.dp,
                         spread = 0.dp,
                     )
-                }
-                else Modifier
+                } else Modifier
             ),
-        interactionSource = interactionSource,
     ){
         Icon(
             imageVector = icon,
@@ -281,9 +323,10 @@ fun CircleIconButton(
 @Composable
 fun QuantitySelectionButton(
     count: Int,
-    onValueChange: (Int) -> Unit // Callback để cập nhật giá trị bên ngoài
+    onValueChange: (Int) -> Unit = {},
+    modifier: Modifier = Modifier// Callback để cập nhật giá trị bên ngoài
 ) {
-    Box(modifier = Modifier
+    Box(modifier = modifier
         .outerShadow() // Đổ bóng lên nền
         .background(OrangeDefault, shape = RoundedCornerShape(50))
         .padding(0.dp)) {

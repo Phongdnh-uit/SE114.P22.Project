@@ -16,6 +16,7 @@ import com.example.mam.gui.screen.SignUpScreen
 import com.example.mam.ViewModel.SignInViewModel
 import com.example.mam.ViewModel.SignUpViewModel
 import com.example.mam.data.SignInState
+import com.example.mam.gui.screen.StartScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -26,42 +27,46 @@ fun SignInSignUpNavHost(
     signInVM: SignInViewModel = viewModel(),
     signUpVM: SignUpViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
-    startDestination: String = SignInSignUpScreen.Login.name,
+    startDestination: String = SignInSignUpScreen.Start.name,
 ){
-    val coroutineScope = rememberCoroutineScope()
     val signInState: SignInState by signInVM.signInState.collectAsState()
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ){
-        composable(route = SignInSignUpScreen.Login.name) {
-            SignInScreen(
+        composable(route = SignInSignUpScreen.Start.name) {
+            StartScreen(
                 onSignInClicked = {
-                    username, password ->
-                    signInVM.CheckSignIn(username = username, password = password)
+                    navController.navigate(SignInSignUpScreen.SignIn.name)
                 },
                 onSignUpClicked = {
-                    coroutineScope.launch {
-                    delay(100)
-                    navController.navigate(SignInSignUpScreen.SignUp.name) }
-                    },
-                onForgotClicked = {
-                    coroutineScope.launch {
-                        delay(100)
-                        navController.navigate(SignInSignUpScreen.ForgetPW.name)
-                    }
+                    navController.navigate(SignInSignUpScreen.SignUp.name)
                 },
                 onTermsClicked = {
-                    coroutineScope.launch {
-                        delay(100)
-                        navController.navigate(SignInSignUpScreen.Terms.name)
-                    }
+                    navController.navigate(SignInSignUpScreen.Terms.name)
+                }
+            )
+        }
+        composable(route = SignInSignUpScreen.SignIn.name) {
+            SignInScreen(
+                onSignInClicked = {
+                    signInVM.CheckSignIn()
+                },
+                onForgotClicked = {
+                    navController.navigate(SignInSignUpScreen.ForgetPW.name)
                 },
             )
         }
         composable(route = SignInSignUpScreen.SignUp.name){
-            SignUpScreen()
+            SignUpScreen(
+                onSignUpClicked = {
+
+                },
+                onSignInClicked = {
+                    navController.navigate(SignInSignUpScreen.SignIn.name)
+                }
+            )
         }
         composable(route = SignInSignUpScreen.ForgetPW.name){
             ChangePasswordScreen()

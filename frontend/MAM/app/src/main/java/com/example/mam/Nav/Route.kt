@@ -1,7 +1,8 @@
 package com.example.mam.nav
 
-enum class SignInSignUpScreen{
-    Login,
+enum class SignInSignUpScreen {
+    Start,
+    SignIn,
     ForgetPW,
     Terms,
     SignUp,

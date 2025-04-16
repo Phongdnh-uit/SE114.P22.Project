@@ -11,21 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SignInViewModel :ViewModel(){
+class SignInViewModel : ViewModel(){
     private val _signInState = MutableStateFlow(SignInState())
     val signInState = _signInState.asStateFlow()
-    fun CheckSignIn(username: String, password: String){
-        _signInState.update {
-            currentState ->
-            currentState.copy(
-                username = username,
-                password = password
-
-            )
-        }
+    fun CheckSignIn(){
         viewModelScope.launch {
             try {
-                val request = SignInRequest(username, password)
+                val request = SignInRequest(_signInState.value.username, _signInState.value.password)
                 val response = RetrofitClient.api.login(request)
                 Log.d("LOGIN", "AccessToken: ${response.accessToken}")
                 Log.d("LOGIN", "RefreshToken: ${response.refreshToken}")
@@ -33,6 +25,12 @@ class SignInViewModel :ViewModel(){
                 Log.e("LOGIN", "Login failed: ${e.message}")
             }
         }
+    }
+    fun SetUsername(it: String){
+        _signInState.value = _signInState.value.copy(username = it)
+    }
+    fun SetPassword(it: String){
+        _signInState.value = _signInState.value.copy(password = it)
     }
 
 }
