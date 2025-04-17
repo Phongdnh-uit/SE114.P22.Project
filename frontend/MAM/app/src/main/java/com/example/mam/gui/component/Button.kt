@@ -66,6 +66,7 @@ fun UnderlinedClickableText(
         withStyle(style = SpanStyle(color = color)) {
             append(text)
         }
+        append("   ")
         // Đánh dấu phần cần click
         pushStringAnnotation(tag = "CLICK", annotation = "clicked")
         withStyle(style = SpanStyle(
