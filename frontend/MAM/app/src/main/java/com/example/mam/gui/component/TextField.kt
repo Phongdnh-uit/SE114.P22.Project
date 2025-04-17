@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
@@ -335,12 +336,6 @@ fun OtpInputField(
                                 focusManager.clearFocus()
                             }
                         }
-
-                        // Xử lý backspace
-                        if (newValue.isEmpty() && index > 0) {
-                            focusRequesters[index - 1].requestFocus()
-                        }
-
                         // Khi hoàn thành OTP
                         if (otpValues.all { it.isNotEmpty() }) {
                             focusManager.clearFocus()
@@ -349,7 +344,7 @@ fun OtpInputField(
                         val currentOtp = otpValues.joinToString("")
                         onOtpChange(currentOtp) // Gọi callback khi OTP thay đổi
 
-                        if (currentOtp.length == otpLength) {
+                        if (currentOtp.length == otpLength && currentOtp.all { it.isDigit() }) {
                             onOtpComplete(currentOtp)
                         }
                     }
@@ -369,13 +364,13 @@ fun OtpInputField(
                             if (otpValues[index].isEmpty()) {
                                 if (index > 0) {
                                     focusRequesters[index - 1].requestFocus()
-                                    otpValues[index - 1] = "" // Xóa giá trị ô trước
                                     true
                                 } else {
                                     false
                                 }
                             } else {
-                                otpValues[index] = "" // Xóa giá trị ô hiện tại
+                                otpValues[index] = ""
+                                focusRequesters[index].requestFocus()
                                 true
                             }
                         } else {
