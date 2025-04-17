@@ -13,24 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
-import com.example.mam.ViewModel.SignInViewModel
-import com.example.mam.data.SignInState
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
@@ -48,9 +41,6 @@ fun StartScreen(
     onTermsClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val signInVM: SignInViewModel = viewModel()
-    val signInState: SignInState by signInVM.signInState.collectAsState()
-    val scrollState = rememberScrollState()
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,7 +49,6 @@ fun StartScreen(
             .background(color = OrangeDefault)
             .padding(WindowInsets.statusBars.asPaddingValues())
             //.padding(WindowInsets.ime.asPaddingValues())
-            .verticalScroll(scrollState),
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_mam_foreground),

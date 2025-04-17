@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -22,9 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -33,29 +29,30 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
-import com.example.mam.ViewModel.SignInViewModel
-import com.example.mam.data.SignInState
-import com.example.mam.gui.component.BasicOutlinedButton
 import com.example.mam.gui.component.EditField
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordField
-import com.example.mam.gui.component.QuantitySelectionButton
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.model.SignInState
+import com.example.mam.services.repo.FakeAuthorizationRepo
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
+import com.example.mam.viewmodel.AuthorizationViewModel
 
 @Composable
 fun SignInScreen(
     onSignInClicked: () -> Unit = {},
     onForgotClicked: () -> Unit = {},
+    signInVM: AuthorizationViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val signInVM: SignInViewModel = viewModel()
+
     val signInState: SignInState by signInVM.signInState.collectAsState()
     val scrollState = rememberScrollState()
     Column(
@@ -115,13 +112,13 @@ fun SignInScreen(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { signInVM.SetUsername(it) },
+                    onValueChange = { signInVM.setUsername(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordField(
                     label = "Mật khẩu",
                     value = signInState.password,
-                    onValueChange = { signInVM.SetPassword(it)},
+                    onValueChange = { signInVM.setSIPassword(it)},
                     modifier = Modifier.fillMaxWidth()
                 )
                 UnderlinedClickableText(
@@ -148,5 +145,6 @@ fun SignInScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignInScreenPreview() {
-        SignInScreen()
+    val fakeVM = AuthorizationViewModel(repository = FakeAuthorizationRepo())
+        SignInScreen(signInVM = fakeVM)
 }

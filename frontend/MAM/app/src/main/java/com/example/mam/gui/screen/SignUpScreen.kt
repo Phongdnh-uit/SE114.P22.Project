@@ -31,26 +31,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
-import com.example.mam.ViewModel.SignUpViewModel
-import com.example.mam.data.SignUpState
 import com.example.mam.gui.component.EditFieldType1
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordFieldType1
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.model.SignUpState
+import com.example.mam.services.repo.FakeAuthorizationRepo
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
+import com.example.mam.viewmodel.AuthorizationViewModel
 
 @Composable
 fun SignUpScreen(
     onSignInClicked: () -> Unit = {},
     onSignUpClicked: () -> Unit = {},
+    signUpVM: AuthorizationViewModel = viewModel(),
     modifier: Modifier = Modifier
 ){
-    val signUpVM: SignUpViewModel = viewModel()
     val signUpState: SignUpState by signUpVM.signUpState.collectAsState()
     val scrollState = rememberScrollState()
     Column(
@@ -148,7 +149,7 @@ fun SignUpScreen(
                     value = signUpState.password,
                     subLabel = "Mật khẩu có ít nhất 6 chữ số",
                     backgroundColor = WhiteDefault,
-                    onValueChange = { signUpVM.setPassword(it)},
+                    onValueChange = { signUpVM.setSUPassword(it)},
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordFieldType1(
@@ -195,5 +196,6 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    SignUpScreen()
+    val fakeVM = AuthorizationViewModel(repository = FakeAuthorizationRepo())
+    SignUpScreen(signUpVM = fakeVM)
 }

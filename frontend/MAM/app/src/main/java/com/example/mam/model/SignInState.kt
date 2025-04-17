@@ -1,4 +1,4 @@
-package com.example.mam.data
+package com.example.mam.model
 
 data class SignInState (
     val username: String = "",
