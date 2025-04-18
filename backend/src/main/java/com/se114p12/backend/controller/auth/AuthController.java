@@ -87,16 +87,20 @@ public class AuthController {
     return ResponseEntity.ok().body("Logout successfully");
   }
 
-  @PostMapping("/forgot-password")
-  public void forgotPassword(Model model) {
-    model.addAttribute("name", "Phong");
-    try {
-      mailService.sendEmail(
-          "dangnguyenhuyphong@gmail.com", "Forgot password", "forgot-password", model);
-    } catch (MessagingException e) {
-      e.printStackTrace();
-    }
-  }
+/**
+ * On working
+ * */
+    
+  // @PostMapping("/forgot-password")
+  // public void forgotPassword(Model model) {
+  //   model.addAttribute("name", "Phong");
+  //   try {
+  //     mailService.sendEmail(
+  //         "dangnguyenhuyphong@gmail.com", "Forgot password", "forgot-password", model);
+  //   } catch (MessagingException e) {
+  //     e.printStackTrace();
+  //   }
+  // }
 
   // @PostMapping("/reset-password")
 
