@@ -1,13 +1,13 @@
 package com.se114p12.backend.service;
 
-import com.se114p12.backend.domain.Cart;
-import com.se114p12.backend.domain.User;
-import com.se114p12.backend.domain.enums.UserStatus;
+import com.se114p12.backend.domain.cart.Cart;
+import com.se114p12.backend.domain.authentication.User;
+import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
-import com.se114p12.backend.repository.CartRepository;
-import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.repository.cart.CartRepository;
+import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.util.TypeUtil;
 import com.se114p12.backend.vo.PageVO;
 

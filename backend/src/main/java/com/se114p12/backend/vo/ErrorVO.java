@@ -1,7 +1,7 @@
 package com.se114p12.backend.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.se114p12.backend.domain.enums.ErrorType;
+import com.se114p12.backend.enums.ErrorType;
 
 import lombok.Builder;
 import lombok.Data;

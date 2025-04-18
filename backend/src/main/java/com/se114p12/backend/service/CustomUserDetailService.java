@@ -1,7 +1,7 @@
 package com.se114p12.backend.service;
 
-import com.se114p12.backend.domain.User;
-import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.domain.authentication.User;
+import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.util.TypeUtil;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

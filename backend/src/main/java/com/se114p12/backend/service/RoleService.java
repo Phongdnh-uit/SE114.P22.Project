@@ -1,9 +1,9 @@
 package com.se114p12.backend.service;
 
-import com.se114p12.backend.domain.Role;
+import com.se114p12.backend.domain.authentication.Role;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
-import com.se114p12.backend.repository.RoleRepository;
+import com.se114p12.backend.repository.authentication.RoleRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

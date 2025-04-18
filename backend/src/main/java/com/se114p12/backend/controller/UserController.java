@@ -1,6 +1,6 @@
 package com.se114p12.backend.controller;
 
-import com.se114p12.backend.domain.User;
+import com.se114p12.backend.domain.authentication.User;
 import com.se114p12.backend.service.UserService;
 import com.se114p12.backend.vo.PageVO;
 

@@ -1,6 +1,6 @@
 package com.se114p12.backend.exception;
 
-import com.se114p12.backend.domain.enums.ErrorType;
+import com.se114p12.backend.enums.ErrorType;
 import com.se114p12.backend.vo.ErrorVO;
 import java.util.HashMap;
 import java.util.Map;
