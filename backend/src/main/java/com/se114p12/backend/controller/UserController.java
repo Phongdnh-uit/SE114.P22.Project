@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserService userService;
 
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
   public ResponseEntity<PageVO<?>> getAllUsers(@ParameterObject Pageable pageable) {
     return ResponseEntity.ok(userService.getAllUsers(pageable));
