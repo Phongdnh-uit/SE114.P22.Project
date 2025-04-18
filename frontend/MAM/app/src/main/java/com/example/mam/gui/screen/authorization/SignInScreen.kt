@@ -1,8 +1,10 @@
-package com.example.mam.gui.screen
+package com.example.mam.gui.screen.authorization
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,31 +33,30 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
+import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.EditField
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordField
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
-import com.example.mam.model.SignInState
-import com.example.mam.services.repo.FakeAuthorizationRepo
+import com.example.mam.model.authorization.SignInState
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
-import com.example.mam.viewmodel.AuthorizationViewModel
+import com.example.mam.viewmodel.authorization.SignInViewModel
 
 @Composable
 fun SignInScreen(
     onSignInClicked: () -> Unit = {},
     onForgotClicked: () -> Unit = {},
-    signInVM: AuthorizationViewModel = viewModel(),
+    onBackClicked: () -> Unit ={},
+    viewModel: SignInViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-
-    val signInState: SignInState by signInVM.signInState.collectAsState()
+    val signInState: SignInState by viewModel.signInState.collectAsState()
     val scrollState = rememberScrollState()
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -65,12 +68,26 @@ fun SignInScreen(
             //.padding(WindowInsets.ime.asPaddingValues())
             .verticalScroll(scrollState),
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_mam_foreground),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Box(
+            contentAlignment = Alignment.TopStart
+        ) {
+            CircleIconButton(
+                backgroundColor = OrangeLighter,
+                foregroundColor = OrangeDefault,
+                icon = Icons.Filled.ArrowBack,
+                shadow = "outer",
+                onClick = onBackClicked,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 16.dp, top = 16.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.ic_mam_foreground),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Text(
             text = "Đăng nhập",
             style = Typography.titleLarge
@@ -112,13 +129,13 @@ fun SignInScreen(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onValueChange = { signInVM.setUsername(it) },
+                    onValueChange = { viewModel.setUsername(it) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 PasswordField(
                     label = "Mật khẩu",
                     value = signInState.password,
-                    onValueChange = { signInVM.setSIPassword(it)},
+                    onValueChange = { viewModel.setSIPassword(it)},
                     modifier = Modifier.fillMaxWidth()
                 )
                 UnderlinedClickableText(
@@ -142,9 +159,9 @@ fun SignInScreen(
 }
 
 
+@SuppressLint("SuspiciousIndentation")
 @Preview(showBackground = true)
 @Composable
 fun SignInScreenPreview() {
-    val fakeVM = AuthorizationViewModel(repository = FakeAuthorizationRepo())
-        SignInScreen(signInVM = fakeVM)
+        SignInScreen()
 }

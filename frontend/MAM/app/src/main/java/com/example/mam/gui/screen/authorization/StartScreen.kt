@@ -1,4 +1,4 @@
-package com.example.mam.gui.screen
+package com.example.mam.gui.screen.authorization
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

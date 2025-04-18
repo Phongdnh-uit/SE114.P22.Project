@@ -1,4 +1,4 @@
-package com.example.mam.model
+package com.example.mam.model.authorization
 
 data class SignUpState (
     val name: String = "",

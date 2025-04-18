@@ -1,6 +1,5 @@
-package com.example.mam.gui.screen
+package com.example.mam.gui.screen.authorization
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement

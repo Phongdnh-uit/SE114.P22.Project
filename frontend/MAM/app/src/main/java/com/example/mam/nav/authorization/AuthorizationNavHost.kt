@@ -1,4 +1,4 @@
-package com.example.mam.nav
+package com.example.mam.nav.authorization
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,20 +7,25 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mam.viewmodel.AuthorizationViewModel
-import com.example.mam.gui.screen.ChangePasswordScreen
-import com.example.mam.gui.screen.SignInScreen
-import com.example.mam.gui.screen.SignUpScreen
-import com.example.mam.gui.screen.StartScreen
+import com.example.mam.gui.screen.authorization.ChangePasswordScreen
+import com.example.mam.gui.screen.authorization.SignInScreen
+import com.example.mam.gui.screen.authorization.SignUpScreen
+import com.example.mam.gui.screen.authorization.StartScreen
+import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
+import com.example.mam.viewmodel.authorization.SignInViewModel
+import com.example.mam.viewmodel.authorization.SignUpViewModel
 
 
 @Composable
 fun AuthorizationNavHost(
     modifier: Modifier = Modifier,
-    authorizationVM: AuthorizationViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     startDestination: String = SignInSignUpScreen.Start.name,
 ){
+    val signInVM: SignInViewModel = viewModel()
+    val signUpVM: SignUpViewModel = viewModel()
+    val changePasswordVM: ChangePasswordViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -42,25 +47,40 @@ fun AuthorizationNavHost(
         composable(route = SignInSignUpScreen.SignIn.name) {
             SignInScreen(
                 onSignInClicked = {
-                    authorizationVM.checkSignIn()
+                    signInVM.checkSignIn()
                 },
                 onForgotClicked = {
                     navController.navigate(SignInSignUpScreen.ForgetPW.name)
+                },
+                onBackClicked = {
+                    navController.popBackStack()
                 },
             )
         }
         composable(route = SignInSignUpScreen.SignUp.name){
             SignUpScreen(
                 onSignUpClicked = {
-
+                    //Xử lý đăng ký
+                    navController.navigate(SignInSignUpScreen.SignIn.name)
                 },
                 onSignInClicked = {
                     navController.navigate(SignInSignUpScreen.SignIn.name)
-                }
+                },
+                onBackClicked = {
+                    navController.popBackStack()
+                },
             )
         }
         composable(route = SignInSignUpScreen.ForgetPW.name){
-            ChangePasswordScreen()
+            ChangePasswordScreen(
+                onChangeClicked = {
+                    //Xử lý đổi mật khẩu
+                    navController.popBackStack(SignInSignUpScreen.SignIn.name,inclusive = false)
+                },
+                onCloseClicked = {
+                    navController.popBackStack()
+                },
+            )
         }
     }
 }

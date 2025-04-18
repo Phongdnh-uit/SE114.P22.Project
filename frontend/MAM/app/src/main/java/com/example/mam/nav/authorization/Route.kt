@@ -1,4 +1,4 @@
-package com.example.mam.nav
+package com.example.mam.nav.authorization
 
 enum class SignInSignUpScreen {
     Start,
