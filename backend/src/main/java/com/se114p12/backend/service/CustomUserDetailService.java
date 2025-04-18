@@ -24,24 +24,27 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (TypeUtil.checkUsernameType(username) == 1) {
             User user =  userRepository.findByPhone(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            String role = "ROLE_ " + user.getRole().getName();
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getPhone())
                     .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
+                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
                     .build();
         } else if (TypeUtil.checkUsernameType(username) == 1) {
             User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            String role = "ROLE_ " + user.getRole().getName();
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
                     .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
+                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
                     .build();
         } else {
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            String role = "ROLE_ " + user.getRole().getName();
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getUsername())
                     .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
+                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
                     .build();
         }
     }

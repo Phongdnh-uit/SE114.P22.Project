@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Product Module")
@@ -24,16 +25,20 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId, pageable));
     }
 
+    
+    @PreAuthorize("hasRole('ADMIN')") 
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         return ResponseEntity.ok(productService.create(product));
     }
 
+    @PreAuthorize("hasRole('ADMIN')") 
     @PutMapping(value = "/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @Valid @RequestBody Product productDetails) {
         return ResponseEntity.ok(productService.update(id, productDetails));
     }
 
+    @PreAuthorize("hasRole('ADMIN')") 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
         productService.delete(id);

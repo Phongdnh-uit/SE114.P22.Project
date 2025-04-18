@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Product Category Module")
@@ -32,11 +33,13 @@ public class ProductCategoryController {
         return ResponseEntity.ok().body(productCategoryService.findById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')") 
     @PostMapping
     public ResponseEntity<?> createProductCategory(@Valid @RequestBody ProductCategory productCategory) {
         return ResponseEntity.ok().body(productCategoryService.create(productCategory));
     }
 
+    @PreAuthorize("hasRole('ADMIN')") 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProductCategory(
             @PathVariable("id") Long id,
@@ -44,6 +47,7 @@ public class ProductCategoryController {
         return ResponseEntity.ok().body(productCategoryService.update(id, productCategory));
     }
 
+    @PreAuthorize("hasRole('ADMIN')") 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProductCategory(
             @PathVariable Long id) {
