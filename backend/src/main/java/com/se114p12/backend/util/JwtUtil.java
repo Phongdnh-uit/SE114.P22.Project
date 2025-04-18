@@ -1,8 +1,8 @@
 package com.se114p12.backend.util;
 
-import com.se114p12.backend.domain.User;
+import com.se114p12.backend.domain.authentication.User;
 import com.se114p12.backend.exception.ResourceNotFoundException;
-import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.repository.authentication.UserRepository;
 import java.time.Instant;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,5 +92,24 @@ public class JwtUtil {
     } catch (JwtException e) {
       throw new JwtException("Invalid JWT token", e);
     }
+  }
+
+  public Long getCurrentUserId() {
+    String credential = getCurrentUserCredentials();
+
+    // Tuỳ vào hệ thống dùng username/email/phone:
+    Optional<User> userOptional;
+
+    if (TypeUtil.checkUsernameType(credential) == 1) {
+      userOptional = userRepository.findByPhone(credential);
+    } else if (TypeUtil.checkUsernameType(credential) == 2) {
+      userOptional = userRepository.findByEmail(credential);
+    } else {
+      userOptional = userRepository.findByUsername(credential);
+    }
+
+    return userOptional
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"))
+            .getId();
   }
 }

@@ -30,7 +30,7 @@ public class CustomUserDetailService implements UserDetailsService {
                     .password(user.getPassword())
                     .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
                     .build();
-        } else if (TypeUtil.checkUsernameType(username) == 1) {
+        } else if (TypeUtil.checkUsernameType(username) == 2) {
             User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             String role = "ROLE_ " + user.getRole().getName();
             return org.springframework.security.core.userdetails.User
