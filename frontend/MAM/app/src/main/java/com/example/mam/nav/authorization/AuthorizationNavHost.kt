@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mam.gui.screen.authorization.ChangePasswordScreen
+import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
 import com.example.mam.gui.screen.authorization.StartScreen
@@ -20,7 +21,7 @@ import com.example.mam.viewmodel.authorization.SignUpViewModel
 fun AuthorizationNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = SignInSignUpScreen.Start.name,
+    startDestination: String = AuthorizationScreen.Start.name,
 ){
     val signInVM: SignInViewModel = viewModel()
     val signUpVM: SignUpViewModel = viewModel()
@@ -31,55 +32,71 @@ fun AuthorizationNavHost(
         startDestination = startDestination,
         modifier = modifier
     ){
-        composable(route = SignInSignUpScreen.Start.name) {
+        composable(route = AuthorizationScreen.Start.name) {
             StartScreen(
                 onSignInClicked = {
-                    navController.navigate(SignInSignUpScreen.SignIn.name)
+                    navController.navigate(AuthorizationScreen.SignIn.name)
                 },
                 onSignUpClicked = {
-                    navController.navigate(SignInSignUpScreen.SignUp.name)
+                    navController.navigate(AuthorizationScreen.SignUp.name)
                 },
                 onTermsClicked = {
-                    navController.navigate(SignInSignUpScreen.Terms.name)
+                    navController.navigate(AuthorizationScreen.Terms.name)
                 }
             )
         }
-        composable(route = SignInSignUpScreen.SignIn.name) {
+        composable(route = AuthorizationScreen.SignIn.name) {
             SignInScreen(
                 onSignInClicked = {
                     signInVM.checkSignIn()
                 },
                 onForgotClicked = {
-                    navController.navigate(SignInSignUpScreen.ForgetPW.name)
+                    navController.navigate(AuthorizationScreen.ForgetPW.name)
                 },
                 onBackClicked = {
                     navController.popBackStack()
                 },
             )
         }
-        composable(route = SignInSignUpScreen.SignUp.name){
+        composable(route = AuthorizationScreen.SignUp.name){
             SignUpScreen(
                 onSignUpClicked = {
                     //Xử lý đăng ký
-                    navController.navigate(SignInSignUpScreen.SignIn.name)
+                    navController.navigate(AuthorizationScreen.SignIn.name)
                 },
                 onSignInClicked = {
-                    navController.navigate(SignInSignUpScreen.SignIn.name)
+                    navController.navigate(AuthorizationScreen.SignIn.name)
                 },
                 onBackClicked = {
                     navController.popBackStack()
                 },
             )
         }
-        composable(route = SignInSignUpScreen.ForgetPW.name){
+        composable(route = AuthorizationScreen.ForgetPW.name){
             ChangePasswordScreen(
                 onChangeClicked = {
                     //Xử lý đổi mật khẩu
-                    navController.popBackStack(SignInSignUpScreen.SignIn.name,inclusive = false)
+                    navController.navigate(AuthorizationScreen.OTP.name)
                 },
                 onCloseClicked = {
                     navController.popBackStack()
                 },
+            )
+        }
+        composable(route = AuthorizationScreen.OTP.name){
+            ForgetPasswordScreen(
+                onVerifyClicked = {
+                    if (changePasswordVM.isOTPValid()) {
+                        //xu ly
+                        navController.navigate(AuthorizationScreen.SignIn.name)
+                    }
+                    else {
+
+                    }
+                },
+                onCloseClicked = {
+                    navController.popBackStack()
+                }
             )
         }
     }

@@ -22,6 +22,9 @@ class ChangePasswordViewModel(): ViewModel() {
     fun setRepeatPassword(it: String){
         _changePasswordState.update { state -> state.copy(repeatPassword = it) }
     }
+    fun setOTP(it: String){
+        _changePasswordState.update { state -> state.copy(oTP = it) }
+    }
     fun isPasswordValid(): Boolean{
         return _changePasswordState.value.newPassword.length >= 6
     }
@@ -33,5 +36,8 @@ class ChangePasswordViewModel(): ViewModel() {
     }
     fun changePassword(){
 
+    }
+    fun isOTPValid(): Boolean{
+        return true
     }
 }

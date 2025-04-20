@@ -1,5 +1,6 @@
 package com.example.mam.gui.screen.authorization
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.gui.component.OtpInputField
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OtpInputWithCountdown
@@ -41,11 +44,16 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
+import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
-    var otpInput by remember { mutableStateOf("") }
-    val otp = otpInput
+fun ForgetPasswordScreen(
+    onVerifyClicked: () -> Unit = {},
+    onCloseClicked: () -> Unit = {},
+    viewModel: ChangePasswordViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
     var resetTrigger by remember { mutableStateOf(false) } // State để trigger reset
 
     BoxWithConstraints(
@@ -79,7 +87,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                     foregroundColor = OrangeDefault,
                     icon = Icons.Filled.Close,
                     shadow = "outer",
-                    onClick = {},
+                    onClick = onCloseClicked,
                     modifier = Modifier
                         .focusable(false)
                         .align(Alignment.CenterStart)
@@ -130,7 +138,7 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                     )
                 )
                 Text(
-                    text = "+84 904 599 204",
+                    text = " ",
                     style = TextStyle(
                         fontSize = Variables.BodySizeMedium,
                         lineHeight = 22.4.sp,
@@ -150,11 +158,9 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                 ) {
                     OtpInputField(
                         otpLength = 4,
-                        onOtpChange = { otp ->
-                            otpInput = otp
+                        onOtpChange = { viewModel.setOTP((it))
                         },
-                        onOtpComplete = { otp ->
-                            otpInput = otp
+                        onOtpComplete = { viewModel.setOTP((it))
                         },
                         resetTrigger = resetTrigger
                     )
@@ -162,13 +168,13 @@ fun ForgetPasswordScreen(modifier: Modifier = Modifier) {
                 OtpInputWithCountdown(
                     onResendClick = {
                         resetTrigger = !resetTrigger
-                        otpInput = ""
+                        viewModel.setOTP((""))
                     }
                 )
                 OuterShadowFilledButton(
                     text = "Xác nhận",
-                    onClick = { },
-                    isEnable = (otpInput.length == 4),
+                    onClick = onVerifyClicked,
+                    isEnable = (viewModel.changePasswordState.value.oTP.length == 4),
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(40.dp),

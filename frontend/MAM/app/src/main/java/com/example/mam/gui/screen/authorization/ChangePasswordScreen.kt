@@ -41,6 +41,7 @@ import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
 
 @Composable
 fun ChangePasswordScreen(
+    isChangePassword: Boolean = false,
     onChangeClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     viewModel: ChangePasswordViewModel = viewModel(),
@@ -129,13 +130,15 @@ fun ChangePasswordScreen(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    PasswordFieldType1(
-                        label = "Mật khẩu cũ",
-                        value = changePasswordState.oldPassword,
-                        backgroundColor = WhiteDefault,
-                        onValueChange = { viewModel.setOldPassword(it) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    if(isChangePassword){
+                        PasswordFieldType1(
+                            label = "Mật khẩu cũ",
+                            value = changePasswordState.oldPassword,
+                            backgroundColor = WhiteDefault,
+                            onValueChange = { viewModel.setOldPassword(it) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                     PasswordFieldType1(
                         label = "Mật khẩu mới",
                         subLabel = "Mật khẩu có ít nhất 6 chữ số",
