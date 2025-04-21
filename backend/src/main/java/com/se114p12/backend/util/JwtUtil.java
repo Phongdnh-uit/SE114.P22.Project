@@ -1,10 +1,10 @@
 package com.se114p12.backend.util;
 
-import com.se114p12.backend.domain.User;
+import com.se114p12.backend.domain.authentication.User;
 import com.se114p12.backend.exception.ResourceNotFoundException;
-import com.se114p12.backend.repository.UserRepository;
+import com.se114p12.backend.repository.authentication.UserRepository;
 import java.time.Instant;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,8 +15,10 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class JwtUtil {
   public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
+  private final LoginUtil loginUtil;
   private final UserRepository userRepository;
 
   @Value("${jwt.access.token.expiration}")
@@ -28,28 +30,18 @@ public class JwtUtil {
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder jwtDecoder;
 
-  public JwtUtil(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserRepository userRepository) {
-    this.jwtEncoder = jwtEncoder;
-    this.jwtDecoder = jwtDecoder;
-    this.userRepository = userRepository;
-  }
+  public String generateAccessToken(Long userId) {
 
-  public String generateAccessToken(String credential) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-    User user;
-
-    if (TypeUtil.checkUsernameType(credential) == 1) {
-      user = userRepository.findByPhone(credential).orElseThrow();
-    } else if (TypeUtil.checkUsernameType(credential) == 2) {
-      user = userRepository.findByEmail(credential).orElseThrow();
-    } else {
-      user = userRepository.findByUsername(credential).orElseThrow();
-    }
     Instant now = Instant.now();
     Instant exp = now.plusSeconds(accessTokenExpirationTime);
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
-            .subject(credential)
+            .subject(user.getId().toString())
             .issuedAt(now)
             .claim("role", user.getRole().getName())
             .expiresAt(exp)
@@ -58,32 +50,49 @@ public class JwtUtil {
     return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
   }
 
-  public String generateRefreshToken(String credential) {
+  public String generateRefreshToken(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     Instant now = Instant.now();
     Instant exp = now.plusSeconds(refreshTokenExpirationTime);
     JwtClaimsSet claims =
-        JwtClaimsSet.builder().subject(credential).issuedAt(now).expiresAt(exp).build();
+        JwtClaimsSet.builder()
+            .subject(user.getId().toString())
+            .issuedAt(now)
+            .expiresAt(exp)
+            .build();
     JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
     return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
   }
 
-  private static String extractPrincipal(Authentication authentication) {
-    if (authentication == null) {
-      return null;
-    } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
-      return springSecurityUser.getUsername();
-    } else if (authentication.getPrincipal() instanceof Jwt jwt) {
-      return jwt.getSubject();
-    } else if (authentication.getPrincipal() instanceof String s) {
-      return s;
+  /**
+   * Extracts the principal (user identifier) from the Authentication object. Supports UserDetails
+   * (userId), Jwt (sub).
+   *
+   * @param authentication the Authentication object from SecurityContext
+   * @return the user identifier (preferably userId)
+   * @throws IllegalStateException if principal type is unsupported
+   */
+  private Long extractPrincipal(Authentication authentication) {
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof UserDetails userDetails) {
+      return loginUtil.getUserByCredentialId(userDetails.getUsername()).getId();
+    } else if (principal instanceof Jwt jwt) {
+      return Long.parseLong(jwt.getSubject());
     }
-    return null;
+    throw new IllegalStateException(
+        "Unsupported principal type: " + principal.getClass().getName());
   }
 
-  public static String getCurrentUserCredentials() {
+  public Long getCurrentUserId() {
     SecurityContext context = SecurityContextHolder.getContext();
-    return Optional.ofNullable(extractPrincipal(context.getAuthentication()))
-        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    Authentication authentication = context.getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+      throw new IllegalStateException("No authenticated user found");
+    }
+    return extractPrincipal(authentication);
   }
 
   public Jwt checkValidity(String token) {

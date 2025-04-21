@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MAM</string>
+    <string name="dang_nhap">Đăng Nhập</string>
+    <string name="so_dien_thoai">Số điện thoại</string>
+    <string name="mat_khau">Mật khẩu</string>
+    <string name="dang_ky">Đăng Ký</string>
+    <string name="ho_ten">Họ và tên</string>"
+</resources>

@@ -1,6 +1,6 @@
 package com.se114p12.backend.exception;
 
-import com.se114p12.backend.domain.enums.ErrorType;
+import com.se114p12.backend.enums.ErrorType;
 import com.se114p12.backend.vo.ErrorVO;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,5 +43,11 @@ public class GlobalExceptionHandler {
     }
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
         .body(ErrorVO.builder().type(ErrorType.VALIDATION_ERROR).details(errorMap).build());
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<?> handle(Exception e) {
+    e.printStackTrace(); // log ra console
+    return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
   }
 }

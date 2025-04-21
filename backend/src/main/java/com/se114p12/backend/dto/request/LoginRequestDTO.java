@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 public class LoginRequestDTO {
+    // credentialId can be username or email or phone number
     @NotBlank
-    private String username;
+    private String credentialId;
 
     @NotBlank
     private String password;

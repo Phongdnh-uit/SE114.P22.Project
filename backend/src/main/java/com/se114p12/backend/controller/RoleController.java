@@ -1,6 +1,6 @@
 package com.se114p12.backend.controller;
 
-import com.se114p12.backend.domain.Role;
+import com.se114p12.backend.domain.authentication.Role;
 import com.se114p12.backend.service.RoleService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

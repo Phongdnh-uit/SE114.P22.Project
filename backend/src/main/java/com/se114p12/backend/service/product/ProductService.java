@@ -1,0 +1,85 @@
+package com.se114p12.backend.service.product;
+
+import com.se114p12.backend.domain.product.Product;
+import com.se114p12.backend.domain.product.ProductCategory;
+import com.se114p12.backend.dto.request.ProductRequestDTO;
+import com.se114p12.backend.repository.product.ProductRepository;
+import com.se114p12.backend.service.storage.StorageService;
+import com.se114p12.backend.vo.PageVO;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.Instant;
+
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+    private final ProductRepository productRepository;
+    private final ProductCategoryService productCategoryService;
+    private final StorageService storageService;
+
+    public PageVO<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
+        Page<Product> productPage = productRepository.findByCategory_Id(categoryId, pageable);
+        return PageVO.<Product>builder()
+                .content(productPage.getContent())
+                .page(productPage.getNumber())
+                .size(productPage.getSize())
+                .totalElements(productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .numberOfElements(productPage.getNumberOfElements())
+                .build();
+    }
+
+    public Product create(ProductRequestDTO dto) {
+        ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+        if (category == null) {
+            throw new IllegalArgumentException("Category not found.");
+        }
+
+        Product product = Product.builder()
+                .category(category)
+                .name(dto.getName())
+                .shortDescription(dto.getShortDescription())
+                .detailDescription(dto.getDetailDescription())
+                .originalPrice(dto.getOriginalPrice())
+                .createdAt(Instant.now())
+                .isAvailable(true)
+                .build();
+
+        product.setImageUrl(processImage(dto.getImage(), "product-items"));
+
+        return productRepository.save(product);
+    }
+
+    public Product update(Long id, @NotNull ProductRequestDTO dto) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product with the given ID does not exist."));
+
+        existingProduct.setName(dto.getName());
+        existingProduct.setShortDescription(dto.getShortDescription());
+        existingProduct.setDetailDescription(dto.getDetailDescription());
+        existingProduct.setOriginalPrice(dto.getOriginalPrice());
+        existingProduct.setUpdatedAt(Instant.now());
+
+        if (dto.getCategoryId() != 0) {
+            ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+            existingProduct.setCategory(category);
+        }
+
+        existingProduct.setImageUrl(processImage(dto.getImage(), "product-items"));
+
+        return productRepository.save(existingProduct);
+    }
+
+    public void delete(Long id) {
+        productRepository.deleteById(id);
+    }
+
+    private String processImage(MultipartFile image, String folder) {
+        return (image != null && !image.isEmpty()) ? "/uploads/" + folder + "/" + storageService.store(image, folder) : null;
+    }
+}
