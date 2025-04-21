@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mam.gui.screen.authorization.ChangePasswordScreen
-import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
+import com.example.mam.gui.screen.authorization.OTPScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
 import com.example.mam.gui.screen.authorization.StartScreen
@@ -84,7 +84,7 @@ fun AuthorizationNavHost(
             )
         }
         composable(route = AuthorizationScreen.OTP.name){
-            ForgetPasswordScreen(
+            OTPScreen(
                 onVerifyClicked = {
                     if (changePasswordVM.isOTPValid()) {
                         //xu ly

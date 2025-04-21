@@ -36,15 +36,18 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
@@ -314,6 +317,7 @@ fun OtpInputField(
     val otpValues = remember(resetTrigger) { mutableStateListOf(*Array(otpLength) { "" }) }
     val focusRequesters = remember { List(otpLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
+    val isDeleting = remember { mutableStateOf(false) }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -325,9 +329,8 @@ fun OtpInputField(
             BasicTextField(
                 value = otpValues[index],
                 onValueChange = { newValue ->
-                    if (newValue.length <= 1 && newValue.all { it.isDigit() }) {
+                    if (newValue.length <= 1 && newValue.isDigitsOnly()) {
                         otpValues[index] = newValue
-
                         // Chuyển focus sang ô tiếp theo khi nhập
                         if (newValue.isNotEmpty()) {
                             if (index < otpLength - 1) {
@@ -335,11 +338,6 @@ fun OtpInputField(
                             } else {
                                 focusManager.clearFocus()
                             }
-                        }
-                        // Khi hoàn thành OTP
-                        if (otpValues.all { it.isNotEmpty() }) {
-                            focusManager.clearFocus()
-                            onOtpComplete(otpValues.joinToString(""))
                         }
                         val currentOtp = otpValues.joinToString("")
                         onOtpChange(currentOtp) // Gọi callback khi OTP thay đổi
@@ -364,15 +362,11 @@ fun OtpInputField(
                             if (otpValues[index].isEmpty()) {
                                 if (index > 0) {
                                     focusRequesters[index - 1].requestFocus()
-                                    true
-                                } else {
-                                    false
                                 }
                             } else {
-                                otpValues[index] = ""
-                                focusRequesters[index].requestFocus()
-                                true
+                                otpValues[index] = "" // Chỉ xóa, không chuyển focus
                             }
+                            true
                         } else {
                             false
                         }
@@ -382,7 +376,9 @@ fun OtpInputField(
                     textAlign = TextAlign.Center,
                     color = BrownDefault
                 ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next),
                 singleLine = true,
                 decorationBox = { innerTextField ->
                     Box(
@@ -399,6 +395,97 @@ fun OtpInputField(
     LaunchedEffect(Unit) {
         delay(300)
         focusRequesters[0].requestFocus()
+    }
+}
+
+@Composable
+fun newOtpInputField(
+    number: Int?,
+    index: Int,
+    focusedIndex: Int?,
+    focusRequester: FocusRequester,
+    onFocusChanged: (Boolean) -> Unit,
+    onNumberChanged: (Int?) -> Unit,
+    onKeyboardBack: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    var text by remember(number) {
+        mutableStateOf(
+            TextFieldValue(
+                text = number?.toString().orEmpty(),
+                selection = TextRange(index = if (number != null) 1 else 0)
+            )
+        )
+    }
+    var isFocused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(number) {
+        text = TextFieldValue(
+            text = number?.toString().orEmpty(),
+            selection = TextRange(index = if (number != null) 1 else 0)
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .border(
+                width = 2.dp,
+                color = OrangeDefault,
+                shape = CircleShape
+            )
+            .background(WhiteDefault, CircleShape),
+        contentAlignment = Alignment.Center
+    ){
+        BasicTextField(
+            value = text,
+            onValueChange = { newText ->
+                val newNumber = newText.text
+                if(newNumber.length <= 1 && newNumber.isDigitsOnly()){
+                    onNumberChanged(newNumber.toIntOrNull())
+                    text = newText
+                }
+            },
+            singleLine = true,
+            textStyle = TextStyle(
+                fontSize = Variables.BodySizeMedium,
+                textAlign = TextAlign.Center,
+                color = BrownDefault
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next),
+            modifier = modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isFocused = it.isFocused
+                    if (it.isFocused && index != focusedIndex) {
+                        onFocusChanged(true) // Gọi callback để ViewModel cập nhật đúng ô đang focus
+                    }
+                }
+                .onKeyEvent { event ->
+                    val didPressDelete = event.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL
+                    if (didPressDelete) {
+                        if (text.text.isEmpty()) {
+                            onKeyboardBack()
+                        } else {
+                            text = TextFieldValue("") // Clear text & giữ focus
+                            onNumberChanged(null)
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                },
+            decorationBox = { innerTextField ->
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    innerTextField()
+                }
+            }
+        )
     }
 }
 
