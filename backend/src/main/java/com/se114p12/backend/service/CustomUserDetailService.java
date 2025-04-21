@@ -1,51 +1,28 @@
 package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.authentication.User;
-import com.se114p12.backend.repository.authentication.UserRepository;
-import com.se114p12.backend.util.TypeUtil;
+import com.se114p12.backend.util.LoginUtil;
+import java.util.Collections;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+  private final LoginUtil loginUtil;
 
-    public CustomUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (TypeUtil.checkUsernameType(username) == 1) {
-            User user =  userRepository.findByPhone(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String role = "ROLE_ " + user.getRole().getName();
-            return org.springframework.security.core.userdetails.User
-                    .withUsername(user.getPhone())
-                    .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
-                    .build();
-        } else if (TypeUtil.checkUsernameType(username) == 2) {
-            User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String role = "ROLE_ " + user.getRole().getName();
-            return org.springframework.security.core.userdetails.User
-                    .withUsername(user.getEmail())
-                    .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
-                    .build();
-        } else {
-            User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String role = "ROLE_ " + user.getRole().getName();
-            return org.springframework.security.core.userdetails.User
-                    .withUsername(user.getUsername())
-                    .password(user.getPassword())
-                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
-                    .build();
-        }
-    }
+  @Override
+  public UserDetails loadUserByUsername(String credentialId) throws UsernameNotFoundException {
+    User user = loginUtil.getUserByCredentialId(credentialId);
+    String role = "ROLE_ " + user.getRole().getName();
+    return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
+        .password(user.getPassword())
+        .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
+        .build();
+  }
 }

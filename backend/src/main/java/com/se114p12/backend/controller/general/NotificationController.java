@@ -24,11 +24,11 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.pushNotification(request));
     }
 
-    @GetMapping("/subscribe")
-    public SseEmitter subscribe() {
-        String username = JwtUtil.getCurrentUserCredentials(); // Lấy username/email/phone từ token
-        return notificationService.createEmitter(username);
-    }
+    // @GetMapping("/subscribe")
+    // public SseEmitter subscribe() {
+    //     String username = JwtUtil.getCurrentUserCredentials(); // Lấy username/email/phone từ token
+    //     return notificationService.createEmitter(username);
+    // }
 
     @GetMapping("/me")
     public ResponseEntity<List<NotificationResponse>> getMyNotifications() {
