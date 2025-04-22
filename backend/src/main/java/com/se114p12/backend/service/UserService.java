@@ -2,13 +2,15 @@ package com.se114p12.backend.service;
 
 import com.se114p12.backend.domain.authentication.User;
 import com.se114p12.backend.domain.cart.Cart;
+import com.se114p12.backend.dto.request.PasswordChangeDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.enums.UserStatus;
+import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.cart.CartRepository;
-import com.se114p12.backend.util.LoginUtil;
+import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
   private final CartRepository cartRepository;
-  private final LoginUtil loginUtil;
+  private final JwtUtil jwtUtil;
 
   //    public User create(User user) {
   //        user.setId(null);
@@ -99,6 +101,19 @@ public class UserService {
             .findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     user.setRefreshToken(refreshToken);
+  }
+
+  public void resetPassword(PasswordChangeDTO passwordChangeDTO) {
+    Long userId = jwtUtil.getCurrentUserId();
+    User currentUser =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    if (!passwordEncoder.matches(
+        passwordChangeDTO.getCurrentPassword(), currentUser.getPassword())) {
+      throw new BadRequestException("Password doesn't match");
+    }
+    currentUser.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
   }
 
   // Private helper methods

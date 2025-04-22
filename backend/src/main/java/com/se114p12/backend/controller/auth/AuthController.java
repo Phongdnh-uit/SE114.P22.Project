@@ -1,14 +1,14 @@
 package com.se114p12.backend.controller.auth;
 
 import com.se114p12.backend.dto.request.LoginRequestDTO;
+import com.se114p12.backend.dto.request.PasswordChangeDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
-import com.se114p12.backend.dto.response.LoginResponseDTO;
+import com.se114p12.backend.dto.response.AuthResponseDTO;
 import com.se114p12.backend.service.UserService;
 import com.se114p12.backend.service.mail.MailService;
 import com.se114p12.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +35,8 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+  public ResponseEntity<AuthResponseDTO> login(
+      @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
 
     UsernamePasswordAuthenticationToken authenticationToken =
         new UsernamePasswordAuthenticationToken(
@@ -53,14 +54,14 @@ public class AuthController {
     String refreshToken = jwtUtil.generateRefreshToken(userId);
 
     userService.setUserRefreshToken(userId, refreshToken);
-    LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
+    AuthResponseDTO loginResponseDTO = new AuthResponseDTO();
     loginResponseDTO.setAccessToken(accessToken);
     loginResponseDTO.setRefreshToken(refreshToken);
     return ResponseEntity.ok().body(loginResponseDTO);
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+  public ResponseEntity<AuthResponseDTO> refreshToken(@RequestBody String refreshToken) {
     Jwt jwt = jwtUtil.checkValidity(refreshToken);
     Long userId = Long.parseLong(jwt.getSubject());
 
@@ -70,33 +71,29 @@ public class AuthController {
 
     userService.setUserRefreshToken(userId, refreshToken);
 
-    return ResponseEntity.ok()
-        .body(
-            Map.of(
-                "accessToken", accessToken,
-                "refreshToken", newRefreshToken));
+    AuthResponseDTO loginResponseDTO = new AuthResponseDTO();
+    loginResponseDTO.setAccessToken(accessToken);
+    loginResponseDTO.setRefreshToken(newRefreshToken);
+    return ResponseEntity.ok().body(loginResponseDTO);
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<?> logout() {
+  public ResponseEntity<String> logout() {
     Long userId = jwtUtil.getCurrentUserId();
     userService.setUserRefreshToken(userId, null);
     return ResponseEntity.ok().body("Logout successfully");
   }
 
-  /** On working */
+  @PostMapping("/change-password")
+  public ResponseEntity<String> changePassword(
+      @Valid @RequestBody PasswordChangeDTO passwordChangeDTO) {
+    userService.resetPassword(passwordChangeDTO);
+    return ResponseEntity.ok().body("Reset password successfully");
+  }
 
-  // @PostMapping("/forgot-password")
-  // public void forgotPassword(Model model) {
-  //   model.addAttribute("name", "Phong");
-  //   try {
-  //     mailService.sendEmail(
-  //         "dangnguyenhuyphong@gmail.com", "Forgot password", "forgot-password", model);
-  //   } catch (MessagingException e) {
-  //     e.printStackTrace();
-  //   }
-  // }
+  @PostMapping("/reset-password/init")
+  public void requestPasswordReset() {}
 
-  // @PostMapping("/reset-password")
-
+  @PostMapping("/reset-password/finish")
+  public void finishPasswordReset() {}
 }
