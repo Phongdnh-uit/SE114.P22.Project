@@ -9,8 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.test.core.app.ActivityScenario.launch
-import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
+import com.example.mam.gui.screen.authorization.ChangePasswordScreen
 import com.example.mam.gui.screen.authorization.OTPScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
