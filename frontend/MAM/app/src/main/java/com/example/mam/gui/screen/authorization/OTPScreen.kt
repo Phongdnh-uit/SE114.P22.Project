@@ -36,16 +36,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mam.gui.component.OtpInputField
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OtpInputWithCountdown
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.newOtpInputField
-import com.example.mam.viewmodel.authorization.otp.OtpAction
-import com.example.mam.viewmodel.authorization.otp.OtpState
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
@@ -55,7 +51,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
-import com.plcoding.composeotpinput.OtpViewModel
+import com.example.mam.viewmodel.authorization.otp.OtpAction
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
