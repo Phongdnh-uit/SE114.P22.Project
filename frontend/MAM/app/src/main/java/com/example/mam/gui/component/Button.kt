@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -286,13 +287,12 @@ fun CircleIconButton(
         enabled = isEnable,
         onClick = onClick,
         modifier = modifier
-            .size(50.dp)
+            .size(40.dp)
             .focusable(false)
             .then(
                 if (isEnable) Modifier.bounceClick()
                 else Modifier
             )
-            .size(50.dp)
             .then(
                 if (shadow.equals("inner")) {
                     Modifier
@@ -321,7 +321,7 @@ fun CircleIconButton(
             imageVector = icon,
             contentDescription = null,
             tint = foregroundColor ?: WhiteDefault,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(30.dp)
         )
     }
 }
@@ -357,7 +357,7 @@ fun QuantitySelectionButton(
                     .background(Color.White, shape = RoundedCornerShape(50))
                     .wrapContentWidth()
                     .padding(0.dp)
-                    .height(50.dp)
+                    .height(30.dp)
             ){
                 Text(
                     text = "$count",

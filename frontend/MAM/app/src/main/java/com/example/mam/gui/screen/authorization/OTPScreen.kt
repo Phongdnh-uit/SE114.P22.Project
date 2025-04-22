@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.gui.component.OtpInputField
 import com.example.mam.gui.component.CircleIconButton
@@ -44,14 +43,14 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
+import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ForgetPasswordScreen(
+fun OTPScreen(
     onVerifyClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
-    viewModel: ChangePasswordViewModel = viewModel(),
+    viewModel: ForgetPasswordViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     var resetTrigger by remember { mutableStateOf(false) } // State để trigger reset
@@ -138,7 +137,7 @@ fun ForgetPasswordScreen(
                     )
                 )
                 Text(
-                    text = " ",
+                    text = viewModel.phoneNumber,
                     style = TextStyle(
                         fontSize = Variables.BodySizeMedium,
                         lineHeight = 22.4.sp,
@@ -174,7 +173,7 @@ fun ForgetPasswordScreen(
                 OuterShadowFilledButton(
                     text = "Xác nhận",
                     onClick = onVerifyClicked,
-                    isEnable = (viewModel.changePasswordState.value.oTP.length == 4),
+                    isEnable = viewModel.isOTPValid(),
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(40.dp),
@@ -188,5 +187,5 @@ fun ForgetPasswordScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewForgetPasswordScreen() {
-    ForgetPasswordScreen()
+    OTPScreen()
 }

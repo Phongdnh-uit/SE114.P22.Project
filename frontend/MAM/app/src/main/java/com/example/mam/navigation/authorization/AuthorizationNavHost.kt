@@ -1,20 +1,24 @@
-package com.example.mam.nav.authorization
+package com.example.mam.navigation.authorization
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mam.gui.screen.authorization.ChangePasswordScreen
+import androidx.test.core.app.ActivityScenario.launch
 import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
+import com.example.mam.gui.screen.authorization.OTPScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
 import com.example.mam.gui.screen.authorization.StartScreen
-import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
+import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 import com.example.mam.viewmodel.authorization.SignInViewModel
 import com.example.mam.viewmodel.authorization.SignUpViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -25,9 +29,9 @@ fun AuthorizationNavHost(
 ){
     val signInVM: SignInViewModel = viewModel()
     val signUpVM: SignUpViewModel = viewModel()
-    val changePasswordVM: ChangePasswordViewModel = viewModel()
-
-    NavHost(
+    val forgetPasswordVM: ForgetPasswordViewModel = viewModel()
+    val coroutineScope = rememberCoroutineScope()
+        NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
@@ -48,7 +52,13 @@ fun AuthorizationNavHost(
         composable(route = AuthorizationScreen.SignIn.name) {
             SignInScreen(
                 onSignInClicked = {
-                    signInVM.checkSignIn()
+                    coroutineScope.launch {
+                        val result = signInVM.SignIn() // Ensure it's awaited properly
+                        when (result) {
+                            0 -> signInVM.notifySignInFalse()
+                            1 -> {}
+                        }
+                    }
                 },
                 onForgotClicked = {
                     navController.navigate(AuthorizationScreen.ForgetPW.name)
@@ -61,8 +71,13 @@ fun AuthorizationNavHost(
         composable(route = AuthorizationScreen.SignUp.name){
             SignUpScreen(
                 onSignUpClicked = {
-                    //Xử lý đăng ký
-                    navController.navigate(AuthorizationScreen.SignIn.name)
+                    coroutineScope.launch {
+                        when (signUpVM.SignUp()) {
+                            0 -> signUpVM.notifySignUpFalse()
+                            1 -> navController.navigate(AuthorizationScreen.SignIn.name)
+                        }
+                    }
+
                 },
                 onSignInClicked = {
                     navController.navigate(AuthorizationScreen.SignIn.name)
@@ -73,10 +88,12 @@ fun AuthorizationNavHost(
             )
         }
         composable(route = AuthorizationScreen.ForgetPW.name){
-            ChangePasswordScreen(
+            ForgetPasswordScreen(
                 onChangeClicked = {
-                    //Xử lý đổi mật khẩu
-                    navController.navigate(AuthorizationScreen.OTP.name)
+                    coroutineScope.launch {
+                        forgetPasswordVM.getPhoneNumber()
+                        navController.navigate(AuthorizationScreen.OTP.name)
+                    }
                 },
                 onCloseClicked = {
                     navController.popBackStack()
@@ -84,14 +101,15 @@ fun AuthorizationNavHost(
             )
         }
         composable(route = AuthorizationScreen.OTP.name){
-            ForgetPasswordScreen(
+            OTPScreen(
                 onVerifyClicked = {
-                    if (changePasswordVM.isOTPValid()) {
-                        //xu ly
-                        navController.navigate(AuthorizationScreen.SignIn.name)
-                    }
-                    else {
-
+                    coroutineScope.launch {
+                        if (forgetPasswordVM.isOTPValid()) {
+                            forgetPasswordVM.changePassword()
+                            navController.navigate(AuthorizationScreen.SignIn.name)
+                        } else {
+                            forgetPasswordVM.notifyOTPInValid()
+                        }
                     }
                 },
                 onCloseClicked = {

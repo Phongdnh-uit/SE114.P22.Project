@@ -31,23 +31,23 @@ import com.example.mam.gui.component.EditFieldType1
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordFieldType1
 import com.example.mam.gui.component.outerShadow
-import com.example.mam.model.authorization.ChangePasswordState
+import com.example.mam.entity.authorization.request.ForgetPasswordRequest
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
+import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 
 @Composable
-fun ChangePasswordScreen(
-    isChangePassword: Boolean = false,
+fun ForgetPasswordScreen(
     onChangeClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
-    viewModel: ChangePasswordViewModel = viewModel(),
+    viewModel: ForgetPasswordViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val changePasswordState: ChangePasswordState by viewModel.changePasswordState.collectAsState()
+    val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsState()
+    val repeatPassword: String by viewModel.repeatPassword.collectAsState()
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -114,14 +114,15 @@ fun ChangePasswordScreen(
                     verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
+                        .fillMaxWidth(0.8f)
                         .wrapContentHeight()
                 ) {
                     Spacer(modifier = Modifier.height(10.dp))
                     EditFieldType1(
                         label = "Tên người dùng",
                         subLabel = "Tên người dùng/Email/Số điện thoại",
-                        value = changePasswordState.username,
+                        errorLabel = if (!viewModel.isUsernamevalid()) "Không tìm thấy người dùng" else "",
+                        value = forgetPasswordState.username,
                         backgroundColor = WhiteDefault,
                         onValueChange = { viewModel.setUsername(it) },
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -130,27 +131,19 @@ fun ChangePasswordScreen(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    if(isChangePassword){
-                        PasswordFieldType1(
-                            label = "Mật khẩu cũ",
-                            value = changePasswordState.oldPassword,
-                            backgroundColor = WhiteDefault,
-                            onValueChange = { viewModel.setOldPassword(it) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                     PasswordFieldType1(
                         label = "Mật khẩu mới",
                         subLabel = "Mật khẩu có ít nhất 6 chữ số",
                         errorLabel = if (!viewModel.isPasswordValid()) "Mật khẩu không hợp lệ!" else "",
-                        value = changePasswordState.newPassword,
+                        value = forgetPasswordState.newPassword,
                         backgroundColor = WhiteDefault,
                         onValueChange = { viewModel.setNewPassword(it) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     PasswordFieldType1(
                         label = "Xác nhận mật khẩu mới",
-                        value = changePasswordState.newPassword,
+                        errorLabel = if (!viewModel.isRepeatPasswordValid()) "Mật khẩu chưa đúng!" else "",
+                        value = repeatPassword,
                         backgroundColor = WhiteDefault,
                         onValueChange = { viewModel.setRepeatPassword(it) },
                         imeAction = ImeAction.Done,
@@ -174,5 +167,5 @@ fun ChangePasswordScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewChangePasswordScreen() {
-    ChangePasswordScreen()
+    ForgetPasswordScreen()
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -23,28 +25,26 @@ import com.example.mam.R
 import com.example.mam.ui.theme.OrangeDefault
 
 @Composable
-fun DashBoard(
+fun HomeScreen(
     modifier: Modifier = Modifier
 ){
     val scrollState = rememberScrollState()
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = OrangeDefault)
-            .padding(WindowInsets.statusBars.asPaddingValues())
-            //.padding(WindowInsets.ime.asPaddingValues())
-            .verticalScroll(scrollState),
-    ){
-        item{
-            Row(
-                modifier = Modifier
-            ) {
+    Box(
+
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = OrangeDefault)
+                .padding(WindowInsets.statusBars.asPaddingValues())
+                //.padding(WindowInsets.ime.asPaddingValues())
+                .verticalScroll(scrollState),
+        ) {
+            Box(modifier = Modifier) {
 
             }
-        }
-        item {
             LazyColumn(
 
             ) {
@@ -59,7 +59,29 @@ fun DashBoard(
                         )
                     }
                 }
+                item {
+
+                }
+                item {
+                    LazyRow(
+
+                    ) {
+
+                    }
+                }
+                item {
+                    LazyColumn(
+
+                    ) {
+
+                    }
+                }
             }
+        }
+        Row(
+
+        ){
+
         }
     }
 }
@@ -67,5 +89,5 @@ fun DashBoard(
 @Preview
 @Composable
 fun DashBoardPreview(){
-    DashBoard()
+    HomeScreen()
 }

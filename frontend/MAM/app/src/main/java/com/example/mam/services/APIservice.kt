@@ -1,7 +1,7 @@
 package com.example.mam.services
 
-import com.example.mam.services.request.SignInRequest
-import com.example.mam.services.response.SignInResponse
+import com.example.mam.entity.authorization.request.SignInRequest
+import com.example.mam.entity.authorization.response.SignInResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 

@@ -1,8 +1,8 @@
-package com.example.mam.services.request
+package com.example.mam.entity.authorization.request
 
 data class SignUpRequest(
-    val fullname: String = "",
-    val phone: String = "",
+    val fullName: String = "",
+    val phoneNumber: String = "",
     val email: String = "",
     val username: String = "",
     val password: String = ""

@@ -1,4 +1,4 @@
-package com.example.mam.services.request
+package com.example.mam.entity.authorization.request
 
 data class SignInRequest (
     val username: String = "",
