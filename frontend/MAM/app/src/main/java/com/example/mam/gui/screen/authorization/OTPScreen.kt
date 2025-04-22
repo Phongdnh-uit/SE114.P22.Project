@@ -54,14 +54,14 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.authorization.ChangePasswordViewModel
+import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 import com.plcoding.composeotpinput.OtpViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun OTPScreen(
     focusRequester: List<FocusRequester> = List(4) { FocusRequester() },
-    viewModel: ForgetPasswordForgetPasswordViewModel = viewModel(),
+    viewModel: ForgetPasswordViewModel = viewModel(),
     onAction: (OtpAction) -> Unit = viewModel::onAction,
     onVerifyClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
