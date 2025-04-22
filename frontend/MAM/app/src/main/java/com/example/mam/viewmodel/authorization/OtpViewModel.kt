@@ -3,9 +3,12 @@ package com.plcoding.composeotpinput
 import androidx.lifecycle.ViewModel
 import com.example.mam.viewmodel.authorization.otp.OtpAction
 import com.example.mam.viewmodel.authorization.otp.OtpState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
 private const val VALID_OTP_CODE = "1414"
 
@@ -13,6 +16,9 @@ class OtpViewModel: ViewModel() {
 
     private val _state = MutableStateFlow(OtpState())
     val state = _state.asStateFlow()
+    private val _otp = MutableStateFlow<String>("")
+    val otp: StateFlow<String> = _otp
+
 
     fun onAction(action: OtpAction) {
         when(action) {
@@ -100,5 +106,9 @@ class OtpViewModel: ViewModel() {
             }
         }
         return currentFocusedIndex
+    }
+
+    fun setOTP(s: String) {
+        _otp.value = s
     }
 }

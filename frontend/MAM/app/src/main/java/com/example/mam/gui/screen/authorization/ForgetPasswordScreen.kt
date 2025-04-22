@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,14 @@ fun ForgetPasswordScreen(
 ) {
     val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsState()
     val repeatPassword: String by viewModel.repeatPassword.collectAsState()
+    val forgetPasswordViewModel: ForgetPasswordViewModel = viewModel()
+
+    val phoneNumber by forgetPasswordViewModel.phoneNumber.collectAsState()
+
+    // Gọi hàm lấy số điện thoại
+    LaunchedEffect(Unit) {
+        viewModel.fetchPhoneNumber()
+    }
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()

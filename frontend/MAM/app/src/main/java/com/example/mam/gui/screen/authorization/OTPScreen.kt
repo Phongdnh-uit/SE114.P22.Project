@@ -10,17 +10,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,12 +56,14 @@ import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 import com.example.mam.viewmodel.authorization.otp.OtpAction
+import com.plcoding.composeotpinput.OtpViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun OTPScreen(
     focusRequester: List<FocusRequester> = List(4) { FocusRequester() },
-    viewModel: ForgetPasswordViewModel = viewModel(),
+    forgetPasswordViewModel: ForgetPasswordViewModel = viewModel(),
+    viewModel: OtpViewModel = viewModel(),
     onAction: (OtpAction) -> Unit = viewModel::onAction,
     onVerifyClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
@@ -68,6 +74,12 @@ fun OTPScreen(
     // Quản lý focus và bàn phím
     val focusManager = LocalFocusManager.current
     val keyboardManager = LocalSoftwareKeyboardController.current
+
+    val phoneNumber by forgetPasswordViewModel.phoneNumber.collectAsState()
+
+    LaunchedEffect(Unit) {
+        forgetPasswordViewModel.fetchPhoneNumber()
+    }
 
     // Tự động focus vào ô tương ứng
     LaunchedEffect(state.focusedIndex) {
@@ -171,7 +183,8 @@ fun OTPScreen(
                     )
                 )
                 Text(
-                    text = viewModel.phoneNumber,
+                    text = phoneNumber,
+                   // text = viewModel.phoneNumber,
                     style = TextStyle(
                         fontSize = Variables.BodySizeMedium,
                         lineHeight = 22.4.sp,
@@ -182,6 +195,8 @@ fun OTPScreen(
                 )
                 Box(
                     modifier = Modifier
+                        .width(238.dp)
+                        .height(49.dp)
                         .background(
                             color = OrangeLight,
                             shape = RoundedCornerShape(40.dp)
@@ -198,12 +213,12 @@ fun OTPScreen(
 //                        resetTrigger = resetTrigger
 //                    )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(vertical = 16.dp)
                             .fillMaxWidth()
-                            .height(64.dp) // Giới hạn chiều cao hợp lý
+                            .wrapContentHeight()
                     ) {
                         state.code.forEachIndexed { index, number ->
                             newOtpInputField(
@@ -223,24 +238,23 @@ fun OTPScreen(
                                     onAction(OtpAction.OnKeyboardBack)
                                 },
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .aspectRatio(1f)
+                                    .width(42.dp)
+                                    .aspectRatio(1f),
+                                resetTrigger = resetTrigger
                             )
                         }
-                    }
-                    state.isValid?.let { isValid ->
                     }
                 }
                 OtpInputWithCountdown(
                     onResendClick = {
                         resetTrigger = !resetTrigger
-//                        viewModel.setOTP((""))
+                        viewModel.setOTP((""))
                     }
                 )
                 OuterShadowFilledButton(
                     text = "Xác nhận",
                     onClick = onVerifyClicked,
-                    isEnable = viewModel.isOTPValid(),
+                    //isEnable = viewModel.isOTPValid(),
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(40.dp),

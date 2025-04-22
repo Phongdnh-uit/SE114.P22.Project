@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mam.gui.screen.authorization.ChangePasswordScreen
+import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
 import com.example.mam.gui.screen.authorization.OTPScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
@@ -90,7 +90,7 @@ fun AuthorizationNavHost(
             ForgetPasswordScreen(
                 onChangeClicked = {
                     coroutineScope.launch {
-                        forgetPasswordVM.getPhoneNumber()
+                        forgetPasswordVM.fetchPhoneNumber()
                         navController.navigate(AuthorizationScreen.OTP.name)
                     }
                 },

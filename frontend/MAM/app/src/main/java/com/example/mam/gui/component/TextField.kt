@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -407,7 +408,8 @@ fun newOtpInputField(
     onFocusChanged: (Boolean) -> Unit,
     onNumberChanged: (Int?) -> Unit,
     onKeyboardBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    resetTrigger: Boolean
 ){
     var text by remember(number) {
         mutableStateOf(
@@ -418,6 +420,13 @@ fun newOtpInputField(
         )
     }
     var isFocused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(resetTrigger) {
+        if (resetTrigger) {
+            text = TextFieldValue("") // Reset lại giá trị text khi resetTrigger thay đổi
+            onNumberChanged(null) // Reset giá trị của số
+        }
+    }
 
     LaunchedEffect(number) {
         text = TextFieldValue(
@@ -435,7 +444,8 @@ fun newOtpInputField(
                 shape = CircleShape
             )
             .background(WhiteDefault, CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+
     ){
         BasicTextField(
             value = text,
@@ -469,7 +479,7 @@ fun newOtpInputField(
                         if (text.text.isEmpty()) {
                             onKeyboardBack()
                         } else {
-                            text = TextFieldValue("") // Clear text & giữ focus
+                            text = TextFieldValue("")
                             onNumberChanged(null)
                         }
                         true
