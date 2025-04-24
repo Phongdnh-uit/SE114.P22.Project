@@ -95,14 +95,6 @@ public class UserService {
     return savedUser;
   }
 
-  public void setUserRefreshToken(Long userId, String refreshToken) {
-    User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    user.setRefreshToken(refreshToken);
-  }
-
   public void resetPassword(PasswordChangeDTO passwordChangeDTO) {
     Long userId = jwtUtil.getCurrentUserId();
     User currentUser =

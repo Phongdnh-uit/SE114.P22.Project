@@ -1,10 +1,13 @@
 package com.se114p12.backend.controller.auth;
 
+import com.se114p12.backend.domain.authentication.RefreshToken;
 import com.se114p12.backend.dto.request.LoginRequestDTO;
 import com.se114p12.backend.dto.request.PasswordChangeDTO;
+import com.se114p12.backend.dto.request.RefreshTokenRequestDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.dto.response.AuthResponseDTO;
 import com.se114p12.backend.service.UserService;
+import com.se114p12.backend.service.authentication.RefreshTokenService;
 import com.se114p12.backend.service.mail.MailService;
 import com.se114p12.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Auth Module")
@@ -27,6 +29,7 @@ public class AuthController {
   private final UserService userService;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final JwtUtil jwtUtil;
+  private final RefreshTokenService refreshTokenService;
   private final MailService mailService;
 
   @PostMapping("/register")
@@ -51,9 +54,8 @@ public class AuthController {
 
     String accessToken = jwtUtil.generateAccessToken(userId);
 
-    String refreshToken = jwtUtil.generateRefreshToken(userId);
+    String refreshToken = refreshTokenService.generateRefreshToken(userId).getToken();
 
-    userService.setUserRefreshToken(userId, refreshToken);
     AuthResponseDTO loginResponseDTO = new AuthResponseDTO();
     loginResponseDTO.setAccessToken(accessToken);
     loginResponseDTO.setRefreshToken(refreshToken);
@@ -61,26 +63,24 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<AuthResponseDTO> refreshToken(@RequestBody String refreshToken) {
-    Jwt jwt = jwtUtil.checkValidity(refreshToken);
-    Long userId = Long.parseLong(jwt.getSubject());
+  public ResponseEntity<AuthResponseDTO> refreshToken(
+      @Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
+    RefreshToken refreshToken =
+        refreshTokenService.verifyExpiration(
+            refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken()));
 
-    String accessToken = jwtUtil.generateAccessToken(userId);
-
-    String newRefreshToken = jwtUtil.generateRefreshToken(userId);
-
-    userService.setUserRefreshToken(userId, refreshToken);
+    String accessToken = jwtUtil.generateAccessToken(refreshToken.getUser().getId());
 
     AuthResponseDTO loginResponseDTO = new AuthResponseDTO();
     loginResponseDTO.setAccessToken(accessToken);
-    loginResponseDTO.setRefreshToken(newRefreshToken);
+    loginResponseDTO.setRefreshToken(refreshTokenRequestDTO.getRefreshToken());
     return ResponseEntity.ok().body(loginResponseDTO);
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<String> logout() {
-    Long userId = jwtUtil.getCurrentUserId();
-    userService.setUserRefreshToken(userId, null);
+  public ResponseEntity<String> logout(
+      @Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
+    refreshTokenService.deleteByToken(refreshTokenRequestDTO.getRefreshToken());
     return ResponseEntity.ok().body("Logout successfully");
   }
 

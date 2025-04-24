@@ -24,9 +24,6 @@ public class JwtUtil {
   @Value("${jwt.access.token.expiration}")
   private Long accessTokenExpirationTime;
 
-  @Value("${jwt.refresh.token.expiration}")
-  private Long refreshTokenExpirationTime;
-
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder jwtDecoder;
 
@@ -44,23 +41,6 @@ public class JwtUtil {
             .subject(user.getId().toString())
             .issuedAt(now)
             .claim("role", user.getRole().getName())
-            .expiresAt(exp)
-            .build();
-    JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-    return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-  }
-
-  public String generateRefreshToken(Long userId) {
-    User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    Instant now = Instant.now();
-    Instant exp = now.plusSeconds(refreshTokenExpirationTime);
-    JwtClaimsSet claims =
-        JwtClaimsSet.builder()
-            .subject(user.getId().toString())
-            .issuedAt(now)
             .expiresAt(exp)
             .build();
     JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
