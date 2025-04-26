@@ -1,0 +1,26 @@
+package com.se114p12.backend.domains.authentication;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.se114p12.backend.domains.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@Entity
+@Table(name = "roles")
+public class Role extends BaseEntity {
+    @Column(nullable = false, unique = true)
+    @NotBlank
+    private String name;
+
+    private String description;
+
+    private Boolean active;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "role")
+    private List<User> users;
+}
