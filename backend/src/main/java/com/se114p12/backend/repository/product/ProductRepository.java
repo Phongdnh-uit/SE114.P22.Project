@@ -1,6 +1,6 @@
 package com.se114p12.backend.repository.product;
 
-import com.se114p12.backend.domain.product.Product;
+import com.se114p12.backend.domains.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

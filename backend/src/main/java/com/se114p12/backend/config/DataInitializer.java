@@ -1,7 +1,7 @@
 package com.se114p12.backend.config;
 
-import com.se114p12.backend.domain.authentication.Role;
-import com.se114p12.backend.domain.authentication.User;
+import com.se114p12.backend.domains.authentication.Role;
+import com.se114p12.backend.domains.authentication.User;
 import com.se114p12.backend.repository.authentication.RoleRepository;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import lombok.RequiredArgsConstructor;
