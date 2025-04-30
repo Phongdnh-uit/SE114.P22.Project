@@ -1,6 +1,8 @@
 package com.se114p12.backend.services;
 
 import com.se114p12.backend.domains.authentication.User;
+import com.se114p12.backend.enums.LoginProvider;
+import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.util.LoginUtil;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,9 @@ public class CustomUserDetailService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String credentialId) throws UsernameNotFoundException {
     User user = loginUtil.getUserByCredentialId(credentialId);
+    if (!user.getLoginProvider().equals(LoginProvider.LOCAL)) {
+        throw new BadRequestException("Account provider by another provider: " + user.getLoginProvider());
+    }
     String role = "ROLE_ " + user.getRole().getName();
     return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
         .password(user.getPassword())

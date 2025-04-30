@@ -1,6 +1,9 @@
 package com.se114p12.backend.controllers.auth;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.se114p12.backend.domains.authentication.RefreshToken;
+import com.se114p12.backend.domains.authentication.User;
+import com.se114p12.backend.dto.request.GoogleLoginRequestDTO;
 import com.se114p12.backend.dto.request.LoginRequestDTO;
 import com.se114p12.backend.dto.request.PasswordChangeDTO;
 import com.se114p12.backend.dto.request.RefreshTokenRequestDTO;
@@ -35,6 +38,28 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
     return ResponseEntity.ok().body(userService.register(registerRequestDTO));
+  }
+
+  @PostMapping("/oauth2/google")
+  public ResponseEntity<AuthResponseDTO> loginWithGoogle(
+      @Valid @RequestBody GoogleLoginRequestDTO googleLoginRequest) {
+
+     GoogleIdToken googleIdToken = jwtUtil.verifyGoogleCredential(googleLoginRequest);
+     GoogleIdToken.Payload payload = googleIdToken.getPayload();
+
+//     get user or register user if not exists
+     User user = userService.getOrRegisterGoogleUser(payload);
+
+//     create access token
+     String accessToken = jwtUtil.generateAccessToken(user.getId());
+
+     // create refresh token
+     String refreshToken = refreshTokenService.generateRefreshToken(user.getId()).getToken();
+
+     AuthResponseDTO authenticationResponseDTO = new AuthResponseDTO();
+     authenticationResponseDTO.setAccessToken(accessToken);
+     authenticationResponseDTO.setRefreshToken(refreshToken);
+     return ResponseEntity.ok(authenticationResponseDTO);
   }
 
   @PostMapping("/login")

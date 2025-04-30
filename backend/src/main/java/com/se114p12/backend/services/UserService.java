@@ -1,9 +1,11 @@
 package com.se114p12.backend.services;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.se114p12.backend.domains.authentication.User;
 import com.se114p12.backend.domains.cart.Cart;
 import com.se114p12.backend.dto.request.PasswordChangeDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
+import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.DataConflictException;
@@ -13,6 +15,8 @@ import com.se114p12.backend.repository.cart.CartRepository;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,6 +89,7 @@ public class UserService {
     user.setEmail(registerRequestDTO.getEmail());
     user.setPhone(registerRequestDTO.getPhone());
     user.setStatus(UserStatus.PENDING);
+    user.setLoginProvider(LoginProvider.LOCAL);
     User savedUser = userRepository.save(user);
 
     // Tạo cart sau khi đăng ký
@@ -107,6 +112,21 @@ public class UserService {
     }
     currentUser.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
   }
+
+  // Register or get user from Google
+  public User getOrRegisterGoogleUser(GoogleIdToken.Payload payload) {
+    Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
+    if (userOptional.isPresent()) return userOptional.get();
+    User user = new User();
+    user.setEmail(payload.getEmail());
+    user.setFullname(payload.get("name").toString());
+    user.setUsername(payload.get("name").toString());
+    user.setPassword("");
+    user.setLoginProvider(LoginProvider.GOOGLE);
+    user.setStatus(UserStatus.ACTIVE);
+    return userRepository.save(user);
+  }
+
 
   // Private helper methods
 
