@@ -68,4 +68,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Verification> verifications = new ArrayList<>();
 }

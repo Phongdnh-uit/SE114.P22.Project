@@ -117,14 +117,14 @@
           <h1>Xác Thực Email</h1>
         </div>
         <div class="email-body">
-          <p>Chào <strong>${name}</strong>,</p>
+          <p>Chào <strong th:text="${email}"></strong>,</p>
           <p>
             Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký, vui
             lòng xác thực email của bạn bằng cách nhấn vào nút dưới đây:
           </p>
-          <a href="${verifyLink}" class="verify-button">Xác Thực Email</a>
+          <a th:href="${verifyLink}" class="verify-button">Xác Thực Email</a>
           <p class="highlight-text">
-            Lưu ý: Đường link xác thực này sẽ hết hạn sau 24 giờ kể từ khi bạn
+            Lưu ý: Đường link xác thực này sẽ hết hạn sau 1 giờ kể từ khi bạn
             nhận được email này.
           </p>
           <p>

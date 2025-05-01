@@ -2,16 +2,20 @@ package com.se114p12.backend.services;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.se114p12.backend.domains.authentication.User;
+import com.se114p12.backend.domains.authentication.Verification;
 import com.se114p12.backend.domains.cart.Cart;
 import com.se114p12.backend.dto.request.PasswordChangeDTO;
 import com.se114p12.backend.dto.request.RegisterRequestDTO;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
+import com.se114p12.backend.enums.VerificationType;
 import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.cart.CartRepository;
+import com.se114p12.backend.services.authentication.VerificationService;
+import com.se114p12.backend.services.mail.MailService;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
 import java.util.List;
@@ -31,6 +35,8 @@ public class UserService {
   private final UserRepository userRepository;
   private final CartRepository cartRepository;
   private final JwtUtil jwtUtil;
+  private final VerificationService verificationService;
+  private final MailService mailService;
 
   //    public User create(User user) {
   //        user.setId(null);
@@ -97,6 +103,9 @@ public class UserService {
     cart.setUser(savedUser);
     cartRepository.save(cart);
 
+    // verify email
+    Verification verification = verificationService.createActivationVerification(savedUser.getId());
+    mailService.sendActivationEmail(user.getEmail(), verification.getCode());
     return savedUser;
   }
 
@@ -127,7 +136,13 @@ public class UserService {
     return userRepository.save(user);
   }
 
-
+  public void verifyEmail(String code) {
+    Verification verification = verificationService.verifyVerificationCode(code, VerificationType.ACTIVATION);
+    User user = verification.getUser();
+    user.setStatus(UserStatus.ACTIVE);
+    userRepository.save(user);
+    verificationService.deleteVerification(verification);
+  }
   // Private helper methods
 
   private User findUserById(Long id) {
