@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +33,11 @@ public class NotificationController {
     @GetMapping("/me")
     public ResponseEntity<List<NotificationResponse>> getMyNotifications() {
         Long userId = jwtUtil.getCurrentUserId();
-        return ResponseEntity.ok(notificationService.getNotificationsByUserId(userId));
+        List<NotificationResponse> responses = notificationService.getNotificationsByUserId(userId)
+                .stream()
+                .map(notification -> notificationService.toResponse(notification, userId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/me/read-all")
@@ -44,7 +49,8 @@ public class NotificationController {
 
     @PostMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
+        Long userId = jwtUtil.getCurrentUserId();
+        notificationService.markAsRead(userId, id);
         return ResponseEntity.ok().build();
     }
 

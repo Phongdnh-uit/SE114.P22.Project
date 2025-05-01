@@ -8,10 +8,4 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long>,
         JpaSpecificationExecutor<Notification> {
-
-    List<Notification> findByUser_Id(Long userId);
-
-    List<Notification> findByUser_Username(String username);
-
-    long countByUser_IdAndStatus(Long userId, Integer status);
 }

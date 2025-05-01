@@ -21,6 +21,13 @@ public class VariationService {
         if (variation.getId() != null && variationRepository.existsById(variation.getId())) {
             throw new IllegalArgumentException("Variation with the given ID already exists.");
         }
+
+        if (variation.getProduct() != null && variation.getProduct().getId() != null) {
+            Product product = productRepository.findById(variation.getProduct().getId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            variation.setProduct(product);
+        }
+
         return variationRepository.save(variation);
     }
 

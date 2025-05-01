@@ -12,9 +12,7 @@ public class NotificationResponse {
     private NotificationType type;
     private String title;
     private String message;
-
-    @Nullable
-//    private String anchor;
     private Integer status;
     private Instant createdAt;
+    private Long userId; // người nhận
 }

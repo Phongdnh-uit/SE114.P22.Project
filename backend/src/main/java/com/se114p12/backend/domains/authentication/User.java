@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.se114p12.backend.domains.BaseEntity;
 import com.se114p12.backend.domains.cart.Cart;
 import com.se114p12.backend.domains.general.Notification;
+import com.se114p12.backend.domains.general.NotificationUser;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import jakarta.persistence.*;
@@ -66,8 +67,8 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Cart cart;
 
-    @OneToMany(mappedBy = "user")
-    private List<Notification> notifications = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationUser> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Verification> verifications = new ArrayList<>();
