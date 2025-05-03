@@ -3,15 +3,18 @@ package com.se114p12.backend.controllers.auth;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.se114p12.backend.domains.authentication.RefreshToken;
 import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.dto.request.GoogleLoginRequestDTO;
-import com.se114p12.backend.dto.request.LoginRequestDTO;
-import com.se114p12.backend.dto.request.PasswordChangeDTO;
-import com.se114p12.backend.dto.request.RefreshTokenRequestDTO;
-import com.se114p12.backend.dto.request.RegisterRequestDTO;
+import com.se114p12.backend.domains.authentication.Verification;
+import com.se114p12.backend.dto.request.*;
 import com.se114p12.backend.dto.response.AuthResponseDTO;
+import com.se114p12.backend.enums.OTPAction;
+import com.se114p12.backend.enums.UserStatus;
+import com.se114p12.backend.enums.VerificationType;
+import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.services.UserService;
 import com.se114p12.backend.services.authentication.RefreshTokenService;
-import com.se114p12.backend.services.mail.MailService;
+import com.se114p12.backend.services.authentication.VerificationService;
+import com.se114p12.backend.services.general.MailService;
+import com.se114p12.backend.services.general.SMSService;
 import com.se114p12.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,6 +25,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Tag(name = "Auth Module")
 @RestController
@@ -34,6 +39,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final MailService mailService;
+    private final SMSService smsService;
+    private final VerificationService verificationService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
@@ -122,11 +129,39 @@ public class AuthController {
         return ResponseEntity.ok().body("Reset password successfully");
     }
 
-    @PostMapping("/reset-password/init")
-    public void requestPasswordReset() {
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOTP(@Valid @RequestBody SendOTPRequestDTO sendOTPRequestDTO) {
+        smsService.sendOtp(sendOTPRequestDTO.getPhoneNumber());
+        return ResponseEntity.ok().body("Send OTP successfully");
     }
 
-    @PostMapping("/reset-password/finish")
-    public void finishPasswordReset() {
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOTP(@Valid @RequestBody VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        boolean isValid =
+                smsService.verifyOtp(
+                        verifyOTPRequestDTO.getPhoneNumber(), verifyOTPRequestDTO.getOtp());
+        if (!isValid) {
+            throw new BadRequestException("Invalid OTP");
+        }
+        User user = userService.findByPhone(verifyOTPRequestDTO.getPhoneNumber());
+        if (verifyOTPRequestDTO.getAction() == OTPAction.VERIFY_PHONE) {
+            user.setStatus(UserStatus.ACTIVE);
+            userService.update(user.getId(), user);
+            return ResponseEntity.ok().body("Verify phone successfully");
+        } else if (verifyOTPRequestDTO.getAction() == OTPAction.FORGOT_PASSWORD) {
+            Verification verification = verificationService.createResetPasswordVerification(user.getId());
+            return ResponseEntity.ok().body(Map.of("code", verification.getCode()));
+        }
+        throw new BadRequestException("Invalid action");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO forgotPasswordRequestDTO) {
+        Verification verification = verificationService.verifyVerificationCode(
+                forgotPasswordRequestDTO.getCode(), VerificationType.RESET_PASSWORD);
+        User user = verification.getUser();
+        user.setPassword(forgotPasswordRequestDTO.getNewPassword());
+        userService.update(user.getId(), user);
+        return ResponseEntity.ok().body("Send reset password email successfully");
     }
 }

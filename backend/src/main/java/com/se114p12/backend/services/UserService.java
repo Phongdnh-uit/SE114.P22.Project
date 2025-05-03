@@ -15,7 +15,8 @@ import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.cart.CartRepository;
 import com.se114p12.backend.services.authentication.VerificationService;
-import com.se114p12.backend.services.mail.MailService;
+import com.se114p12.backend.services.general.MailService;
+import com.se114p12.backend.services.general.SMSService;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
 import java.util.List;
@@ -37,6 +38,7 @@ public class UserService {
   private final JwtUtil jwtUtil;
   private final VerificationService verificationService;
   private final MailService mailService;
+  private final SMSService smsService;
 
   //    public User create(User user) {
   //        user.setId(null);
@@ -51,6 +53,11 @@ public class UserService {
   //
   //        return createdUser;
   //    }
+
+  public User findByPhone(String phone) {
+    return userRepository.findByPhone(phone)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+  }
 
   public User update(Long id, User user) {
     User existingUser = findUserById(id);
@@ -93,6 +100,9 @@ public class UserService {
     user.setUsername(registerRequestDTO.getUsername());
     user.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
     user.setEmail(registerRequestDTO.getEmail());
+    if (!smsService.lookupPhoneNumber(registerRequestDTO.getPhone())) {
+      throw new BadRequestException("Invalid phone number");
+    }
     user.setPhone(registerRequestDTO.getPhone());
     user.setStatus(UserStatus.PENDING);
     user.setLoginProvider(LoginProvider.LOCAL);

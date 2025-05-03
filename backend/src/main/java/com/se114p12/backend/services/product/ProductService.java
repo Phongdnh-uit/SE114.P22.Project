@@ -4,7 +4,7 @@ import com.se114p12.backend.domains.product.Product;
 import com.se114p12.backend.domains.product.ProductCategory;
 import com.se114p12.backend.dto.request.product.ProductRequestDTO;
 import com.se114p12.backend.repository.product.ProductRepository;
-import com.se114p12.backend.services.storage.StorageService;
+import com.se114p12.backend.services.general.StorageService;
 import com.se114p12.backend.vo.PageVO;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

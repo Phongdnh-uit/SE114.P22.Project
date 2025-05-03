@@ -1,4 +1,4 @@
-package com.se114p12.backend.services.storage;
+package com.se114p12.backend.services.general;
 
 import java.io.IOException;
 import java.nio.file.Files;

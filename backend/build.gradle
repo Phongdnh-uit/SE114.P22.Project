@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.turkraft.springfilter:jpa:3.2.0'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'com.google.api-client:google-api-client:2.7.2'
+    implementation 'com.twilio.sdk:twilio:10.7.2'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
