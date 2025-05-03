@@ -1,13 +1,11 @@
 package com.se114p12.backend.domains.order;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.se114p12.backend.domains.product.Product;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_details")
@@ -17,8 +15,23 @@ public class OrderDetail {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull private Long quantity;
+  @ManyToOne
+  @JoinColumn(name = "order_id")
+  private Order order;
 
-  @NotNull private BigDecimal price;
-  private String note;
+  private String productId;
+  private String productName;
+  private String productImage;
+  private String variationInfo;
+
+  @NotNull
+  private Long quantity;
+
+  // Giá của một món
+  @NotNull
+  private BigDecimal originalPrice;
+
+  // Giá sau khi nhân với số lượng
+  @NotNull
+  private BigDecimal price;
 }

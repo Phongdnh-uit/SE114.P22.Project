@@ -49,7 +49,7 @@ public class ProductService {
                 .isAvailable(true)
                 .build();
 
-        product.setImageUrl(processImage(dto.getImage(), "product-items"));
+        product.setImageUrl(storageService.store(dto.getImage(), "product-items"));
 
         return productRepository.save(product);
     }
@@ -69,7 +69,7 @@ public class ProductService {
             existingProduct.setCategory(category);
         }
 
-        existingProduct.setImageUrl(processImage(dto.getImage(), "product-items"));
+        existingProduct.setImageUrl(storageService.store(dto.getImage(), "product-items"));
 
         return productRepository.save(existingProduct);
     }
@@ -78,7 +78,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    private String processImage(MultipartFile image, String folder) {
-        return (image != null && !image.isEmpty()) ? "/uploads/" + folder + "/" + storageService.store(image, folder) : null;
-    }
+//    private String processImage(MultipartFile image, String folder) {
+//        return (image != null && !image.isEmpty()) ? "/uploads/" + folder + "/" + storageService.store(image, folder) : null;
+//    }
 }
