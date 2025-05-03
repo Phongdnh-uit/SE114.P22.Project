@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.mam.gui.screen.authorization.ForgetPasswordScreen
-//import com.example.mam.gui.screen.authorization.OTPScreen
+import com.example.mam.gui.screen.authorization.OTPScreen
 import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
 import com.example.mam.gui.screen.authorization.StartScreen
@@ -102,10 +102,7 @@ fun MainNavHost(
                 val forgetPasswordVM: ForgetPasswordViewModel = viewModel(backStackEntry)
                 ForgetPasswordScreen(
                     onChangeClicked = {
-                        CoroutineScope(backStackEntry.lifecycle.coroutineScope.coroutineContext).launch {
-                            forgetPasswordVM.getPhoneNumber()
-                            navController.navigate(AuthorizationScreen.OTP.name)
-                        }
+
                     },
                     onCloseClicked = {
                         navController.popBackStack()
@@ -113,21 +110,14 @@ fun MainNavHost(
                 )
             }
             composable(route = AuthorizationScreen.OTP.name) {
-//            OTPScreen(
-//                onVerifyClicked = {
-//                    coroutineScope.launch {
-//                        if (forgetPasswordVM.isOTPValid()) {
-//                            forgetPasswordVM.changePassword()
-//                            navController.navigate(AuthorizationScreen.SignIn.name)
-//                        } else {
-//                            forgetPasswordVM.notifyOTPInValid()
-//                        }
-//                    }
-//                },
-//                onCloseClicked = {
-//                    navController.popBackStack()
-//                }
-//            )
+            OTPScreen(
+                onVerifyClicked = {
+
+                },
+                onCloseClicked = {
+                    navController.popBackStack()
+                }
+            )
             }
         }
         navigation(startDestination = HomeScreen.HomeSreen.name, route = "Home"){

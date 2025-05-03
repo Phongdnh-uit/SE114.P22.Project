@@ -48,9 +48,8 @@ fun ForgetPasswordScreen(
     viewModel: ForgetPasswordViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-<<<<<<< Updated upstream
-    val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsState()
-    val repeatPassword: String by viewModel.repeatPassword.collectAsState()
+    val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsStateWithLifecycle()
+    val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
     val forgetPasswordViewModel: ForgetPasswordViewModel = viewModel()
 
     val phoneNumber by forgetPasswordViewModel.phoneNumber.collectAsState()
@@ -59,10 +58,7 @@ fun ForgetPasswordScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchPhoneNumber()
     }
-=======
-    val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsStateWithLifecycle()
-    val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
->>>>>>> Stashed changes
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
