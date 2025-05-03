@@ -2,6 +2,7 @@ package com.example.mam.gui.screen.authorization
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +52,7 @@ fun StartScreen(
             .fillMaxSize()
             .background(color = OrangeDefault)
             .padding(WindowInsets.statusBars.asPaddingValues())
+            .verticalScroll(scrollState)
             //.padding(WindowInsets.ime.asPaddingValues())
     ) {
         Image(

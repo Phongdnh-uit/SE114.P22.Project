@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
 import com.example.mam.gui.component.CircleIconButton
@@ -56,7 +57,7 @@ fun SignInScreen(
     viewModel: SignInViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val signInState: SignInRequest by viewModel.signInState.collectAsState()
+    val signInState: SignInRequest by viewModel.signInState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     Column(
         verticalArrangement = Arrangement.SpaceBetween,

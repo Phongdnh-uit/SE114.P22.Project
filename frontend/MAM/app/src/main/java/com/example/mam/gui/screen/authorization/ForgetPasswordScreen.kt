@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.EditFieldType1
@@ -47,6 +48,7 @@ fun ForgetPasswordScreen(
     viewModel: ForgetPasswordViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+<<<<<<< Updated upstream
     val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsState()
     val repeatPassword: String by viewModel.repeatPassword.collectAsState()
     val forgetPasswordViewModel: ForgetPasswordViewModel = viewModel()
@@ -57,6 +59,10 @@ fun ForgetPasswordScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchPhoneNumber()
     }
+=======
+    val forgetPasswordState: ForgetPasswordRequest by viewModel.forgetPasswordState.collectAsStateWithLifecycle()
+    val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
+>>>>>>> Stashed changes
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()

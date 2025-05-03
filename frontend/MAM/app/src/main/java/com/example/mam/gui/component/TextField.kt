@@ -101,7 +101,7 @@ fun EditField(
 
 @Composable
 fun EditFieldType1(
-    label: String,
+    label: String = "",
     subLabel: String = "",
     errorLabel: String = "",
     value: String,
@@ -114,16 +114,18 @@ fun EditFieldType1(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier){
-        Text(
-            label,
-            style = TextStyle(
-                fontSize = Variables.BodySizeMedium,
-                fontWeight = FontWeight(Variables.BodyFontWeightRegular),
-                color = textColor,
-                textAlign = TextAlign.Start
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+        if (!label.isEmpty()) {
+            Text(
+                label,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeMedium,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = textColor,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         if(!subLabel.isEmpty()){
             Spacer(modifier = Modifier.height(10.dp))
             Text(

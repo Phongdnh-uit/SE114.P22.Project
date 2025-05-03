@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
 import com.example.mam.entity.authorization.request.SignUpRequest
@@ -60,8 +61,8 @@ fun SignUpScreen(
     modifier: Modifier = Modifier
 ){
 
-    val signUpState: SignUpRequest by viewModel.signUpState.collectAsState()
-    val repeatPassword: String by viewModel.repeatPassword.collectAsState()
+    val signUpState: SignUpRequest by viewModel.signUpState.collectAsStateWithLifecycle()
+    val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
