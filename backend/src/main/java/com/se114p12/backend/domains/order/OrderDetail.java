@@ -1,11 +1,9 @@
 package com.se114p12.backend.domains.order;
 
-import com.se114p12.backend.domains.product.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.math.BigDecimal;
+import lombok.Data;
 
 @Entity
 @Table(name = "order_details")
@@ -19,19 +17,13 @@ public class OrderDetail {
   @JoinColumn(name = "order_id")
   private Order order;
 
-  private String productId;
+  private Long productId;
   private String productName;
   private String productImage;
   private String variationInfo;
 
-  @NotNull
-  private Long quantity;
+  @NotNull private Long quantity;
 
   // Giá của một món
-  @NotNull
-  private BigDecimal originalPrice;
-
-  // Giá sau khi nhân với số lượng
-  @NotNull
-  private BigDecimal price;
+  @NotNull private BigDecimal price;
 }

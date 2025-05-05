@@ -3,6 +3,8 @@ package com.se114p12.backend.domains;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,7 +13,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @MappedSuperclass
 public abstract class BaseEntity {

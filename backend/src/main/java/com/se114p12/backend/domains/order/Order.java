@@ -6,17 +6,17 @@ import com.se114p12.backend.domains.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Data
+@Getter
+@Setter
 public class Order extends BaseEntity {
-
-  @NotNull
-  private Instant orderDate;
 
   @NotNull
   private String shippingAddress;
@@ -44,6 +44,6 @@ public class Order extends BaseEntity {
 //  @JoinColumn(name = "shipper_id")
 //  private Shipper shipper;
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderDetail> orderDetails;
 }
