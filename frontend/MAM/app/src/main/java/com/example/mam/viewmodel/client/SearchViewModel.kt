@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class SearchViewModel(): ViewModel() {
+    private var _originListProduct = MutableStateFlow<MutableList<Product>>(mutableListOf())
     private var _listProduct = MutableStateFlow<MutableList<Product>>(mutableListOf())
     val listProduct: StateFlow<List<Product>> get() = _listProduct
     private val _searchText = MutableStateFlow("")
@@ -23,196 +24,31 @@ class SearchViewModel(): ViewModel() {
     private val _searchHistory = MutableStateFlow<List<String>>(emptyList())
     val searchHistory: StateFlow<List<String>> get() = _searchHistory
 
+
     fun loadListProduct(){
-        _listProduct.value.add(Product(
-            "P000",
-            "Burger thịt hun khói phô mai",
-            "",
-            "",
-            100000,
-            true,
-            "PC002",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P001",
-            "Burger thịt hun khói phô mai",
-            "",
-            "",
-            100000,
-            true,
-            "PC002",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P002",
-            "Burger thịt hun khói phô mai",
-            "",
-            "",
-            100000,
-            true,
-            "PC002",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P003",
-            "Pizza truyền thống",
-            "",
-            "",
-            100000,
-            true,
-            "PC001",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P004",
-            "Pizza truyền thống",
-            "",
-            "",
-            100000,
-            true,
-            "PC001",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P005",
-            "Pizza truyền thống",
-            "",
-            "",
-            100000,
-            true,
-            "PC001",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P006",
-            "Hotdog truyền thống",
-            "",
-            "",
-            100000,
-            true,
-            "PC003",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P007",
-            "Hotdog truyền thống",
-            "",
-            "",
-            100000,
-            false,
-            "PC003",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P008",
-            "Hotdog truyền thống",
-            "",
-            "",
-            100000,
-            true,
-            "PC003",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P009",
-            "Gá rán",
-            "",
-            "",
-            100000,
-            true,
-            "PC004",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P010",
-            "Gá rán",
-            "",
-            "",
-            100000,
-            true,
-            "PC004",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P011",
-            "Gá rán",
-            "",
-            "",
-            100000,
-            true,
-            "PC004",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P012",
-            "Bít tết áp chảo",
-            "",
-            "",
-            100000,
-            true,
-            "PC005",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P013",
-            "Bít tết áp chảo",
-            "",
-            "",
-            100000,
-            true,
-            "PC005",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P014",
-            "Bít tết áp chảo",
-            "",
-            "",
-            100000,
-            true,
-            "PC005",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P015",
-            "Nước chanh",
-            "",
-            "",
-            100000,
-            true,
-            "PC006",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P016",
-            "Nước chanh",
-            "",
-            "",
-            100000,
-            true,
-            "PC006",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P017",
-            "Nước chanh",
-            "",
-            "",
-            100000,
-            true,
-            "PC006",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P018",
-            "Khoai tây chiên",
-            "",
-            "",
-            100000,
-            true,
-            "PC007",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P019",
-            "Khoai tây chiên",
-            "",
-            "",
-            100000,
-            true,
-            "PC007",
-            R.drawable.bacon_and_cheese_heaven))
-        _listProduct.value.add(Product(
-            "P020",
-            "Khoai tây chiên",
-            "",
-            "",
-            100000,
-            true,
-            "PC007",
-            R.drawable.bacon_and_cheese_heaven))
+        _originListProduct.value = mutableListOf(
+            Product("P000", "Burger thịt hun khói phô mai", "", "", 100000, true, "PC002", R.drawable.bacon_and_cheese_heaven),
+            Product("P001", "Burger thịt hun khói phô mai", "", "", 100000, true, "PC002", R.drawable.bacon_and_cheese_heaven),
+            Product("P002", "Burger thịt hun khói phô mai", "", "", 100000, true, "PC002", R.drawable.bacon_and_cheese_heaven),
+            Product("P003", "Pizza truyền thống", "", "", 100000, true, "PC001", R.drawable.bacon_and_cheese_heaven),
+            Product("P004", "Pizza truyền thống", "", "", 100000, true, "PC001", R.drawable.bacon_and_cheese_heaven),
+            Product("P005", "Pizza truyền thống", "", "", 100000, true, "PC001", R.drawable.bacon_and_cheese_heaven),
+            Product("P006", "Hotdog truyền thống", "", "", 100000, true, "PC003", R.drawable.bacon_and_cheese_heaven),
+            Product("P007", "Hotdog truyền thống", "", "", 100000, false, "PC003", R.drawable.bacon_and_cheese_heaven),
+            Product("P008", "Hotdog truyền thống", "", "", 100000, true, "PC003", R.drawable.bacon_and_cheese_heaven),
+            Product("P009", "Gà rán", "", "", 100000, true, "PC004", R.drawable.bacon_and_cheese_heaven),
+            Product("P010", "Gà rán", "", "", 100000, true, "PC004", R.drawable.bacon_and_cheese_heaven),
+            Product("P011", "Gà rán", "", "", 100000, true, "PC004", R.drawable.bacon_and_cheese_heaven),
+            Product("P012", "Bít tết áp chảo", "", "", 100000, true, "PC005", R.drawable.bacon_and_cheese_heaven),
+            Product("P013", "Bít tết áp chảo", "", "", 100000, true, "PC005", R.drawable.bacon_and_cheese_heaven),
+            Product("P014", "Bít tết áp chảo", "", "", 100000, true, "PC005", R.drawable.bacon_and_cheese_heaven),
+            Product("P015", "Nước chanh", "", "", 100000, true, "PC006", R.drawable.bacon_and_cheese_heaven),
+            Product("P016", "Nước chanh", "", "", 100000, true, "PC006", R.drawable.bacon_and_cheese_heaven),
+            Product("P017", "Nước chanh", "", "", 100000, true, "PC006", R.drawable.bacon_and_cheese_heaven),
+            Product("P018", "Khoai tây chiên", "", "", 100000, true, "PC007", R.drawable.bacon_and_cheese_heaven),
+            Product("P019", "Khoai tây chiên", "", "", 100000, true, "PC007", R.drawable.bacon_and_cheese_heaven),
+            Product("P020", "Khoai tây chiên", "", "", 100000, true, "PC007", R.drawable.bacon_and_cheese_heaven) )
+        _listProduct.value = _originListProduct.value
     }
 
     fun setSearchText(query: String){
@@ -220,15 +56,17 @@ class SearchViewModel(): ViewModel() {
     }
 
     fun getSearchHistory(): List<String>{
-        return _searchHistory.value.asReversed()
+        return _searchHistory.value
     }
 
     fun search() {
         val query = _searchText.value.lowercase()
         if (query.isNotBlank() && !_searchHistory.value.contains(query)) {
-            _searchHistory.value = (_searchHistory.value + query).takeLast(10) // Keep last 10 searches
+            val updatedHistory = _searchHistory.value.toMutableList().apply { add(query) }
+            _searchHistory.value = updatedHistory.takeLast(10) // Giữ tối đa 10 lần tìm kiếm
         }
-        _listProduct.value = _listProduct.value.filter { it.name.lowercase().contains(query) }.toMutableList()
+
+        _listProduct.value = _originListProduct.value.filter { it.name.lowercase().contains(query) }.toMutableList()
     }
 
     fun setSortOption(option: String){
@@ -240,7 +78,7 @@ class SearchViewModel(): ViewModel() {
             SortOptions.NameDesc.value -> _listProduct.value.sortedByDescending { it.name }.toMutableList()
             SortOptions.PriceIncr.value -> _listProduct.value.sortedBy { it.originalPrice }.toMutableList()
             SortOptions.PriceDesc.value -> _listProduct.value.sortedByDescending { it.originalPrice }.toMutableList()
-            SortOptions.All.value -> loadListProduct().let { _listProduct.value }
+            SortOptions.All.value -> _listProduct.value.toMutableList()
             else -> _listProduct.value
         }
     }

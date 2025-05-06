@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,16 +82,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ItemScreen(
-    onAddClick: (CartItem) -> Unit = {CartItem -> },
+    onAddClick: () -> Unit = {},
     onBackClicked: () -> Unit = {},
     onCartClicked: () -> Unit = {},
     viewModel: ItemViewModel,
     modifier: Modifier = Modifier,
 ){
-    val item: Product = viewModel.item
+
     val cartItem: CartItem by viewModel.cartItem.collectAsStateWithLifecycle()
+    val item: Product = cartItem.product
     val scrollState = rememberScrollState()
     var quantity by remember { mutableStateOf(1) }
+    quantity = cartItem.quantity
     var spacerheight by remember { mutableStateOf(170) }
     val lazyState = rememberLazyListState()
     val coroutine = rememberCoroutineScope()
@@ -109,7 +114,7 @@ fun ItemScreen(
             }
         }
     }
-    Box(Modifier.fillMaxSize().background(OrangeDefault)){
+    Box(Modifier.fillMaxSize().background(OrangeDefault).padding(WindowInsets.statusBars.asPaddingValues())){
         Image(
             painter = painterResource(item.img),
             contentScale = ContentScale.Crop,
@@ -117,6 +122,7 @@ fun ItemScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
+
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -295,7 +301,7 @@ fun ItemScreen(
                 OuterShadowFilledButton(
                     text = "Thêm",
                     icon = Icons.Default.AddShoppingCart,
-                    onClick = { viewModel.addToCart() },
+                    onClick = onAddClick ,
                     modifier = Modifier
                 )
             }
@@ -303,11 +309,3 @@ fun ItemScreen(
     }
 }
 
-@Preview
-@Composable
-fun ItemPreview(){
-    val viewModel: ItemViewModel = viewModel()
-    ItemScreen(
-        viewModel = viewModel
-    )
-}

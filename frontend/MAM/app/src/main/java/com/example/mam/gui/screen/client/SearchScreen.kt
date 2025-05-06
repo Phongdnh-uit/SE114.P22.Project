@@ -36,17 +36,23 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,13 +74,15 @@ fun SearchScreen(
     onItemClicked: (Product) -> Unit = { Product -> },
     viewModel: SearchViewModel = viewModel()
 ){
-    viewModel.loadListProduct()
+    LaunchedEffect(Unit) { viewModel.loadListProduct() }
+
     val listProduct = viewModel.listProduct.collectAsStateWithLifecycle()
     val searchQuery = viewModel.searchText.collectAsStateWithLifecycle()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
     var sortExpanded by remember { mutableStateOf(false) }
     val sortOption = viewModel.sortOption.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,7 +95,11 @@ fun SearchScreen(
             Box{
             OutlinedTextField(
                 value = searchQuery.value,
-                onValueChange = { viewModel.setSearchText(it) },
+                onValueChange = {
+                    viewModel.setSearchText(it)
+                    if (searchHistory.value.isNotEmpty()) {
+                        expanded = true // Chỉ mở nếu có lịch sử tìm kiếm
+                    }},
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = WhiteDefault,  // Màu nền khi focus
                     unfocusedContainerColor = WhiteDefault, // Màu nền khi không focus
@@ -129,22 +141,26 @@ fun SearchScreen(
                                 disabledContentColor = BrownDefault,
                                 disabledContainerColor = WhiteDefault
                             ),
-                            onClick = { viewModel.search() }) {
+                            onClick = {
+                                focusManager.clearFocus()
+                                viewModel.search() }) {
                             Icon(Icons.Default.Search, contentDescription = "Search")
                         }
                     }
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Search),
+                    imeAction = ImeAction.Done),
+
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = true }
+                    .onFocusChanged { if(it.isFocused && searchHistory.value.isNotEmpty()) expanded = true },
             )
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 containerColor = WhiteDefault,
+                properties = PopupProperties(focusable = false),
                 modifier = Modifier
                     .zIndex(1f)
                     .fillParentMaxWidth()

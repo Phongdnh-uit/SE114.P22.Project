@@ -515,9 +515,10 @@ fun RadioOption(
     modifier: Modifier = Modifier,
     title: String,
     options: List<VarianceOption>,
+    defaultOption: VarianceOption = options.first() ,
     onClick: (VarianceOption) -> Unit,
 ) {
-    var temp: VarianceOption by remember { mutableStateOf(options.first()) }
+    var temp: VarianceOption by remember { mutableStateOf(defaultOption) }
     Column(
         modifier = modifier.wrapContentHeight()
     ) {
@@ -558,12 +559,13 @@ fun PizzaSizeOption(
     modifier: Modifier = Modifier,
     title: String,
     options: List<VarianceOption>,
+    defaultOption: VarianceOption = options.first() ,
     @DrawableRes image: Int,
     onClick: (VarianceOption) -> Unit,
     ) {
         val scope = rememberCoroutineScope()
         val state = rememberLazyListState()
-        var temp: VarianceOption by remember { mutableStateOf(options.first()) }
+        var temp: VarianceOption by remember { mutableStateOf(defaultOption) }
         Column(
             modifier = modifier.wrapContentHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -698,7 +700,6 @@ fun MultiChoiceOption(
                 .wrapContentHeight()
         ) {
             items(options) { option ->
-                var isSelected: Boolean = false
                 CustomToggleButton(
                     text = option.value,
                     onSelect = { onSelect(option) },
