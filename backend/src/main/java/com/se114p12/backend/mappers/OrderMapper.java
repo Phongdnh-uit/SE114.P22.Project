@@ -1,4 +1,4 @@
-package com.se114p12.backend.mapper;
+package com.se114p12.backend.mappers;
 
 import com.se114p12.backend.domains.order.Order;
 import com.se114p12.backend.dto.order.OrderResponseDTO;

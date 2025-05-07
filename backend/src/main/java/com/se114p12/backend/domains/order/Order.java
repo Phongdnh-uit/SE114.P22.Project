@@ -4,6 +4,8 @@ import com.se114p12.backend.domains.authentication.User;
 import com.se114p12.backend.domains.shipper.Shipper;
 import com.se114p12.backend.enums.OrderStatus;
 import com.se114p12.backend.domains.BaseEntity;
+import com.se114p12.backend.enums.PaymentMethod;
+import com.se114p12.backend.enums.PaymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,32 +21,35 @@ import java.util.List;
 @Setter
 public class Order extends BaseEntity {
 
-  @NotNull
-  private String shippingAddress;
+    @NotNull
+    private String shippingAddress;
 
-  private Long totalPrice;
+    private Long totalPrice;
 
-  private String note;
+    private String note;
 
-  @NotNull
-  private Instant expectedDeliveryTime;
+    @NotNull
+    private Instant expectedDeliveryTime;
 
-  @NotNull
-  private Instant actualDeliveryTime;
+    @NotNull
+    private Instant actualDeliveryTime;
 
-  @Enumerated(EnumType.STRING)
-  private OrderStatus orderStatus;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
-//  private Payment paymentMethod;
+    @NotNull
+    private PaymentMethod paymentMethod;
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+    private PaymentStatus paymentStatus;
 
-  @ManyToOne
-  @JoinColumn(name = "shipper_id")
-  private Shipper shipper;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<OrderDetail> orderDetails;
+    @ManyToOne
+    @JoinColumn(name = "shipper_id")
+    private Shipper shipper;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails;
 }
