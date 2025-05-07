@@ -6,6 +6,7 @@ import com.se114p12.backend.domains.BaseEntity;
 import com.se114p12.backend.domains.cart.Cart;
 import com.se114p12.backend.domains.general.Notification;
 import com.se114p12.backend.domains.general.NotificationUser;
+import com.se114p12.backend.domains.review.Review;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import jakarta.persistence.*;
@@ -72,4 +73,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Verification> verifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Review> reviews = new ArrayList<>();
 }
