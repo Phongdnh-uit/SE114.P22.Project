@@ -1,6 +1,7 @@
 package com.se114p12.backend.domains.order;
 
 import com.se114p12.backend.domains.authentication.User;
+import com.se114p12.backend.domains.shipper.Shipper;
 import com.se114p12.backend.enums.OrderStatus;
 import com.se114p12.backend.domains.BaseEntity;
 import jakarta.persistence.*;
@@ -40,9 +41,9 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-//  @ManyToOne
-//  @JoinColumn(name = "shipper_id")
-//  private Shipper shipper;
+  @ManyToOne
+  @JoinColumn(name = "shipper_id")
+  private Shipper shipper;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderDetail> orderDetails;
