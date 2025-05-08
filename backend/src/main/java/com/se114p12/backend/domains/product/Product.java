@@ -3,7 +3,6 @@ package com.se114p12.backend.domains.product;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.se114p12.backend.domains.BaseEntity;
-import com.se114p12.backend.domains.review.Review;
 import com.se114p12.backend.domains.variation.Variation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -54,7 +53,4 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     @NotNull
     private Boolean isAvailable;
-
-    @OneToMany(mappedBy = "product")
-    private List<Review> reviews = new ArrayList<>();
 }

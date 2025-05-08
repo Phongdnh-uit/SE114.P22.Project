@@ -3,7 +3,7 @@ package com.se114p12.backend.services.shipper;
 import com.se114p12.backend.domains.shipper.Shipper;
 import com.se114p12.backend.dto.request.shipper.ShipperRequest;
 import com.se114p12.backend.dto.response.shipper.ShipperResponse;
-import com.se114p12.backend.mapper.ShipperMapper;
+import com.se114p12.backend.mapper.shipper.ShipperMapper;
 import com.se114p12.backend.repository.shipper.ShipperRepository;
 import com.se114p12.backend.vo.PageVO;
 import lombok.RequiredArgsConstructor;
