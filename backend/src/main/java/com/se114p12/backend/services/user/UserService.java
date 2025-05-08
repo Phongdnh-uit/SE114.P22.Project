@@ -1,36 +1,39 @@
 package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.se114p12.backend.dto.user.UserRequestDTO;
+import com.se114p12.backend.dto.user.UserResponseDTO;
 import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.dto.authentication.PasswordChangeDTO;
 import com.se114p12.backend.dto.authentication.RegisterRequestDTO;
+import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.vo.PageVO;
 
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 public interface UserService {
+    PageVO<UserResponseDTO> getAllUsers(Specification<User> specification, Pageable pageable);
 
-    User findByPhone(String phone);
+    UserResponseDTO getUserById(Long id);
 
-    User update(Long id, User user);
+    UserResponseDTO findByPhone(String phone);
+
+    UserResponseDTO register(RegisterRequestDTO registerRequestDTO);
+
+    UserResponseDTO getOrRegisterGoogleUser(GoogleIdToken.Payload payload);
+
+    UserResponseDTO update(Long id, UserRequestDTO userRequestDTO);
 
     void delete(Long id);
 
-    PageVO<User> getAllUsers(Pageable pageable);
-
-    User getUserById(Long id);
-
-    List<User> searchUsers(String keyword);
-
-    User register(RegisterRequestDTO registerRequestDTO);
-
     void resetPassword(PasswordChangeDTO passwordChangeDTO);
-
-    User getOrRegisterGoogleUser(GoogleIdToken.Payload payload);
 
     void verifyEmail(String code);
 
     void assignRoleToUser(Long userId, Long roleId);
+
+    void updateUserStatus(Long id, UserStatus status);
 }

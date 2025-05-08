@@ -1,6 +1,7 @@
 package com.se114p12.backend.controllers.auth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.se114p12.backend.dto.user.UserResponseDTO;
 import com.se114p12.backend.entities.authentication.RefreshToken;
 import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.authentication.Verification;
@@ -54,7 +55,7 @@ public class AuthController {
         GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
 //     get user or register user if not exists
-        User user = userService.getOrRegisterGoogleUser(payload);
+        UserResponseDTO user = userService.getOrRegisterGoogleUser(payload);
 
 //     create access token
         String accessToken = jwtUtil.generateAccessToken(user.getId());
@@ -142,10 +143,9 @@ public class AuthController {
         if (!isValid) {
             throw new BadRequestException("Invalid OTP");
         }
-        User user = userService.findByPhone(verifyOTPRequestDTO.getPhoneNumber());
+        UserResponseDTO user = userService.findByPhone(verifyOTPRequestDTO.getPhoneNumber());
         if (verifyOTPRequestDTO.getAction() == OTPAction.VERIFY_PHONE) {
-            user.setStatus(UserStatus.ACTIVE);
-            userService.update(user.getId(), user);
+            userService.updateUserStatus(user.getId(), UserStatus.ACTIVE);
             return ResponseEntity.ok().body("Verify phone successfully");
         } else if (verifyOTPRequestDTO.getAction() == OTPAction.FORGOT_PASSWORD) {
             Verification verification = verificationService.createResetPasswordVerification(user.getId());
@@ -159,8 +159,10 @@ public class AuthController {
         Verification verification = verificationService.verifyVerificationCode(
                 forgotPasswordRequestDTO.getCode(), VerificationType.RESET_PASSWORD);
         User user = verification.getUser();
-        user.setPassword(forgotPasswordRequestDTO.getNewPassword());
-        userService.update(user.getId(), user);
+        PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
+        passwordChangeDTO.setCurrentPassword(user.getPassword());
+        passwordChangeDTO.setNewPassword(forgotPasswordRequestDTO.getNewPassword());
+        userService.resetPassword(passwordChangeDTO);
         return ResponseEntity.ok().body("Send reset password email successfully");
     }
 }
