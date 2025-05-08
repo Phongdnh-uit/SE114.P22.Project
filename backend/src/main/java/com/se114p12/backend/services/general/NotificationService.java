@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.general;
 
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.general.Notification;
 import com.se114p12.backend.entities.general.NotificationUser;
 import com.se114p12.backend.entities.general.NotificationUserId;

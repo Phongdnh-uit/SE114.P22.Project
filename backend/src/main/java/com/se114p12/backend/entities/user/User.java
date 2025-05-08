@@ -1,8 +1,10 @@
-package com.se114p12.backend.entities.authentication;
+package com.se114p12.backend.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.se114p12.backend.entities.BaseEntity;
+import com.se114p12.backend.entities.authentication.Role;
+import com.se114p12.backend.entities.authentication.Verification;
 import com.se114p12.backend.entities.cart.Cart;
 import com.se114p12.backend.entities.general.NotificationUser;
 import com.se114p12.backend.enums.LoginProvider;
@@ -27,34 +29,25 @@ import lombok.experimental.Accessors;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    @NotBlank
+    @Column(nullable = false)
     private String fullname;
 
-    @NotBlank
-    @Pattern(
-            regexp = "^[a-zA-Z]+\\d*$",
-            message = "Username must contains letters and numbers and must begin with a letter")
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @NotBlank
     private String password;
 
-    @Email
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String phone;
 
     private String avatarUrl;
 
-    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
@@ -62,13 +55,13 @@ public class User extends BaseEntity {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationUser> notifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Verification> verifications = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")

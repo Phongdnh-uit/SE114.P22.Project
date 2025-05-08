@@ -1,6 +1,6 @@
 package com.se114p12.backend.entities.order;
 
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.shipper.Shipper;
 import com.se114p12.backend.enums.OrderStatus;
 import com.se114p12.backend.entities.BaseEntity;

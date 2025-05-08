@@ -2,7 +2,7 @@ package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.se114p12.backend.entities.authentication.Role;
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.authentication.Verification;
 import com.se114p12.backend.entities.cart.Cart;
 import com.se114p12.backend.dto.authentication.PasswordChangeDTO;

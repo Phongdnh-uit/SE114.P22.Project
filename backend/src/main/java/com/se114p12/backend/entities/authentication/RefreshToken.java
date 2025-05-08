@@ -1,5 +1,6 @@
 package com.se114p12.backend.entities.authentication;
 
+import com.se114p12.backend.entities.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

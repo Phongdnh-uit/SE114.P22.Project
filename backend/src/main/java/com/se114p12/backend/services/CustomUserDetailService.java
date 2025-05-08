@@ -1,6 +1,6 @@
 package com.se114p12.backend.services;
 
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.util.LoginUtil;

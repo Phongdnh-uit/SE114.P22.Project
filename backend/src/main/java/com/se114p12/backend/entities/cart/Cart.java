@@ -2,7 +2,7 @@ package com.se114p12.backend.entities.cart;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.se114p12.backend.entities.BaseEntity;
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 

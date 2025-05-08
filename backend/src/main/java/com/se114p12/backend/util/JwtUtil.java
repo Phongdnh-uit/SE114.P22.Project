@@ -4,7 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.dto.authentication.GoogleLoginRequestDTO;
 import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.ResourceNotFoundException;

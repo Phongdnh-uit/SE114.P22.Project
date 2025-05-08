@@ -1,7 +1,7 @@
 package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.dto.authentication.PasswordChangeDTO;
 import com.se114p12.backend.dto.authentication.RegisterRequestDTO;
 import com.se114p12.backend.vo.PageVO;

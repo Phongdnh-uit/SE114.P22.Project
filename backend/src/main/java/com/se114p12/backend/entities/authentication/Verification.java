@@ -2,6 +2,7 @@ package com.se114p12.backend.entities.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.se114p12.backend.entities.BaseEntity;
+import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.enums.VerificationType;
 import jakarta.persistence.*;
 import lombok.Data;
