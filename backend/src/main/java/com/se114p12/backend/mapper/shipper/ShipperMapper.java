@@ -1,4 +1,4 @@
-package com.se114p12.backend.mapper;
+package com.se114p12.backend.mapper.shipper;
 
 import com.se114p12.backend.domains.shipper.Shipper;
 import com.se114p12.backend.dto.request.shipper.ShipperRequest;
