@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +49,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
 import com.example.mam.entity.CartItem
+import com.example.mam.entity.OrderItem
 import com.example.mam.entity.Product
 import com.example.mam.entity.ProductCategory
 import com.example.mam.entity.VarianceOption
@@ -130,14 +134,6 @@ fun CartItemContainer(
         modifier = modifier
             .height(160.dp)
             .fillMaxWidth(0.95f)
-//            .clip(
-//                RoundedCornerShape(
-//                    topStart = 50.dp,
-//                    topEnd = 0.dp,
-//                    bottomStart = 0.dp,
-//                    bottomEnd = 50.dp
-//                )
-//            )
     ){
         Row(
             Modifier.fillMaxSize()
@@ -171,7 +167,10 @@ fun CartItemContainer(
                     .fillMaxSize()
                     .padding(0.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()) {
                     Text(
                         text = cartItem.product.name,
                         textAlign = TextAlign.Start,
@@ -181,7 +180,6 @@ fun CartItemContainer(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .align(Alignment.Start)
-                            .padding(10.dp)
                             .fillMaxWidth()
                     )
                     Text(
@@ -192,7 +190,6 @@ fun CartItemContainer(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .align(Alignment.Start)
-                            .padding(10.dp)
                             .fillMaxWidth()
                     )
                 }
@@ -227,6 +224,99 @@ fun CartItemContainer(
                         Icon(Icons.Filled.Delete, "")
                     }
                 }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun OrderItemContainer(
+    item: OrderItem,
+    modifier: Modifier = Modifier,
+){
+    Card(
+        colors = CardColors(
+            containerColor = WhiteDefault,
+            contentColor = BrownDefault,
+            disabledContainerColor = GreyLight,
+            disabledContentColor = GreyDefault
+        ),
+        shape = RoundedCornerShape(50.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        modifier = modifier
+            .height(130.dp)
+            .fillMaxWidth(0.95f)
+//            .clip(
+//                RoundedCornerShape(
+//                    topStart = 50.dp,
+//                    topEnd = 0.dp,
+//                    bottomStart = 0.dp,
+//                    bottomEnd = 50.dp
+//                )
+//            )
+    ){
+        Row(
+            Modifier.fillMaxSize()
+        ){
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .wrapContentWidth()
+                    .padding(horizontal = 10.dp)) {
+                Image(
+                    painter = painterResource(item.product.img),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .size(105.dp)
+                        .clip(CircleShape)
+                )
+
+            }
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
+            ) {
+                Column {
+                    Text(
+                        text = item.product.name,
+                        textAlign = TextAlign.Start,
+                        maxLines = 2,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .fillMaxWidth()
+                    )
+                    Text(
+                        text = item.options,
+                        textAlign = TextAlign.Start,
+                        maxLines = 3,
+                        fontSize = 18.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .fillMaxWidth()
+                    )
+                }
+                Text(
+                    text = item.getPriceToString(),
+                    textAlign = TextAlign.End,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    color = OrangeDefault,
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                        .fillMaxWidth())
+
             }
 
         }
@@ -335,6 +425,42 @@ fun ContainerPreview(){
                 true,
                 "PC001",
                 R.drawable.bacon_and_cheese_heaven
+            )
+        )
+        val cartItem = CartItem(
+            Product(
+                "P003",
+                "Pizza truyền thống",
+                "",
+                "Sốt BBQ đặc trưng, gà nướng, hành tây, ớt chuông, lá basil và phô mai Mozzarella. ",
+                100000,
+                true,
+                "PC001",
+                R.drawable.bacon_and_cheese_heaven
+            ),
+            1,
+            mutableListOf(
+                VarianceOption("V002P003", "V001", "Thường", 0),
+                VarianceOption("V004P003", "V004", "Hành tây", 0),
+                VarianceOption("V005P003", "V004", "Ớt chuông", 0),
+                VarianceOption("V008P003", "V007", "25cm", 0),
+            )
+        )
+        OrderItemContainer(
+            item = OrderItem(
+                Product(
+                    "P003",
+                    "Pizza truyền thống",
+                    "",
+                    "Sốt BBQ đặc trưng, gà nướng, hành tây, ớt chuông, lá basil và phô mai Mozzarella. ",
+                    100000,
+                    true,
+                    "PC001",
+                    R.drawable.bacon_and_cheese_heaven
+                ),
+                1,
+                cartItem.getOptionsToString(),
+                cartItem.getPrice()
             )
         )
     }

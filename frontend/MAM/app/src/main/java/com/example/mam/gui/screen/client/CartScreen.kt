@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +60,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.viewmodel.client.CartViewModel
 
-@SuppressLint("MutableCollectionMutableState")
+//@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CartScreen(
     onBackClicked: () -> Unit = {},
@@ -69,7 +70,8 @@ fun CartScreen(
     modifier: Modifier = Modifier
 ) {
     val cart: Cart by viewModel.cart.collectAsStateWithLifecycle()
-    LaunchedEffect(viewModel.cart) {
+    val isScreenActive = rememberUpdatedState(newValue = true)
+    LaunchedEffect(isScreenActive.value) {
         viewModel.getCart("")
     }
     Box(

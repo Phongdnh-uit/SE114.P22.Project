@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
@@ -143,7 +144,7 @@ fun EditFieldType1(
         OutlinedTextField(
             value = value,
             textStyle = TextStyle(
-                fontSize = Variables.BodySizeMedium, // <-- Chỉnh font size ở đây
+                fontSize = 20.sp, // <-- Chỉnh font size ở đây
                 color = textColor // Đảm bảo màu chữ vẫn đúng
             ),
             colors = TextFieldDefaults.colors(

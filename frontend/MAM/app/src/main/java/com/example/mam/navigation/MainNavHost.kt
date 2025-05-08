@@ -19,15 +19,19 @@ import com.example.mam.gui.screen.authorization.SignInScreen
 import com.example.mam.gui.screen.authorization.SignUpScreen
 import com.example.mam.gui.screen.authorization.StartScreen
 import com.example.mam.gui.screen.client.CartScreen
+import com.example.mam.gui.screen.client.CheckOutScreen
 import com.example.mam.gui.screen.client.HomeScreen
 import com.example.mam.gui.screen.client.ItemScreen
+import com.example.mam.gui.screen.client.OrderScreen
 import com.example.mam.gui.screen.client.SearchScreen
 import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 import com.example.mam.viewmodel.authorization.SignInViewModel
 import com.example.mam.viewmodel.authorization.SignUpViewModel
 import com.example.mam.viewmodel.client.CartViewModel
+import com.example.mam.viewmodel.client.CheckOutViewModel
 import com.example.mam.viewmodel.client.HomeScreenViewModel
 import com.example.mam.viewmodel.client.ItemViewModel
+import com.example.mam.viewmodel.client.OrderViewModel
 import com.example.mam.viewmodel.client.SearchViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import kotlinx.coroutines.CoroutineScope
@@ -396,11 +400,107 @@ fun MainNavHost(
                     onAdditionalProductClicked = { item ->
                         navController.navigate("Details/${item}")
                     },
-                    onCheckOutClicked = {},
+                    onCheckOutClicked = {navController.navigate(("CheckOut"))},
                     viewModel = viewModel
                 )
             }
+            composable(
+                route = "CheckOut",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(1000)
+                    )
 
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(1000),
+                        targetAlpha = 1f)
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(1000),
+                        initialAlpha = 1f)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(1000)
+                    )
+                }
+            ) { backStackEntry ->
+                val viewModel: CheckOutViewModel = viewModel(backStackEntry)
+                CheckOutScreen(
+                    onBackClicked = {navController.popBackStack()},
+                    onCheckOutClicked = {
+                        //order
+                        navController.navigate("Order") },
+                    onChangeAddressClicked = {},
+                    viewModel = viewModel
+                )
+            }
+            composable(
+                route = "Address",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(1000)
+                    )
+
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(1000),
+                        targetAlpha = 1f)
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(1000),
+                        initialAlpha = 1f)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(1000)
+                    )
+                }
+            ){
+
+            }
+            composable(
+                route = "Order",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(1000)
+                    )
+
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(1000),
+                        targetAlpha = 1f)
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(1000),
+                        initialAlpha = 1f)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(1000)
+                    )
+                }
+            ){ backStackEntry ->
+                val viewModel: OrderViewModel = viewModel(backStackEntry)
+                OrderScreen(
+                    onBackClicked = {navController.popBackStack()},
+                    onVerifyClicked = {},
+                    viewModel = viewModel
+                )
+            }
         }
 
     }
