@@ -1,12 +1,12 @@
 package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.se114p12.backend.domains.authentication.Role;
-import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.domains.authentication.Verification;
-import com.se114p12.backend.domains.cart.Cart;
-import com.se114p12.backend.dto.request.PasswordChangeDTO;
-import com.se114p12.backend.dto.request.RegisterRequestDTO;
+import com.se114p12.backend.entities.authentication.Role;
+import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.authentication.Verification;
+import com.se114p12.backend.entities.cart.Cart;
+import com.se114p12.backend.dto.authentication.PasswordChangeDTO;
+import com.se114p12.backend.dto.authentication.RegisterRequestDTO;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.enums.VerificationType;
@@ -106,11 +106,14 @@ public class UserServiceImpl implements UserService {
         if (!smsService.lookupPhoneNumber(registerRequestDTO.getPhone())) {
             throw new BadRequestException("Invalid phone number");
         }
-        user.setPhone(registerRequestDTO.getPhone());
+        user.setPhone(SMSService.formatPhoneNumber(registerRequestDTO.getPhone()));
         user.setStatus(UserStatus.PENDING);
         user.setLoginProvider(LoginProvider.LOCAL);
         User savedUser = userRepository.save(user);
 
+        Role userRole = roleRepository.findByName("USER").orElseThrow(()->
+                new ResourceNotFoundException("Role not found"));
+        user.setRole(userRole);
         // Tạo cart sau khi đăng ký
         Cart cart = new Cart();
         cart.setUser(savedUser);

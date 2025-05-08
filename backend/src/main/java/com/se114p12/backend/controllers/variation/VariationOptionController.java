@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.variation;
 
-import com.se114p12.backend.domains.variation.VariationOption;
+import com.se114p12.backend.entities.variation.VariationOption;
 import com.se114p12.backend.services.variation.VariationOptionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

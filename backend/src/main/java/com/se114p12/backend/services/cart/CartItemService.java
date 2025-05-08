@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.cart;
 
-import com.se114p12.backend.domains.cart.CartItem;
+import com.se114p12.backend.entities.cart.CartItem;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.repository.cart.CartItemRepository;
 import com.se114p12.backend.vo.PageVO;

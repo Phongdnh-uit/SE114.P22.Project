@@ -1,11 +1,10 @@
 package com.se114p12.backend.controllers.auth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.se114p12.backend.domains.authentication.RefreshToken;
-import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.domains.authentication.Verification;
-import com.se114p12.backend.dto.request.*;
-import com.se114p12.backend.dto.response.AuthResponseDTO;
+import com.se114p12.backend.entities.authentication.RefreshToken;
+import com.se114p12.backend.entities.authentication.User;
+import com.se114p12.backend.entities.authentication.Verification;
+import com.se114p12.backend.dto.authentication.*;
 import com.se114p12.backend.enums.OTPAction;
 import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.enums.VerificationType;

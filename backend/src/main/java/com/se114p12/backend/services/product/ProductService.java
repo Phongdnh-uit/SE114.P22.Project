@@ -1,8 +1,8 @@
 package com.se114p12.backend.services.product;
 
-import com.se114p12.backend.domains.product.Product;
-import com.se114p12.backend.domains.product.ProductCategory;
-import com.se114p12.backend.dto.request.product.ProductRequestDTO;
+import com.se114p12.backend.entities.product.Product;
+import com.se114p12.backend.entities.product.ProductCategory;
+import com.se114p12.backend.dto.product.ProductRequestDTO;
 import com.se114p12.backend.repository.product.ProductRepository;
 import com.se114p12.backend.services.general.StorageService;
 import com.se114p12.backend.vo.PageVO;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 

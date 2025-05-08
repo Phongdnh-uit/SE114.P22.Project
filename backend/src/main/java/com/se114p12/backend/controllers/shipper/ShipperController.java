@@ -1,7 +1,7 @@
 package com.se114p12.backend.controllers.shipper;
 
-import com.se114p12.backend.dto.request.shipper.ShipperRequest;
-import com.se114p12.backend.dto.response.shipper.ShipperResponse;
+import com.se114p12.backend.dto.shipper.ShipperRequest;
+import com.se114p12.backend.dto.shipper.ShipperResponse;
 import com.se114p12.backend.services.shipper.ShipperService;
 import com.se114p12.backend.vo.PageVO;
 import lombok.RequiredArgsConstructor;

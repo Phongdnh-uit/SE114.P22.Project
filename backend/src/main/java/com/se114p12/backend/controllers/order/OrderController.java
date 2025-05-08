@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.order;
 
-import com.se114p12.backend.domains.order.Order;
+import com.se114p12.backend.entities.order.Order;
 import com.se114p12.backend.dto.order.OrderRequestDTO;
 import com.se114p12.backend.dto.order.OrderResponseDTO;
 import com.se114p12.backend.services.order.OrderService;

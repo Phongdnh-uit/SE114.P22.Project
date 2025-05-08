@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.cart;
 
-import com.se114p12.backend.domains.cart.CartItem;
+import com.se114p12.backend.entities.cart.CartItem;
 import com.se114p12.backend.services.cart.CartItemService;
 import com.se114p12.backend.vo.PageVO;
 import io.swagger.v3.oas.annotations.tags.Tag;

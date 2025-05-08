@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.authentication;
 
-import com.se114p12.backend.domains.authentication.RefreshToken;
+import com.se114p12.backend.entities.authentication.RefreshToken;
 
 public interface RefreshTokenService {
   RefreshToken findByToken(String token);

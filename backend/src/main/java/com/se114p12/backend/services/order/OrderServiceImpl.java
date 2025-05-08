@@ -1,10 +1,10 @@
 package com.se114p12.backend.services.order;
 
-import com.se114p12.backend.domains.cart.Cart;
-import com.se114p12.backend.domains.cart.CartItem;
-import com.se114p12.backend.domains.order.Order;
-import com.se114p12.backend.domains.order.OrderDetail;
-import com.se114p12.backend.domains.product.Product;
+import com.se114p12.backend.entities.cart.Cart;
+import com.se114p12.backend.entities.cart.CartItem;
+import com.se114p12.backend.entities.order.Order;
+import com.se114p12.backend.entities.order.OrderDetail;
+import com.se114p12.backend.entities.product.Product;
 import com.se114p12.backend.dto.order.OrderRequestDTO;
 import com.se114p12.backend.dto.order.OrderResponseDTO;
 import com.se114p12.backend.enums.OrderStatus;

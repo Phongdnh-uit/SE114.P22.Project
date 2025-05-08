@@ -1,6 +1,6 @@
 package com.se114p12.backend.services;
 
-import com.se114p12.backend.domains.authentication.Role;
+import com.se114p12.backend.entities.authentication.Role;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.RoleRepository;

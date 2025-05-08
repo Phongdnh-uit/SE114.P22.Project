@@ -1,8 +1,8 @@
 package com.se114p12.backend.mapper.shipper;
 
-import com.se114p12.backend.domains.shipper.Shipper;
-import com.se114p12.backend.dto.request.shipper.ShipperRequest;
-import com.se114p12.backend.dto.response.shipper.ShipperResponse;
+import com.se114p12.backend.entities.shipper.Shipper;
+import com.se114p12.backend.dto.shipper.ShipperRequest;
+import com.se114p12.backend.dto.shipper.ShipperResponse;
 import org.mapstruct.*;
 
 import java.util.List;

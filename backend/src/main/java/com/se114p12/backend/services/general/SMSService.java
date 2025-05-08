@@ -61,20 +61,36 @@ public class SMSService {
 
     public boolean lookupPhoneNumber(String phoneNumber) {
         try {
+            phoneNumber = formatPhoneNumber(phoneNumber);
             PhoneNumber phoneInfo = PhoneNumber.fetcher(phoneNumber)
                     .setFields("line_type_intelligence")
                     .fetch();
             boolean isValid = phoneInfo.getValid();
-
+            if (!isValid) {
+                throw new SMSException("Invalid phone number");
+            }
             System.out.println("Phone number: " + phoneInfo.getPhoneNumber());
-            System.out.println("Valid: " + isValid);
             System.out.println("type: " + phoneInfo.getLineTypeIntelligence().get("type"));
             System.out.println("Carrier name: " + phoneInfo.getLineTypeIntelligence().get("carrier_name"));
             System.out.println("Country: " + phoneInfo.getCountryCode());
 
-            return isValid && "mobile".equalsIgnoreCase(phoneInfo.getLineTypeIntelligence().get("type").toString());
+            return "mobile".equalsIgnoreCase(phoneInfo.getLineTypeIntelligence().get("type").toString());
         } catch (Exception e) {
             throw new SMSException(e.getMessage());
+        }
+    }
+
+    public static String formatPhoneNumber(String phoneNumber) {
+        phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+        if (phoneNumber.startsWith("0")) {
+            return "+84" + phoneNumber.substring(1);
+        } else if (phoneNumber.startsWith("84")) {
+            return "+" + phoneNumber;
+        } else if (phoneNumber.startsWith("+84")) {
+            return phoneNumber;
+        } else {
+            return phoneNumber;
         }
     }
 }

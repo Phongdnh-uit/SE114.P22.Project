@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.variation;
 
-import com.se114p12.backend.domains.variation.Variation;
+import com.se114p12.backend.entities.variation.Variation;
 import com.se114p12.backend.services.variation.VariationService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

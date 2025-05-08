@@ -1,6 +1,6 @@
 package com.se114p12.backend.util;
 
-import com.se114p12.backend.domains.authentication.User;
+import com.se114p12.backend.entities.authentication.User;
 import com.se114p12.backend.enums.LoginType;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.UserRepository;

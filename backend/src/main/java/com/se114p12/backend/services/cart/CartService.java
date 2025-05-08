@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.cart;
 
-import com.se114p12.backend.domains.cart.Cart;
+import com.se114p12.backend.entities.cart.Cart;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.cart.CartRepository;
