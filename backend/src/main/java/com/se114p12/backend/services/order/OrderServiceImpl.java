@@ -9,6 +9,7 @@ import com.se114p12.backend.dto.order.OrderRequestDTO;
 import com.se114p12.backend.dto.order.OrderResponseDTO;
 import com.se114p12.backend.enums.OrderStatus;
 import com.se114p12.backend.enums.PaymentStatus;
+import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.mappers.OrderDetailMapper;
 import com.se114p12.backend.mappers.OrderMapper;
@@ -97,6 +98,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO update(Long id, OrderRequestDTO orderRequestDTO) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public void OrderCancel(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        if (order.getOrderStatus().getCode() > 1) {
+            throw new BadRequestException("Can't cancel order because order is confirm");
+        }
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
     }
 
     @Override

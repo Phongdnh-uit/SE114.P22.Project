@@ -11,11 +11,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
   @Bean
   public SecurityFilterChain filterChain(
@@ -47,5 +49,25 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public AppInterceptor appInterceptor() {
+    return new AppInterceptor();
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(appInterceptor())
+            .addPathPatterns("/api/v1/**")
+            .excludePathPatterns(
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/oauth2/google",
+                    "/api/v1/auth/register",
+                    "/api/v1/auth/refresh",
+                    "/api/v1/auth/forgot-password",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html");
   }
 }
