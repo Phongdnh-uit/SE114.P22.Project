@@ -10,7 +10,7 @@ import com.se114p12.backend.enums.OTPAction;
 import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.enums.VerificationType;
 import com.se114p12.backend.exception.BadRequestException;
-import com.se114p12.backend.services.UserService;
+import com.se114p12.backend.services.user.UserService;
 import com.se114p12.backend.services.authentication.RefreshTokenService;
 import com.se114p12.backend.services.authentication.VerificationService;
 import com.se114p12.backend.services.general.MailService;

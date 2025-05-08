@@ -1,7 +1,7 @@
 package com.se114p12.backend.controllers;
 
 import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.services.UserService;
+import com.se114p12.backend.services.user.UserService;
 import com.se114p12.backend.vo.PageVO;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,6 +50,12 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/assign-role/{roleId}")
+    public ResponseEntity<Void> assignRoleToUser(@PathVariable("id") Long userId, @PathVariable("roleId") Long roleId) {
+        userService.assignRoleToUser(userId, roleId);
         return ResponseEntity.noContent().build();
     }
 }
