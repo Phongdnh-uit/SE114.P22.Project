@@ -32,4 +32,9 @@ open class NotificationViewModel(
             }
         }
     }
+    fun markAllAsRead() {
+        _notifications.value = _notifications.value.map {
+            it.copy(isRead = true)
+        }
+    }
 }

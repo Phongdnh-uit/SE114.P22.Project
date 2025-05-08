@@ -64,5 +64,5 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
