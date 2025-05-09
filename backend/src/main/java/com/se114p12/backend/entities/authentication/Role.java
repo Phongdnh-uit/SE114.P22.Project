@@ -13,15 +13,14 @@ import java.util.List;
 @Entity
 @Table(name = "roles")
 public class Role extends BaseEntity {
+
     @Column(nullable = false, unique = true)
-    @NotBlank
     private String name;
 
     private String description;
 
     private Boolean active;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<User> users;
 }
