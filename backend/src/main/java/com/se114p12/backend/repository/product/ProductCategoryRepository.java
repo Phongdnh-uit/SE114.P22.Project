@@ -1,6 +1,6 @@
 package com.se114p12.backend.repository.product;
 
-import com.se114p12.backend.domains.product.ProductCategory;
+import com.se114p12.backend.entities.product.ProductCategory;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

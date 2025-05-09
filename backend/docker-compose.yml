@@ -19,7 +19,7 @@ services:
     build: .
     container_name: mobile_api
     expose:
-      - "8080"
+      - "127.0.0.1:8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mobile-be?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
@@ -31,19 +31,6 @@ services:
         condition: service_healthy
     volumes:
       - /home/phongdev/app/storage:/app/uploads
-    networks:
-      - app_network
-
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx-reverse
-    ports:
-      - "80:80"
-    volumes:
-      - /home/phongdev/app/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - api
     networks:
       - app_network
 

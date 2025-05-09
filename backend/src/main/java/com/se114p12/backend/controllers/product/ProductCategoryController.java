@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.product;
 
-import com.se114p12.backend.domains.product.ProductCategory;
+import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.services.product.ProductCategoryService;
 import com.se114p12.backend.vo.PageVO;
 

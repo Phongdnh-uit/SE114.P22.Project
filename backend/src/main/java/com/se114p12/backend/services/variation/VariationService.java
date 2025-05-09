@@ -1,7 +1,7 @@
 package com.se114p12.backend.services.variation;
 
-import com.se114p12.backend.domains.product.Product;
-import com.se114p12.backend.domains.variation.Variation;
+import com.se114p12.backend.entities.product.Product;
+import com.se114p12.backend.entities.variation.Variation;
 import com.se114p12.backend.repository.product.ProductRepository;
 import com.se114p12.backend.repository.variation.VariationRepository;
 import org.springframework.stereotype.Service;

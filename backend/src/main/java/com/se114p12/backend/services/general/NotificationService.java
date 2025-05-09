@@ -1,11 +1,11 @@
 package com.se114p12.backend.services.general;
 
-import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.domains.general.Notification;
-import com.se114p12.backend.domains.general.NotificationUser;
-import com.se114p12.backend.domains.general.NotificationUserId;
-import com.se114p12.backend.dto.request.general.NotificationRequest;
-import com.se114p12.backend.dto.response.response.NotificationResponse;
+import com.se114p12.backend.entities.user.User;
+import com.se114p12.backend.entities.general.Notification;
+import com.se114p12.backend.entities.general.NotificationUser;
+import com.se114p12.backend.entities.general.NotificationUserId;
+import com.se114p12.backend.dto.general.NotificationRequest;
+import com.se114p12.backend.dto.nofitication.NotificationResponse;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.general.EmitterRepository;
 import com.se114p12.backend.repository.general.NotificationRepository;

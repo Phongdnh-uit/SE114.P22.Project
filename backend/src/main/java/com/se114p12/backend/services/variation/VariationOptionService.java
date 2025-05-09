@@ -1,7 +1,7 @@
 package com.se114p12.backend.services.variation;
 
-import com.se114p12.backend.domains.variation.Variation;
-import com.se114p12.backend.domains.variation.VariationOption;
+import com.se114p12.backend.entities.variation.Variation;
+import com.se114p12.backend.entities.variation.VariationOption;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.repository.variation.VariationOptionRepository;
 import com.se114p12.backend.repository.variation.VariationRepository;

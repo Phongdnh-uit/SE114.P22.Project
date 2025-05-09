@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.product;
 
-import com.se114p12.backend.domains.product.ProductCategory;
+import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.product.ProductCategoryRepository;
 import com.se114p12.backend.vo.PageVO;

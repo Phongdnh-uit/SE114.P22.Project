@@ -1,6 +1,6 @@
 package com.se114p12.backend.repository.cart;
 
-import com.se114p12.backend.domains.cart.Cart;
+import com.se114p12.backend.entities.cart.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;

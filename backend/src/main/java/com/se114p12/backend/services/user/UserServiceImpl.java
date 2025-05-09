@@ -1,18 +1,21 @@
 package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.se114p12.backend.domains.authentication.Role;
-import com.se114p12.backend.domains.authentication.User;
-import com.se114p12.backend.domains.authentication.Verification;
-import com.se114p12.backend.domains.cart.Cart;
-import com.se114p12.backend.dto.request.PasswordChangeDTO;
-import com.se114p12.backend.dto.request.RegisterRequestDTO;
+import com.se114p12.backend.dto.user.UserRequestDTO;
+import com.se114p12.backend.dto.user.UserResponseDTO;
+import com.se114p12.backend.entities.authentication.Role;
+import com.se114p12.backend.entities.user.User;
+import com.se114p12.backend.entities.authentication.Verification;
+import com.se114p12.backend.entities.cart.Cart;
+import com.se114p12.backend.dto.authentication.PasswordChangeDTO;
+import com.se114p12.backend.dto.authentication.RegisterRequestDTO;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.enums.VerificationType;
 import com.se114p12.backend.exception.BadRequestException;
 import com.se114p12.backend.exception.DataConflictException;
 import com.se114p12.backend.exception.ResourceNotFoundException;
+import com.se114p12.backend.mapper.user.UserMapper;
 import com.se114p12.backend.repository.authentication.RoleRepository;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.cart.CartRepository;
@@ -21,12 +24,14 @@ import com.se114p12.backend.services.general.MailService;
 import com.se114p12.backend.services.general.SMSService;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
+
 import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +39,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -43,61 +49,36 @@ public class UserServiceImpl implements UserService {
     private final MailService mailService;
     private final SMSService smsService;
 
-    //    public User create(User user) {
-    //        user.setId(null);
-    //        validateUserUniqueness(user, null);
-    //        user.setPassword(passwordEncoder.encode(user.getPassword()));
-    //        user.setStatus(UserStatus.PENDING);
-    //
-    //        User createdUser = userRepository.save(user);
-    //
-    //        // Tạo cart cho user mới
-    //        cartService.createForUser(createdUser.getId());
-    //
-    //        return createdUser;
-    //    }
-
-    public User findByPhone(String phone) {
-        return userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    public User update(Long id, User user) {
-        User existingUser = findUserById(id);
-        validateUserUniqueness(user, existingUser);
-        updateUserDetails(existingUser, user);
-        return userRepository.save(existingUser);
-    }
-
-    public void delete(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        userRepository.deleteById(id);
-    }
-
-    public PageVO<User> getAllUsers(Pageable pageable) {
-        Page<User> userPage = userRepository.findAll(pageable);
-        return PageVO.<User>builder()
+    @Override
+    public PageVO<UserResponseDTO> getAllUsers(Specification<User> specification,Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(specification, pageable);
+        List<UserResponseDTO> userResponseDTOs = userPage.getContent().stream()
+                .map(userMapper::entityToResponse)
+                .toList();
+        return PageVO.<UserResponseDTO>builder()
                 .page(userPage.getNumber())
                 .size(userPage.getSize())
                 .numberOfElements(userPage.getNumberOfElements())
                 .totalPages(userPage.getTotalPages())
                 .totalElements(userPage.getTotalElements())
-                .content(userPage.getContent())
+                .content(userResponseDTOs)
                 .build();
     }
 
-    public User getUserById(Long id) {
-        return findUserById(id);
+    @Override
+    public UserResponseDTO getUserById(Long id) {
+        return userMapper.entityToResponse(findUserById(id));
     }
 
-    public List<User> searchUsers(String keyword) {
-        return userRepository.findUserByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(
-                keyword, keyword);
+    @Override
+    public UserResponseDTO findByPhone(String phone) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userMapper.entityToResponse(user);
     }
 
-    public User register(RegisterRequestDTO registerRequestDTO) {
+    @Override
+    public UserResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         User user = new User();
         user.setFullname(registerRequestDTO.getFullname());
         user.setUsername(registerRequestDTO.getUsername());
@@ -106,11 +87,14 @@ public class UserServiceImpl implements UserService {
         if (!smsService.lookupPhoneNumber(registerRequestDTO.getPhone())) {
             throw new BadRequestException("Invalid phone number");
         }
-        user.setPhone(registerRequestDTO.getPhone());
+        user.setPhone(SMSService.formatPhoneNumber(registerRequestDTO.getPhone()));
         user.setStatus(UserStatus.PENDING);
         user.setLoginProvider(LoginProvider.LOCAL);
         User savedUser = userRepository.save(user);
 
+        Role userRole = roleRepository.findByName("USER").orElseThrow(() ->
+                new ResourceNotFoundException("Role not found"));
+        user.setRole(userRole);
         // Tạo cart sau khi đăng ký
         Cart cart = new Cart();
         cart.setUser(savedUser);
@@ -119,9 +103,27 @@ public class UserServiceImpl implements UserService {
         // verify email
         Verification verification = verificationService.createActivationVerification(savedUser.getId());
         mailService.sendActivationEmail(user.getEmail(), verification.getCode());
-        return savedUser;
+        return userMapper.entityToResponse(savedUser);
     }
 
+    @Override
+    public UserResponseDTO update(Long id, UserRequestDTO userRequestDTO) {
+        User user = findUserById(id);
+        validateUserUniqueness(userRequestDTO, user);
+        userMapper.partialUpdate(userRequestDTO, user);
+        user = userRepository.save(user);
+        return userMapper.entityToResponse(user);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        userRepository.deleteById(id);
+    }
+
+    @Override
     public void resetPassword(PasswordChangeDTO passwordChangeDTO) {
         Long userId = jwtUtil.getCurrentUserId();
         User currentUser =
@@ -136,9 +138,11 @@ public class UserServiceImpl implements UserService {
     }
 
     // Register or get user from Google
-    public User getOrRegisterGoogleUser(GoogleIdToken.Payload payload) {
+    @Override
+    public UserResponseDTO getOrRegisterGoogleUser(GoogleIdToken.Payload payload) {
         Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
-        if (userOptional.isPresent()) return userOptional.get();
+        if (userOptional.isPresent())
+            return userMapper.entityToResponse(userOptional.get());
         User user = new User();
         user.setEmail(payload.getEmail());
         user.setFullname(payload.get("name").toString());
@@ -146,9 +150,13 @@ public class UserServiceImpl implements UserService {
         user.setPassword("");
         user.setLoginProvider(LoginProvider.GOOGLE);
         user.setStatus(UserStatus.ACTIVE);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        Role userRole = roleRepository.findByName("USER").orElseThrow(() ->
+                new ResourceNotFoundException("Role not found"));
+        return userMapper.entityToResponse(user);
     }
 
+    @Override
     public void verifyEmail(String code) {
         Verification verification = verificationService.verifyVerificationCode(code, VerificationType.ACTIVATION);
         User user = verification.getUser();
@@ -164,37 +172,35 @@ public class UserServiceImpl implements UserService {
         user.setRole(role);
         userRepository.save(user);
     }
-    // Private helper methods
 
+    @Override
+    public void updateUserStatus(Long id, UserStatus status) {
+        User user = findUserById(id);
+        user.setStatus(status);
+        userRepository.save(user);
+    }
+
+    // Private helper methods
     private User findUserById(Long id) {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    private void validateUserUniqueness(User user, User existingUser) {
-        if ((existingUser == null || !user.getUsername().equals(existingUser.getUsername()))
-                && userRepository.existsByUsername(user.getUsername())) {
+    private void validateUserUniqueness(UserRequestDTO userRequestDTO, User existingUser) {
+        if ((existingUser == null || !userRequestDTO.getUsername().equals(existingUser.getUsername()))
+                && userRepository.existsByUsername(userRequestDTO.getUsername())) {
             throw new DataConflictException("Username already exists");
         }
 
-        if ((existingUser == null || !user.getEmail().equals(existingUser.getEmail()))
-                && userRepository.existsByEmail(user.getEmail())) {
+        if ((existingUser == null || !userRequestDTO.getEmail().equals(existingUser.getEmail()))
+                && userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new DataConflictException("Email already exists");
         }
 
-        if ((existingUser == null || !user.getPhone().equals(existingUser.getPhone()))
-                && userRepository.existsByPhone(user.getPhone())) {
+        if ((existingUser == null || !userRequestDTO.getPhone().equals(existingUser.getPhone()))
+                && userRepository.existsByPhone(userRequestDTO.getPhone())) {
             throw new DataConflictException("Phone already exists");
         }
-    }
-
-    private void updateUserDetails(User existingUser, User newUser) {
-        existingUser.setFullname(newUser.getFullname());
-        existingUser.setUsername(newUser.getUsername());
-        existingUser.setEmail(newUser.getEmail());
-        existingUser.setPhone(newUser.getPhone());
-        existingUser.setAvatarUrl(newUser.getAvatarUrl());
-        existingUser.setStatus(newUser.getStatus());
     }
 }

@@ -1,6 +1,6 @@
 package com.se114p12.backend.services.authentication;
 
-import com.se114p12.backend.domains.authentication.Verification;
+import com.se114p12.backend.entities.authentication.Verification;
 import com.se114p12.backend.enums.VerificationType;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.repository.authentication.UserRepository;
