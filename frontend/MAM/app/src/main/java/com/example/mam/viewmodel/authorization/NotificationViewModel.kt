@@ -8,7 +8,6 @@ import com.example.mam.services.APIservice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 open class NotificationViewModel(
     private val api: APIservice

@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
@@ -100,7 +101,7 @@ fun NotificationScreen(
                 CircleIconButton(
                     backgroundColor = OrangeLighter,
                     foregroundColor = OrangeDefault,
-                    icon = Icons.Filled.ArrowBackIosNew,
+                    icon = Icons.Filled.ArrowBack,
                     shadow = "outer",
                     onClick = onBackClicked,
                     modifier = Modifier

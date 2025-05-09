@@ -60,7 +60,6 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = viewModel(),
     modifier: Modifier = Modifier
 ){
-
     val signUpState: SignUpRequest by viewModel.signUpState.collectAsStateWithLifecycle()
     val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
     LazyColumn(

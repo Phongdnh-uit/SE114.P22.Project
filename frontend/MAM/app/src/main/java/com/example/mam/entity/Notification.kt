@@ -10,3 +10,4 @@ data class Notification(
     val isRead: Boolean,
     val icon: ImageVector
 )
+
