@@ -72,6 +72,6 @@ dependencies {
     implementation("com.mapbox.extension:maps-compose:11.11.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
 }
