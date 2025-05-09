@@ -22,6 +22,7 @@ import com.example.mam.gui.screen.client.CartScreen
 import com.example.mam.gui.screen.client.CheckOutScreen
 import com.example.mam.gui.screen.client.HomeScreen
 import com.example.mam.gui.screen.client.ItemScreen
+import com.example.mam.gui.screen.client.MapScreen
 import com.example.mam.gui.screen.client.OrderScreen
 import com.example.mam.gui.screen.client.SearchScreen
 import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
@@ -294,6 +295,7 @@ fun MainNavHost(
                     },
                     onSearchClicked = {navController.navigate(HomeScreen.Search.name)},
                     onCartClicked = { navController.navigate("Cart") },
+                    onShippingClicked = {navController.navigate("Order")},
                     viewmodel = viewmodel
                 )
             }
@@ -436,7 +438,15 @@ fun MainNavHost(
                     onCheckOutClicked = {
                         //order
                         navController.navigate("Order") },
-                    onChangeAddressClicked = {},
+                    onChangeAddressClicked = {
+                        navController.navigate("Address")
+                        // get address for saveStateHandle
+                        navController.previousBackStackEntry?.savedStateHandle?.getLiveData<String>("address")?.observe(
+                            backStackEntry
+                        ) { address ->
+                            viewModel.address = address
+                        }
+                    },
                     viewModel = viewModel
                 )
             }
@@ -466,7 +476,13 @@ fun MainNavHost(
                     )
                 }
             ){
-
+                MapScreen(
+                    onBackClicked = {navController.popBackStack()},
+                    onSelectClicked = { address ->
+                        navController.previousBackStackEntry?.savedStateHandle?.set("address", address)
+                        navController.popBackStack()
+                    },
+                )
             }
             composable(
                 route = "Order",
@@ -475,7 +491,6 @@ fun MainNavHost(
                         AnimatedContentTransitionScope.SlideDirection.Up,
                         tween(1000)
                     )
-
                 },
                 exitTransition = {
                     fadeOut(

@@ -241,7 +241,7 @@ fun OrderScreen(
                                 1 -> "Đơn hàng đã được tiếp nhận"
                                 2 -> "Đơn hàng đang được chế biến"
                                 3 -> "Đơn hàng đang được giao tới bạn"
-                                4 -> "Đơn hàng đã được nhận"
+                                4 -> "Đơn hàng đã được giao tới bạn"
                                 else -> "Đơn hàng không xác định"
                             },
                             fontSize = 18.sp,

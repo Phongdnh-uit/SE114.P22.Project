@@ -190,7 +190,7 @@ fun CheckOutScreen(
                         text = "Chọn địa chỉ khác",
                         fontSize = 18.sp,
                         onClick = onChangeAddressClicked,
-                        modifier = Modifier.wrapContentWidth().align(Alignment.End)
+                        modifier = Modifier.wrapContentWidth().align(Alignment.End).padding(end = 10.dp)
                     )
 
                     HorizontalDivider(
@@ -214,8 +214,9 @@ fun CheckOutScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .wrapContentHeight()
-                            .fillMaxWidth()
+                            .fillMaxWidth(0.9f)
                             .background(OrangeLight)
+                            .align(Alignment.CenterHorizontally)
                     ) {
                         OutlinedTextField(
                             value = promoCodeState.value,
@@ -232,13 +233,13 @@ fun CheckOutScreen(
                             ),
                             shape = RoundedCornerShape(10.dp),
                             singleLine = true,
-                            modifier = Modifier.padding(2.dp).fillMaxWidth(0.7f)
+                            modifier = Modifier.padding(2.dp).weight(1f)
                         )
                         OuterShadowFilledButton(
                             text = "Áp dụng",
                             fontSize = 18.sp,
                             onClick = { viewModel.getDiscount() },
-                            modifier = Modifier.width(90.dp)
+                            modifier = Modifier.wrapContentWidth().padding(end = 10.dp)
 
                         )
                     }
@@ -258,6 +259,7 @@ fun CheckOutScreen(
                     Box(
                         Modifier
                             .padding(8.dp)
+                            .fillMaxWidth()
                     ) {
                         FilterChip(
                             selected = paymentExpanded,
@@ -276,14 +278,15 @@ fun CheckOutScreen(
                                 selectedTrailingIconColor = WhiteDefault
                             ),
                             shape = RoundedCornerShape(50),
-                            modifier = Modifier.fillMaxWidth().height(40.dp)
+                            modifier = Modifier.fillMaxWidth(0.9f).height(40.dp).align(Alignment.Center)
+
                         )
 
                         DropdownMenu(
                             expanded = paymentExpanded,
                             onDismissRequest = { paymentExpanded = false },
                             containerColor = WhiteDefault,
-                            modifier = Modifier.padding(start = 8.dp)
+                            modifier = Modifier.padding(start = 8.dp).fillMaxWidth(0.9f)
                         ) {
                             paymentOptions.value.forEach { option ->
                                 DropdownMenuItem(
@@ -327,7 +330,7 @@ fun CheckOutScreen(
                             cursorColor = BrownDefault             // Màu con trỏ nhập liệu
                         ),
                         shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.padding(2.dp).fillMaxWidth()
+                        modifier = Modifier.padding(2.dp).fillMaxWidth(0.9f).align(Alignment.CenterHorizontally),
                     )
                 }
             }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Text
@@ -218,7 +219,7 @@ fun CartScreen(
                 }
                 OuterShadowFilledButton(
                     text = "Thanh toán",
-                    icon = Icons.Default.AddShoppingCart,
+                    icon = Icons.Default.MonetizationOn,
                     onClick =  onCheckOutClicked ,
                     modifier = Modifier
                 )
