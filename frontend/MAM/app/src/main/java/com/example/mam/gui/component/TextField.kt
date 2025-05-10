@@ -180,6 +180,72 @@ fun EditFieldType1(
 }
 
 @Composable
+fun ProfileInput(
+    label: String = "",
+    subLabel: String = "",
+    value: String,
+    backgroundColor: Color = WhiteDefault,
+    foregroundColor: Color = BrownDefault,
+    textColor: Color = BrownDefault,
+    radius: Dp = 20.dp,
+    keyboardOptions: KeyboardOptions,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier){
+        if (!label.isEmpty()) {
+            Text(
+                label,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeMedium,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = textColor,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        if(!subLabel.isEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                subLabel,
+                style = TextStyle(
+                    fontSize = Variables.BodySizeSmall,
+                    fontWeight = FontWeight(Variables.BodyFontWeightRegular),
+                    color = GreyDark,
+                    textAlign = TextAlign.Start
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        OutlinedTextField(
+            value = value,
+            textStyle = TextStyle(
+                fontSize = 20.sp, // <-- Chỉnh font size ở đây
+                color = textColor // Đảm bảo màu chữ vẫn đúng
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = backgroundColor,  // Màu nền khi focus
+                unfocusedContainerColor = backgroundColor, // Màu nền khi không focus
+                focusedIndicatorColor = foregroundColor,  // Màu viền khi focus
+                unfocusedIndicatorColor = foregroundColor,  // Màu viền khi không focus
+                focusedTextColor = textColor,       // Màu chữ khi focus
+                unfocusedTextColor = textColor,      // Màu chữ khi không focus
+                cursorColor = textColor             // Màu con trỏ nhập liệu
+            ),
+            shape = RoundedCornerShape(radius),
+            onValueChange = onValueChange,
+            keyboardOptions = keyboardOptions,
+            singleLine = true,
+            modifier = modifier
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
 fun PasswordFieldType1(
     label: String,
     value: String,

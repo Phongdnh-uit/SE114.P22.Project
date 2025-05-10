@@ -10,6 +10,7 @@ import com.example.mam.services.APIservice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -20,7 +21,23 @@ class ProfileViewModel(
 ) : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
+    private val _isEditing = MutableStateFlow(false)
+    val isEditing: StateFlow<Boolean> = _isEditing
 
+    fun setEditing(value: Boolean) {
+        _isEditing.value = value
+    }
+
+    fun setFullName(fullName: String) {
+        _user.update { it?.copy(fullName = fullName) }
+    }
+
+    fun setPhoneNumber(phoneNumber: String){
+        _user.update { it?.copy(phoneNumber = phoneNumber) }
+    }
+    fun setEmail(email: String){
+        _user.update { it?.copy(email = email) }
+    }
     init {
         fetchUser()
     }
