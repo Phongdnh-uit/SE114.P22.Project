@@ -395,7 +395,7 @@ fun UserItem(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(user.avatar)
+                    .data(user.avatarUrl)
                     .crossfade(true)
                     .build(),
                 placeholder = coil.compose.rememberImagePainter(R.drawable.ic_mam_logo),
@@ -451,10 +451,7 @@ fun UserItemPreview() {
             id = "1",
             fullName = "Nguyen Van A",
             phoneNumber = "0123456789",
-            email = "",
-            username = "",
-            password = "",
-            avatar = "https://mars.nasa.gov/msl-raw-images/msss/01000/mcam/1000MR0044631300503690E01_DXXX.jpg"
+            avatarUrl = "https://mars.nasa.gov/msl-raw-images/msss/01000/mcam/1000MR0044631300503690E01_DXXX.jpg"
         ),
         onUserClick = {},
         onEditUserClick = {},
@@ -477,19 +474,19 @@ fun ListUserScreenPreview() {
                 id = "1",
                 fullName = "Nguyen Van A",
                 phoneNumber = "0123456789",
-                email = "",
-                username = "",
-                password = "",
-                avatar = "https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small_2x/user-profile-icon-free-vector.jpg"
+                avatarUrl = "https://mars.nasa.gov/msl-raw-images/msss/01000/mcam/1000MR0044631300503690E01_DXXX.jpg"
             ),
             User(
                 id = "2",
                 fullName = "Nguyen Van B",
                 phoneNumber = "0123456789",
-                email = "",
-                username = "",
-                password = "",
-                avatar = "https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small_2x/user-profile-icon-free-vector.jpg"
+                avatarUrl = "https://mars.nasa.gov/msl-raw-images/msss/01000/mcam/1000MR0044631300503690E01_DXXX.jpg"
+            ),
+            User(
+                id = "3",
+                fullName = "Nguyen Van C",
+                phoneNumber = "0123456789",
+                avatarUrl = "https://mars.nasa.gov/msl-raw-images/msss/01000/mcam/1000MR0044631300503690E01_DXXX.jpg"
             )
         )
     )

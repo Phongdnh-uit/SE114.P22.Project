@@ -399,7 +399,7 @@ fun OrderItem(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             AsyncImage(
-                model = owner.avatar,
+                model = owner.avatarUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
