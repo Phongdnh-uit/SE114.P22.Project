@@ -18,13 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -36,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -46,7 +45,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
 import com.example.mam.entity.CartItem
 import com.example.mam.entity.OrderItem
@@ -54,13 +52,11 @@ import com.example.mam.entity.Product
 import com.example.mam.entity.ProductCategory
 import com.example.mam.entity.VarianceOption
 import com.example.mam.ui.theme.BrownDefault
-import com.example.mam.ui.theme.BrownLight
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
-import com.example.mam.ui.theme.Transparent
+import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.client.HomeScreenViewModel
 
 
 @Composable
@@ -71,12 +67,18 @@ fun ProductContainer(
    modifier: Modifier = Modifier
 ){
     Column(
+        //gradient from white on top to orangelight on bottom
+
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .widthIn(min = 300.dp)
             .heightIn(min = 150.dp)
             .clip(shape = CustomShape()) // Điều chỉnh độ cong với giá trị curveHeight
-            .background(WhiteDefault)
+            .background(brush = Brush.verticalGradient(
+                colors = listOf( OrangeLight,WhiteDefault) ,
+                // Light orange hex code
+            )
+            )
 
     ) {
         Spacer(modifier = Modifier.height(20.dp))
@@ -95,7 +97,7 @@ fun ProductContainer(
         )
         Spacer(Modifier.height(10.dp))
         products.forEach { product ->
-            ProductListItem(
+            ProductClientListItem(
                 item = product,
                 onClick = {
                     Log.d("ProductContainer", "Clicked on: ${product.name}")

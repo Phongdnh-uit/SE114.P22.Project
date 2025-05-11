@@ -3,7 +3,6 @@ package com.example.mam.gui.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +35,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -44,7 +43,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -70,7 +67,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mam.R
 import com.example.mam.entity.Product
 import com.example.mam.entity.VarianceOption
 import com.example.mam.ui.theme.BrownDark
@@ -81,8 +77,6 @@ import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.Transparent
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.client.ItemViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -472,19 +466,24 @@ fun QuantitySelectionButton(
 }
 
 @Composable
-fun ProductListItem(
+fun ProductClientListItem(
     item: Product,
     onClick: (Product) -> Unit =  {Product ->},
+    color: Color = WhiteDefault,
     modifier: Modifier = Modifier){
     Card(
         enabled = item.isAvailable,
-        colors = CardColors(GreyLight, BrownDefault, GreyLight.copy(0.5f), GreyDark.copy(0.5f)),
+        colors = CardColors(color, BrownDefault, GreyLight.copy(0.5f), GreyDark.copy(0.5f)),
         onClick = { onClick(item) },
+//        elevation = CardDefaults.cardElevation(
+//            defaultElevation = 4.dp,
+//        ),
         modifier = Modifier
             .height(80.dp)
             .fillMaxWidth(0.9f)
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxSize()
         ) {
@@ -498,10 +497,9 @@ fun ProductListItem(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
             ) {
                 Text(
                     text = item.name,

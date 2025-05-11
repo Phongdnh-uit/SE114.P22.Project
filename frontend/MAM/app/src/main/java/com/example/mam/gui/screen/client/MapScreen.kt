@@ -3,6 +3,7 @@ package com.example.mam.gui.screen.client
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -123,7 +124,10 @@ fun MapScreen(
                         )
                     }
                     else -> {
-                        // Handle other exceptions
+                        Toast(context).apply {
+                            setText("Không thể lấy vị trí hiện tại")
+                            show()
+                        }
                     }
                 }
             }
