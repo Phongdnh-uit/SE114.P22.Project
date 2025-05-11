@@ -2,7 +2,6 @@ package com.example.mam.gui.screen.client
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,10 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,12 +53,11 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.entity.Product
-import com.example.mam.gui.component.ProductListItem
+import com.example.mam.gui.component.ProductClientListItem
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
-import com.example.mam.ui.theme.Transparent
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.client.SearchViewModel
 import com.example.mam.viewmodel.client.SortOptions
@@ -228,12 +223,13 @@ fun SearchScreen(
             }
         }
         items(listProduct.value){product ->
-            ProductListItem(
+            ProductClientListItem(
                 item = product,
                 onClick = {
                     onItemClicked(it)
                     Log.d("ProductContainer", "Clicked on: ${product.name}")
                     },
+                color = WhiteDefault,
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
             )

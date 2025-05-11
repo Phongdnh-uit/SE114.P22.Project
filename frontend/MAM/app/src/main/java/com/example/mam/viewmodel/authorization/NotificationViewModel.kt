@@ -1,6 +1,5 @@
 package com.example.mam.viewmodel.authorization
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mam.entity.Notification
@@ -8,7 +7,6 @@ import com.example.mam.services.APIservice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 open class NotificationViewModel(
     private val api: APIservice

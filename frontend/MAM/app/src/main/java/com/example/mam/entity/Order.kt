@@ -6,7 +6,7 @@ import java.time.Instant
 data class Order(
     val id: String = "",
     val usedId: String = "",
-    val oderDate: Instant ?= null,
+    val orderDate: Instant ?= null,
     val paymentId: String = "",
     val shippingAddress: String = "",
     val orderItems: MutableList<OrderItem> =  mutableListOf(),
