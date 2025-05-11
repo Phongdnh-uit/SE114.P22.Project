@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.service.autofill.FillEventHistory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -31,13 +32,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,14 +60,18 @@ import coil.compose.AsyncImage
 import com.example.mam.entity.User
 import com.example.mam.entity.authorization.request.SignUpRequest
 import com.example.mam.gui.component.CircleIconButton
+import com.example.mam.gui.component.NormalButtonWithIcon
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.ProfileInput
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.innerShadow
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.ui.theme.BrownDark
+import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyAvaDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
+import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
@@ -77,6 +86,7 @@ fun ProfileScreen(
     onBackClicked: () -> Unit = {},
     onSettingClicked: () -> Unit = {},
     onTermsClicked: () -> Unit = {},
+    onHistoryClicked: () -> Unit = {},
     viewModel: ProfileViewModel? = null
     ) {
     val context = LocalContext.current
@@ -84,20 +94,24 @@ fun ProfileScreen(
     val activity = context as? Activity
 
     val userState = viewModel?.user?.collectAsState()
-    val user = userState?.value ?: if (isPreview) {
-        // Dữ liệu mock cho preview
-        User(
-            id = "1",
-            fullName = "Nguyễn Văn A",
-            phoneNumber = "0123456789",
-            email = "a@example.com",
-            username = "nguyenvana",
-            password = "",
-            avatarUrl = "",
-            address = "245 Nguyễn Sinh Cung, Vỹ Dạ, Phú Nhuận, Thành phố Huế"
+    val previewUser = remember {
+        mutableStateOf(
+            User(
+                id = "1",
+                fullName = "Nguyễn Văn A",
+                phoneNumber = "0123456789",
+                email = "a@example.com",
+                username = "nguyenvana",
+                password = "",
+                avatarUrl = "",
+                address = "245 Nguyễn Sinh Cung, Vỹ Dạ, Phú Nhuận, Thành phố Huế"
+            )
         )
-    } else return
-    val isEditing = viewModel?.isEditing?.collectAsStateWithLifecycle()?.value ?: false
+    }
+    val user = userState?.value ?: if (isPreview) previewUser.value else return
+    val isEditingState = viewModel?.isEditing?.collectAsStateWithLifecycle()
+    val previewIsEditing = remember { mutableStateOf(false) }
+    val isEditing = isEditingState?.value ?: if (isPreview) previewIsEditing.value else false
     val imagePicker = if (!isPreview) {
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -235,7 +249,10 @@ fun ProfileScreen(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
-                        onValueChange = { viewModel?.setFullName(it) },
+                        onValueChange = {
+                            if (viewModel != null) viewModel.setFullName(it)
+                            else previewUser.value = previewUser.value.copy(fullName = it)
+                        },
                         enabled = isEditing,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -247,7 +264,13 @@ fun ProfileScreen(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
-                        onValueChange = { viewModel?.setFullName(it) },
+                        onValueChange = {
+                            if (isPreview) {
+                                previewUser.value = previewUser.value.copy(phoneNumber = it)
+                            } else {
+                                viewModel?.setFullName(it)
+                            }
+                        },
                         enabled = isEditing,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -259,7 +282,13 @@ fun ProfileScreen(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
-                        onValueChange = { viewModel?.setFullName(it) },
+                        onValueChange = {
+                            if (isPreview) {
+                                previewUser.value = previewUser.value.copy(email = it)
+                            } else {
+                                viewModel?.setFullName(it)
+                            }
+                        },
                         enabled = isEditing,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -271,9 +300,26 @@ fun ProfileScreen(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
-                        onValueChange = { viewModel?.setFullName(it) },
+                        onValueChange = {
+                            if (isPreview) {
+                                previewUser.value = previewUser.value.copy(address = it)
+                            } else {
+                                viewModel?.setFullName(it)
+                            }
+                        },
                         enabled = isEditing,
                         modifier = Modifier.fillMaxWidth()
+                    )
+                    NormalButtonWithIcon(
+                        text = "Lịch sử đơn hàng",
+                        onClick = onChangePasswordClicked,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(39.dp),
+                        icon = Icons.Outlined.ArrowForwardIos,
+                        color = OrangeLight,
+                        textColor = BrownDefault,
+                        tintIcon = BrownDefault
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -286,7 +332,10 @@ fun ProfileScreen(
                                 .height(40.dp)
                         )
                         OuterShadowFilledButton(
-                            onClick = { viewModel?.setEditing(!isEditing) },
+                            onClick = {
+                                if (viewModel != null) viewModel.setEditing(!isEditing)
+                                else previewIsEditing.value = !previewIsEditing.value
+                            },
                             text = if (isEditing) "Lưu" else "Chỉnh sửa",
                             modifier = Modifier
                                 .weight(1f)

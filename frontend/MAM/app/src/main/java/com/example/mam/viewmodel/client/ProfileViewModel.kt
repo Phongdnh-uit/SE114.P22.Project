@@ -17,7 +17,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ProfileViewModel(
-    private val api: APIservice
+    private val api: APIservice? = null
 ) : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
@@ -38,13 +38,16 @@ class ProfileViewModel(
     fun setEmail(email: String){
         _user.update { it?.copy(email = email) }
     }
+    fun setAddress(address: String){
+        _user.update { it?.copy(address = address) }
+    }
     init {
         fetchUser()
     }
 
     fun fetchUser() {
         viewModelScope.launch {
-            val fetchedUser = api.getUser()
+            val fetchedUser = api?.getUser()
             _user.value = fetchedUser
         }
     }
@@ -59,7 +62,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 val avatarPart = createImagePartFromUri(context, uri)
-                val updatedUser = api.uploadAvatar(avatarPart)
+                val updatedUser = api?.uploadAvatar(avatarPart)
                 _user.value = updatedUser
             } catch (e: Exception) {
             }

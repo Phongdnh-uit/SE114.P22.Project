@@ -239,6 +239,7 @@ fun ProfileInput(
             onValueChange = onValueChange,
             keyboardOptions = keyboardOptions,
             singleLine = true,
+            enabled = enabled,
             modifier = modifier
                 .fillMaxWidth()
         )
