@@ -12,24 +12,12 @@ import java.util.List;
 @Table(name = "product_categories")
 @Data
 public class ProductCategory extends BaseEntity {
-    @NotBlank
+
+    @Column(unique = true)
     private String name;
+
     private String description;
 
     @OneToMany(mappedBy = "category")
-    @JsonManagedReference
     private List<Product> product;
-
-//    @PrePersist
-//    public void prePersist() {
-//        createdAt = Instant.now();
-//        createdBy = JwtUtil.getCurrentUserCredentials();
-//    }
-//
-//    @PreUpdate
-//    public void preUpdate() {
-//        updatedAt = Instant.now();
-//        updatedBy = JwtUtil.getCurrentUserCredentials();
-//    }
-
 }

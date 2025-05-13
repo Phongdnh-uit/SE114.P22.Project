@@ -3,6 +3,8 @@ package com.se114p12.backend.services.product;
 import com.se114p12.backend.entities.product.Product;
 import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.dto.product.ProductRequestDTO;
+import com.se114p12.backend.exception.ResourceNotFoundException;
+import com.se114p12.backend.repository.product.ProductCategoryRepository;
 import com.se114p12.backend.repository.product.ProductRepository;
 import com.se114p12.backend.services.general.StorageService;
 import com.se114p12.backend.vo.PageVO;
@@ -18,7 +20,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductCategoryService productCategoryService;
+    private final ProductCategoryRepository productCategoryRepository;
     private final StorageService storageService;
 
     public PageVO<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
@@ -34,7 +36,9 @@ public class ProductService {
     }
 
     public Product create(ProductRequestDTO dto) {
-        ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+        ProductCategory category = productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
+                () -> new ResourceNotFoundException("Category not found.")
+        );
         if (category == null) {
             throw new IllegalArgumentException("Category not found.");
         }
@@ -64,7 +68,9 @@ public class ProductService {
         existingProduct.setUpdatedAt(Instant.now());
 
         if (dto.getCategoryId() != 0) {
-            ProductCategory category = productCategoryService.findById(dto.getCategoryId());
+            ProductCategory category = productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Category not found.")
+            );
             existingProduct.setCategory(category);
         }
 

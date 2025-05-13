@@ -13,6 +13,7 @@ import com.se114p12.backend.repository.authentication.UserRepository;
 import java.time.Instant;
 import java.util.Collections;
 
+import com.se114p12.backend.services.authentication.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -67,9 +68,12 @@ public class JwtUtil {
     private Long extractPrincipal(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails userDetails) {
-            return loginUtil.getUserByCredentialId(userDetails.getUsername()).getId();
+            return ((CustomUserDetails) userDetails).getId();
         } else if (principal instanceof Jwt jwt) {
             return Long.parseLong(jwt.getSubject());
+        } else if (principal instanceof String) {
+            // fallback case: 'anonymous' user
+            return null;
         }
         throw new IllegalStateException(
                 "Unsupported principal type: " + principal.getClass().getName());
