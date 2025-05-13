@@ -188,6 +188,8 @@ fun OuterShadowFilledButton(
     fontSize: TextUnit = 16.sp,
     isEnable: Boolean = true,
     color: Color = OrangeDefault,
+    textColor: Color = WhiteDefault,
+    tintIcon: Color = WhiteDefault,
     //borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
     shadowColor: Color = BrownDark,
     blurRadius: Dp = 4.dp,
@@ -197,52 +199,104 @@ fun OuterShadowFilledButton(
     icon: ImageVector ?= null,
     image: Int ?= null,
     onClick: () -> Unit,
+                    modifier: Modifier
+        ){
+//    val isPressed = remember { mutableStateOf(false) }
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = color),
+                //border = borderStroke,
+                onClick = onClick,
+                enabled = isEnable,
+                modifier = modifier
+                    .then(
+                        if (isEnable) Modifier
+                            .outerShadow(
+                                color = shadowColor,
+                                bordersRadius = 25.dp,
+                                blurRadius = blurRadius,
+                                offsetX = offsetX,
+                                offsetY = offsetY,
+                                spread = spread,
+                            ) else modifier
+                    ),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
+            ){
+                icon?.let {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = tintIcon,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                image?.let {
+                    Icon(
+                        painter = painterResource(image),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                Text(
+                    text = text,
+                    fontSize = fontSize,
+                    color = textColor
+        )
+    }
+}
+
+@Composable
+fun NormalButtonWithIcon(
+    text: String,
+    fontSize: TextUnit = 14.sp,
+    isEnable: Boolean = true,
+    color: Color = OrangeDefault,
+    textColor: Color = WhiteDefault,
+    tintIcon: Color = WhiteDefault,
+    icon: ImageVector ?= null,
+    image: Int ?= null,
+    onClick: () -> Unit,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
     modifier: Modifier
 ){
-//    val isPressed = remember { mutableStateOf(false) }
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        //border = borderStroke,
         onClick = onClick,
         enabled = isEnable,
-        modifier = modifier
-            .then(
-            if (isEnable) Modifier
-                .outerShadow(
-                color = shadowColor,
-                bordersRadius = 25.dp,
-                blurRadius = blurRadius,
-                offsetX = offsetX,
-                offsetY = offsetY,
-                spread = spread,
-            ) else modifier
-        ),
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
-    ){
-        icon?.let {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = WhiteDefault,
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                fontSize = fontSize,
+                color = textColor,
             )
+
+            Spacer(modifier = Modifier.weight(1f)) // đẩy icon sang cuối
+
+            icon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    tint = tintIcon,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            image?.let {
+                Icon(
+                    painter = painterResource(image),
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
-        image?.let {
-            Icon(
-                painter = painterResource(image),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 8.dp)
-            )
-        }
-        Text(
-            text = text,
-            fontSize = fontSize,
-            color = WhiteDefault
-        )
     }
 }
 
