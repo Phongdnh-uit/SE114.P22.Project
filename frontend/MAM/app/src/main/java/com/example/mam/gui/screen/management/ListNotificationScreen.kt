@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -83,11 +84,12 @@ import com.example.mam.viewmodel.management.ListNotificationViewModel
 @Composable
 fun ListNotificationScreen(
     viewModel: ListNotificationViewModel,
-    onBackClick: () -> Unit,
-    onNotificationClick: (String) -> Unit,
-    onAddNotificationClick : () -> Unit,
-    onEditNotificationClick : (String) -> Unit,
-    onDeleteNotificationClick : (String) -> Unit,
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onNotificationClick: (String) -> Unit = {},
+    onAddNotificationClick : () -> Unit = {},
+    onEditNotificationClick : (String) -> Unit = {},
+    onDeleteNotificationClick : (String) -> Unit = {},
     mockData: List<Notification> ?= null,
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -122,6 +124,16 @@ fun ListNotificationScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLighter,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Home,
+                    shadow = "outer",
+                    onClick = onHomeClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 16.dp, top = 16.dp)
                 )
                 Text(
                     text = "Thông báo",
@@ -455,6 +467,7 @@ fun ListNotificationScreenPreview() {
         onAddNotificationClick = {},
         onEditNotificationClick = {},
         onDeleteNotificationClick = {},
+        onHomeClick = {},
         mockData = listOf(
             Notification(
                 id = "1",

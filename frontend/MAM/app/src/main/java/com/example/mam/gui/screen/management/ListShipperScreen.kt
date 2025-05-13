@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -81,11 +82,12 @@ import com.example.mam.viewmodel.management.ListShipperViewModel
 @Composable
 fun ListShipperScreen(
     viewModel: ListShipperViewModel,
-    onBackClick: () -> Unit,
-    onShipperClick: (String) -> Unit,
-    onAddShipperClick: () -> Unit,
-    onEditShipperClick: (String) -> Unit,
-    onDeleteShipperClick: (String) -> Unit,
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onShipperClick: (String) -> Unit = {},
+    onAddShipperClick: () -> Unit = {},
+    onEditShipperClick: (String) -> Unit = {},
+    onDeleteShipperClick: (String) -> Unit = {},
     mockData: List<Shipper> ?= null
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -120,6 +122,16 @@ fun ListShipperScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLighter,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Home,
+                    shadow = "outer",
+                    onClick = onHomeClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 16.dp, top = 16.dp)
                 )
                 Text(
                     text = "Shipper",
@@ -411,10 +423,10 @@ fun ShipperItem(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            IconButton(onClick = { onEditClick(shipper.phoneNumber) }) {
+            IconButton(onClick = { onEditClick(shipper.id) }) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
             }
-            IconButton(onClick = { onDeleteClick(shipper.phoneNumber) }) {
+            IconButton(onClick = { onDeleteClick(shipper.id) }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
             }
         }

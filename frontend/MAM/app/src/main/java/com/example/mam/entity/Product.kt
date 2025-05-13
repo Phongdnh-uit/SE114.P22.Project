@@ -2,6 +2,7 @@ package com.example.mam.entity
 
 import androidx.annotation.DrawableRes
 import java.text.DecimalFormat
+import java.time.Instant
 
 data class Product(
     val id: String = "",
@@ -12,6 +13,8 @@ data class Product(
     val isAvailable: Boolean = true,
     val idCategory: String = "",
     @DrawableRes val img: Int = 0,
+    val createAt: Instant = Instant.now(),
+    val updateAt: Instant = Instant.now(),
 ){
     fun getPriceToString(): String{
         val formatter = DecimalFormat("#,###")

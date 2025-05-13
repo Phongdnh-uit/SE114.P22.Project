@@ -67,7 +67,9 @@ import com.example.mam.viewmodel.management.DashboardViewModel
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit = {},
+    onItemClicked: (String) -> Unit = {},
+    onActiveOrderClicked: (String) -> Unit = {},
 ) {
     // Your UI code here
     // You can use viewModel to access the data and state
@@ -161,7 +163,9 @@ fun DashboardScreen(
                     ) {
                         MyNav.entries.forEach {
                             Button(
-                                onClick = { /* Handle click */ },
+                                onClick = {
+                                    onItemClicked(it.label)
+                                },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = OrangeDefault,
                                     contentColor = WhiteDefault
@@ -247,14 +251,11 @@ fun DashboardScreen(
 
                         } else {
                             activeOrder.value.forEach { order ->
-                                Text(
-                                    text = order.toString(),
-                                    color = BrownDefault,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .padding(10.dp)
-                                        .fillMaxWidth()
+                                OrderItem(
+                                    order = order,
+                                    onClick = { onActiveOrderClicked(order.id) },
+                                    onEditClick = { },
+                                    onDeleteClick = { },
                                 )
                             }
                         }

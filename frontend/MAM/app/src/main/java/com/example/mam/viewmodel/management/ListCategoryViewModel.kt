@@ -72,6 +72,7 @@ class ListCategoryViewModel(): ViewModel() {
                 // Handle error
             } finally {
                 _isLoading.value = false
+
             }
         }
     }

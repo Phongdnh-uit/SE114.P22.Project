@@ -270,7 +270,7 @@ fun OrderScreen(
                         modifier = Modifier.padding(start = 10.dp).fillMaxWidth()
                         )
                         Text(
-                            text = "Biển số xe" + shipper.value.licensePlate,
+                            text = "Biển số xe: " + shipper.value.licensePlate,
                             fontSize = 18.sp,
                             color = WhiteDefault,
                             textAlign = TextAlign.Start,

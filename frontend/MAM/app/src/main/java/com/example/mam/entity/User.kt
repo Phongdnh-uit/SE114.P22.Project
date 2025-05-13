@@ -1,5 +1,7 @@
 package com.example.mam.entity
 
+import java.time.Instant
+
 data class User(
     val id: String = "",
     val fullName: String = "",
@@ -8,6 +10,8 @@ data class User(
     val username: String = "",
     val password: String = "",
     val avatarUrl: String = "",
-    val address: String = ""
+    val address: String = "",
+    val createAt: Instant = Instant.now(),
+    val updateAt: Instant = Instant.now(),
 ) {
 }
