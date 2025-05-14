@@ -40,7 +40,7 @@ public class ProductCategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<CategoryResponseDTO> createProductCategory(
-            @ModelAttribute CategoryRequestDTO dto) {
+           @Valid @ModelAttribute CategoryRequestDTO dto) {
         return ResponseEntity.ok(productCategoryService.create(dto));
     }
 
@@ -48,7 +48,7 @@ public class ProductCategoryController {
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<CategoryResponseDTO> updateProductCategory(
             @PathVariable Long id,
-            @ModelAttribute CategoryRequestDTO dto) {
+            @Valid @ModelAttribute CategoryRequestDTO dto) {
         return ResponseEntity.ok(productCategoryService.update(id, dto));
     }
 
