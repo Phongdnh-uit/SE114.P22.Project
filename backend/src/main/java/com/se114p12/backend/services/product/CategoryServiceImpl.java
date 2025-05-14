@@ -6,6 +6,7 @@ import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.exception.ResourceNotFoundException;
 import com.se114p12.backend.mapper.product.CategoryMapper;
 import com.se114p12.backend.repository.product.ProductCategoryRepository;
+import com.se114p12.backend.services.general.StorageService;
 import com.se114p12.backend.vo.PageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
     private final CategoryMapper categoryMapper;
+    private final StorageService storageService;
 
     @Override
     public PageVO<CategoryResponseDTO> getAll(Specification<ProductCategory> specification, Pageable pageable) {
@@ -54,6 +55,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException("Product category already exists");
         }
         ProductCategory productCategory = categoryMapper.requestToEntity(categoryRequestDTO);
+
+        if (categoryRequestDTO.getImage() != null && !categoryRequestDTO.getImage().isEmpty()) {
+            String filename = storageService.store(categoryRequestDTO.getImage(), "categories");
+            productCategory.setImageUrl("/images/categories/" + filename);
+        }
+
         productCategory = productCategoryRepository.save(productCategory);
         return categoryMapper.entityToResponse(productCategory);
     }
@@ -67,6 +74,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException("Product category already exists");
         }
         categoryMapper.partialUpdate(categoryRequestDTO, existingProductCategory);
+
+        if (categoryRequestDTO.getImage() != null && !categoryRequestDTO.getImage().isEmpty()) {
+            String filename = storageService.store(categoryRequestDTO.getImage(), "categories");
+            existingProductCategory.setImageUrl("/images/categories/" + filename);
+        }
+
         existingProductCategory = productCategoryRepository.save(existingProductCategory);
         return categoryMapper.entityToResponse(existingProductCategory);
     }
@@ -77,5 +90,4 @@ public class CategoryServiceImpl implements CategoryService {
         }
         productCategoryRepository.deleteById(id);
     }
-
 }
