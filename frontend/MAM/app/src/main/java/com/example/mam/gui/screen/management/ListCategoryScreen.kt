@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,6 +47,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,11 +87,12 @@ import com.example.mam.viewmodel.management.ListCategoryViewModel
 @Composable
 fun ListCategoryScreen(
     viewModel: ListCategoryViewModel,
-    onBackClick: () -> Unit,
-    onCategoryClick: (String) -> Unit,
-    onAddCategoryClick: () -> Unit,
-    onEditCategoryClick: (String) -> Unit,
-    onDeleteCategoryClick: (String) -> Unit,
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onCategoryClick: (String) -> Unit = {},
+    onAddCategoryClick: () -> Unit = {},
+    onEditCategoryClick: (String) -> Unit = {},
+    onDeleteCategoryClick: (String) -> Unit = {},
     mockData: List<ProductCategory> ?= null
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -99,6 +102,10 @@ fun ListCategoryScreen(
     val isLoading = viewModel.isLoading.collectAsStateWithLifecycle()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
 
+    LaunchedEffect(Unit) {
+        viewModel.loadSortingOptions()
+        viewModel.loadData()
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -124,6 +131,16 @@ fun ListCategoryScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLighter,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Home,
+                    shadow = "outer",
+                    onClick = onHomeClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 16.dp, top = 16.dp)
                 )
                 Text(
                     text = "Danh mục",
@@ -315,39 +332,37 @@ fun ListCategoryScreen(
                             onDeleteClick = onDeleteCategoryClick
                         )
                     }
-                } else {
-                    if (isLoading.value) {
-                        item {
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
-                            )
-                        }
-                    }
-                    else
-                        if (categoryList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Không có danh mục nào",
-                                    color = GreyDefault,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                        }
-                        else
-                            items(categoryList) { category ->
-                                CategoryItem(
-                                    category = category,
-                                    onClick = onCategoryClick,
-                                    onEditClick = onEditCategoryClick,
-                                    onDeleteClick = onDeleteCategoryClick
-                                )
-                            }
                 }
+                else if (isLoading.value) {
+                    item {
+                        CircularProgressIndicator(
+                            color = OrangeDefault,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .size(40.dp)
+                        )
+                    }
+                }
+                else if (categoryList.isEmpty()) {
+                    item {
+                        Text(
+                            text = "Không có danh mục nào",
+                            color = GreyDefault,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+                else items(categoryList) { category ->
+                    CategoryItem(
+                        category = category,
+                        onClick = onCategoryClick,
+                        onEditClick = onEditCategoryClick,
+                        onDeleteClick = onDeleteCategoryClick
+                    )
+                }
+
             }
         }
         IconButton(

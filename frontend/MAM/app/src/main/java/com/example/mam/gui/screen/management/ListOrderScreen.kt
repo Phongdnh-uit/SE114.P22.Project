@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -90,11 +91,12 @@ import kotlin.math.acos
 @Composable
 fun ListOrderScreen(
     viewModel: ListOrderViewModel,
-    onBackClick: () -> Unit,
-    onOrderClick: (String) -> Unit,
-    onAddOrderClick: () -> Unit,
-    onEditOrderClick: (String) -> Unit,
-    onDeleteOrderClick: (String) -> Unit,
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onOrderClick: (String) -> Unit = {},
+    onAddOrderClick: () -> Unit = {},
+    onEditOrderClick: (String) -> Unit = {},
+    onDeleteOrderClick: (String) -> Unit = {},
     mockData: List<Order>? = null,
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -129,6 +131,16 @@ fun ListOrderScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLighter,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Home,
+                    shadow = "outer",
+                    onClick = onHomeClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 16.dp, top = 16.dp)
                 )
                 Text(
                     text = "Đơn hàng",
@@ -377,6 +389,7 @@ fun ListOrderScreen(
 @Composable
 fun OrderItem(
     order: Order,
+    isViewOnly: Boolean = false,
     onClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
@@ -447,11 +460,13 @@ fun OrderItem(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            IconButton(onClick = { onEditClick(order.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
-            }
-            IconButton(onClick = { onDeleteClick(order.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+            if (!isViewOnly) {
+                IconButton(onClick = { onEditClick(order.id) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+                }
+                IconButton(onClick = { onDeleteClick(order.id) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+                }
             }
         }
     }

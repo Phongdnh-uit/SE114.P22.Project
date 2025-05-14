@@ -25,6 +25,9 @@ import com.example.mam.gui.screen.client.ItemScreen
 import com.example.mam.gui.screen.client.MapScreen
 import com.example.mam.gui.screen.client.OrderScreen
 import com.example.mam.gui.screen.client.SearchScreen
+import com.example.mam.gui.screen.management.DashboardScreen
+import com.example.mam.gui.screen.management.DashboardScreenPreview
+import com.example.mam.gui.screen.management.ListCategoryScreen
 import com.example.mam.viewmodel.authorization.ForgetPasswordViewModel
 import com.example.mam.viewmodel.authorization.SignInViewModel
 import com.example.mam.viewmodel.authorization.SignUpViewModel
@@ -34,6 +37,8 @@ import com.example.mam.viewmodel.client.HomeScreenViewModel
 import com.example.mam.viewmodel.client.ItemViewModel
 import com.example.mam.viewmodel.client.OrderViewModel
 import com.example.mam.viewmodel.client.SearchViewModel
+import com.example.mam.viewmodel.management.DashboardViewModel
+import com.example.mam.viewmodel.management.ListCategoryViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -121,9 +126,17 @@ fun MainNavHost(
                 val signInVM: SignInViewModel = viewModel(backStackEntry)
                 SignInScreen(
                     onSignInClicked = {
-                        navController.navigate(route = "Home"){
-                            popUpTo("Authorization") {inclusive = true}
+                        if (signInVM.signInState.value.username == "1" || signInVM.signInState.value.password == "1") {
+                            navController.navigate(route = "Home") {
+                                popUpTo("Authorization") { inclusive = true }
+                            }
                         }
+                        else if (signInVM.signInState.value.username == "2" || signInVM.signInState.value.password == "2") {
+                        navController.navigate(route = "Dashboard") {
+                            popUpTo("Authorization") { inclusive = true }
+                        }
+                    }
+
 //                        CoroutineScope(backStackEntry.lifecycle.coroutineScope.coroutineContext).launch {
 //                            val result = signInVM.SignIn()
 //                            when (result) {
@@ -513,6 +526,97 @@ fun MainNavHost(
                 OrderScreen(
                     onBackClicked = {navController.popBackStack()},
                     onVerifyClicked = {},
+                    viewModel = viewModel
+                )
+            }
+            composable(
+                route = "Dashboard",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(1000)
+                    )
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(1000),
+                        targetAlpha = 1f)
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(1000),
+                        initialAlpha = 1f)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(1000)
+                    )
+                }
+            ){ backStackEntry ->
+                val viewModel: DashboardViewModel = viewModel(backStackEntry)
+                DashboardScreen(
+                    onBackClicked = {
+                        navController.navigate(route = "Authorization") {
+                        popUpTo("Dashboard") { inclusive = true }
+                        }
+                    },
+                    onItemClicked = { item ->
+                        when(item) {
+                            "Danh mục" -> navController.navigate("ListCategory")
+                            "Sản phẩm" -> navController.navigate("Details/${item}")
+                            "Người dùng" -> navController.navigate("Details/${item}")
+                            "Shipper" -> navController.navigate("Details/${item}")
+                            "Thông báo" -> navController.navigate("Details/${item}")
+                            "Khuyến mãi" -> navController.navigate("Details/${item}")
+                            "Đơn hàng" -> navController.navigate("Details/${item}")
+                            "Thống kê" -> {}
+                        }
+                    },
+                    onActiveOrderClicked = { order -> },
+                    viewModel = viewModel
+                )
+            }
+            composable(
+                route = "ListCategory",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(1000)
+                    )
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(1000),
+                        targetAlpha = 1f)
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(1000),
+                        initialAlpha = 1f)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(1000)
+                    )
+                }
+            ) { backStackEntry ->
+                val viewModel: ListCategoryViewModel = viewModel(backStackEntry)
+                ListCategoryScreen(
+                    onBackClick = {navController.popBackStack()},
+                    onCategoryClick = { category ->
+                        navController.navigate("Details/${category}")
+                    },
+                    onAddCategoryClick = {
+                        navController.navigate("AddCategory")
+                    },
+                    onEditCategoryClick = { category ->
+                        navController.navigate("EditCategory/${category}")
+                    },
+                    onDeleteCategoryClick = { category ->
+
+                    },
                     viewModel = viewModel
                 )
             }

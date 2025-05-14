@@ -406,7 +406,7 @@ fun ContainerPreview(){
                     100000,
                     true,
                     "PC001",
-                    R.drawable.bacon_and_cheese_heaven
+                    img =  R.drawable.bacon_and_cheese_heaven
                 ),
                 1,
                 mutableListOf(
@@ -426,7 +426,7 @@ fun ContainerPreview(){
                 100000,
                 true,
                 "PC001",
-                R.drawable.bacon_and_cheese_heaven
+                img = R.drawable.bacon_and_cheese_heaven
             )
         )
         val cartItem = CartItem(
@@ -438,7 +438,7 @@ fun ContainerPreview(){
                 100000,
                 true,
                 "PC001",
-                R.drawable.bacon_and_cheese_heaven
+                img = R.drawable.bacon_and_cheese_heaven
             ),
             1,
             mutableListOf(
@@ -458,7 +458,7 @@ fun ContainerPreview(){
                     100000,
                     true,
                     "PC001",
-                    R.drawable.bacon_and_cheese_heaven
+                    img = R.drawable.bacon_and_cheese_heaven
                 ),
                 1,
                 cartItem.getOptionsToString(),

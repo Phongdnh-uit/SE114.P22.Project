@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -85,11 +86,12 @@ import com.example.mam.viewmodel.management.ListProductViewModel
 @Composable
 fun ListProductScreen(
     viewModel: ListProductViewModel,
-    onBackClick: () -> Unit,
-    onProductClick: (String) -> Unit,
-    onAddProductClick: () -> Unit,
-    onEditProductClick: (String) -> Unit,
-    onDeleteProductClick: (String) -> Unit,
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onProductClick: (String) -> Unit = {},
+    onAddProductClick: () -> Unit = {},
+    onEditProductClick: (String) -> Unit = {},
+    onDeleteProductClick: (String) -> Unit = {},
     mockData: List<Product> ?= null
 
 ) {
@@ -125,6 +127,16 @@ fun ListProductScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLighter,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Home,
+                    shadow = "outer",
+                    onClick = onHomeClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 16.dp, top = 16.dp)
                 )
                 Text(
                     text = "Sản phẩm",
@@ -374,6 +386,7 @@ fun ListProductScreen(
 @Composable
 fun ProductItem(
     product: Product,
+    isViewOnly: Boolean = false,
     onProductClick: (String) -> Unit,
     onEditProductClick: (String) -> Unit,
     onDeleteProductClick: (String) -> Unit,
@@ -429,11 +442,13 @@ fun ProductItem(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            IconButton(onClick = { onEditProductClick(product.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
-            }
-            IconButton(onClick = { onDeleteProductClick(product.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+            if (!isViewOnly) {
+                IconButton(onClick = { onEditProductClick(product.id) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+                }
+                IconButton(onClick = { onDeleteProductClick(product.id) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+                }
             }
         }
     }
