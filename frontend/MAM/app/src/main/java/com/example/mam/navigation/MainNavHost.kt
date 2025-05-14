@@ -605,17 +605,11 @@ fun MainNavHost(
                 val viewModel: ListCategoryViewModel = viewModel(backStackEntry)
                 ListCategoryScreen(
                     onBackClick = {navController.popBackStack()},
-                    onCategoryClick = { category ->
-                        navController.navigate("Details/${category}")
-                    },
                     onAddCategoryClick = {
                         navController.navigate("AddCategory")
                     },
                     onEditCategoryClick = { category ->
                         navController.navigate("EditCategory/${category}")
-                    },
-                    onDeleteCategoryClick = { category ->
-
                     },
                     viewModel = viewModel
                 )

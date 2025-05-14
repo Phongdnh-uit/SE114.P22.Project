@@ -1,8 +1,10 @@
 package com.example.mam.gui.screen.management
 
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +29,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
@@ -44,6 +48,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -55,15 +60,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,16 +93,17 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.management.ListCategoryViewModel
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ListCategoryScreen(
     viewModel: ListCategoryViewModel,
     onBackClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
-    onCategoryClick: (String) -> Unit = {},
+
     onAddCategoryClick: () -> Unit = {},
     onEditCategoryClick: (String) -> Unit = {},
-    onDeleteCategoryClick: (String) -> Unit = {},
     mockData: List<ProductCategory> ?= null
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -327,9 +338,8 @@ fun ListCategoryScreen(
                     items(mockData) { category ->
                         CategoryItem(
                             category = category,
-                            onClick = onCategoryClick,
                             onEditClick = onEditCategoryClick,
-                            onDeleteClick = onDeleteCategoryClick
+                            onDeleteClick = { }
                         )
                     }
                 }
@@ -357,9 +367,8 @@ fun ListCategoryScreen(
                 else items(categoryList) { category ->
                     CategoryItem(
                         category = category,
-                        onClick = onCategoryClick,
                         onEditClick = onEditCategoryClick,
-                        onDeleteClick = onDeleteCategoryClick
+                        onDeleteClick = { }
                     )
                 }
 
@@ -385,47 +394,125 @@ fun ListCategoryScreen(
 @Composable
 fun CategoryItem(
     category: ProductCategory,
-    onClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
-){
-    Card(
-        onClick = { onClick(category.id) },
-        colors = CardDefaults.cardColors(
-            containerColor = WhiteDefault
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        ),
+) {
+    var expand by remember { mutableStateOf(false) }
+    Surface(
+        shadowElevation = 4.dp, // Elevation applied here instead
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.padding(8.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = WhiteDefault
+            ),
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .animateContentSize()
         ) {
-            Image(
-                painter = painterResource(id = category.icon),
-                contentDescription = null,
-                modifier = Modifier.size(40.dp)
-            )
-            Text(
-                text = category.name,
-                textAlign = TextAlign.Start,
-                color = BrownDefault,
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.SemiBold,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(10.dp)
-                    .weight(1f)
-            )
-            IconButton(onClick = { onEditClick(category.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = category.icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp).padding(end = 8.dp)
+                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = category.name,
+                        textAlign = TextAlign.Start,
+                        color = BrownDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "ID: " + category.id,
+                        textAlign = TextAlign.Start,
+                        color = GreyDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                IconButton(onClick = { onEditClick(category.id) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+                }
+                IconButton(onClick = { onDeleteClick(category.id) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+                }
+                IconButton(onClick = { expand = !expand }) {
+                    if (!expand) Icon(
+                        Icons.Default.ExpandMore,
+                        contentDescription = "Expand",
+                        tint = BrownDefault
+                    )
+                    else Icon(
+                        Icons.Default.ExpandLess,
+                        contentDescription = "Collapse",
+                        tint = BrownDefault
+                    )
+                }
             }
-            IconButton(onClick = { onDeleteClick(category.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+            if (expand) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                            append("Mô tả: ")
+                        }
+                        append(category.description)},
+                    color = BrownDefault,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                )
+                category.createAt.atZone(ZoneId.systemDefault())?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Ngày tạo: ")
+                            }
+                            append(it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")))
+                        },
+                        color = GreyDefault,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
+                category.updateAt.atZone(ZoneId.systemDefault())?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Ngày cập nhật: ")
+                            }
+                            append(it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")))
+                        },
+                        color = GreyDefault,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }
@@ -439,9 +526,9 @@ fun CategoryItemPreview() {
             category = ProductCategory(
                 id = "1",
                 name = "Hamburger",
+                description = "Món ăn nhanh",
                 icon = R.drawable.ic_hamburger
             ),
-            onClick = {},
             onEditClick = {},
             onDeleteClick = {}
         )
@@ -454,10 +541,8 @@ fun CategoryScreenPreview() {
     ListCategoryScreen(
         viewModel = ListCategoryViewModel(),
         onBackClick = {},
-        onCategoryClick = {},
         onAddCategoryClick = {},
         onEditCategoryClick = {},
-        onDeleteCategoryClick = {},
         mockData = listOf(
             ProductCategory(
                 id = "1",

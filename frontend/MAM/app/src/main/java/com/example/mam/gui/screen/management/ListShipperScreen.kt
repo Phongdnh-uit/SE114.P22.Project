@@ -1,5 +1,6 @@
 package com.example.mam.gui.screen.management
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
@@ -42,6 +45,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -55,11 +59,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +94,6 @@ fun ListShipperScreen(
     onShipperClick: (String) -> Unit = {},
     onAddShipperClick: () -> Unit = {},
     onEditShipperClick: (String) -> Unit = {},
-    onDeleteShipperClick: (String) -> Unit = {},
     mockData: List<Shipper> ?= null
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -321,7 +327,7 @@ fun ListShipperScreen(
                             shipper = shipper,
                             onClick = onShipperClick,
                             onEditClick = onEditShipperClick,
-                            onDeleteClick = onDeleteShipperClick
+                            onDeleteClick = {}
                         )
                     }
                 }
@@ -352,7 +358,7 @@ fun ListShipperScreen(
                                     shipper = shipper,
                                     onClick = onShipperClick,
                                     onEditClick = onEditShipperClick,
-                                    onDeleteClick = onDeleteShipperClick
+                                    onDeleteClick = {}
                                 )
                             }
                         }
@@ -382,52 +388,103 @@ fun ShipperItem(
     onClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
-){
-    Card(
-        onClick = { onClick(shipper.phoneNumber) },
-        colors = CardDefaults.cardColors(
-            containerColor = WhiteDefault
-        ),
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+) {
+    var expand by remember { mutableStateOf(false) }
+        Surface(
+            shadowElevation = 4.dp, // Elevation applied here instead
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.padding(8.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+        Card(
+            onClick = { onClick(shipper.phoneNumber) },
+            colors = CardDefaults.cardColors(
+                containerColor = WhiteDefault
+            ),
+            modifier = Modifier
+                .animateContentSize()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(10.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = shipper.name,
+                        textAlign = TextAlign.Start,
+                        color = BrownDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "ID: " + shipper.id,
+                        textAlign = TextAlign.Start,
+                        color = GreyDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                IconButton(onClick = { onEditClick(shipper.id) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+                }
+                IconButton(onClick = { onDeleteClick(shipper.id) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+                }
+                IconButton(onClick = { expand = !expand }) {
+                    if (!expand) Icon(
+                        Icons.Default.ExpandMore,
+                        contentDescription = "Expand",
+                        tint = BrownDefault
+                    )
+                    else Icon(
+                        Icons.Default.ExpandLess,
+                        contentDescription = "Collapse",
+                        tint = BrownDefault
+                    )
+                }
+            }
+            if(expand) {
                 Text(
-                    text = shipper.name,
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                            append("Số điện thoại: ")
+                        }
+                        append(shipper.phoneNumber)},
                     textAlign = TextAlign.Start,
                     color = BrownDefault,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
                 )
                 Text(
-                    text = shipper.licensePlate,
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                            append("Biển số xe: ")
+                        }
+                        append(shipper.licensePlate)},
                     textAlign = TextAlign.Start,
                     color = BrownDefault,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                        .fillMaxWidth()
                 )
-            }
-            IconButton(onClick = { onEditClick(shipper.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
-            }
-            IconButton(onClick = { onDeleteClick(shipper.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
             }
         }
     }
@@ -457,11 +514,10 @@ fun ShipperScreenPreview() {
         onShipperClick = {},
         onAddShipperClick = {},
         onEditShipperClick = {},
-        onDeleteShipperClick = {},
         mockData = listOf(
-            Shipper("Nguyễn Văn A", "0123456789", "29A-123.45"),
-            Shipper("Trần Thị B", "0987654321", "30A-987.65"),
-            Shipper("Lê Văn C", "0912345678", "31A-456.78")
+            Shipper("Nguyễn Văn A", "0123456789", "29A-123.45", "1"),
+            Shipper("Trần Thị B", "0987654321", "30A-987.65", "2"),
+            Shipper("Lê Văn C", "0912345678", "31A-456.78", "3")
         )
     )
 }

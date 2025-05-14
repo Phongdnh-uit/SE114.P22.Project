@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
@@ -43,6 +45,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -56,11 +59,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +86,10 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.management.ListNotificationViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.math.exp
 
 @Composable
 fun ListNotificationScreen(
@@ -88,8 +98,6 @@ fun ListNotificationScreen(
     onHomeClick: () -> Unit = {},
     onNotificationClick: (String) -> Unit = {},
     onAddNotificationClick : () -> Unit = {},
-    onEditNotificationClick : (String) -> Unit = {},
-    onDeleteNotificationClick : (String) -> Unit = {},
     mockData: List<Notification> ?= null,
 ) {
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
@@ -321,8 +329,6 @@ fun ListNotificationScreen(
                         NotificationItem(
                             notification = noti,
                             onClick = onNotificationClick,
-                            onEditClick = onEditNotificationClick,
-                            onDeleteClick = onDeleteNotificationClick
                         )
                     }
                 }
@@ -354,8 +360,6 @@ fun ListNotificationScreen(
                                 NotificationItem(
                                     notification = noti,
                                     onClick = onNotificationClick,
-                                    onEditClick = onEditNotificationClick,
-                                    onDeleteClick = onDeleteNotificationClick
                                 )
                             }
                 }
@@ -385,54 +389,135 @@ fun ListNotificationScreen(
 fun NotificationItem(
     notification: Notification,
     onClick: (String) -> Unit,
-    onEditClick: (String) -> Unit,
-    onDeleteClick: (String) -> Unit,
 ) {
-    Card(
-        onClick = { onClick(notification.id) },
-        colors = CardDefaults.cardColors(
-            containerColor = WhiteDefault
-        ),
+    var expand by remember { mutableStateOf(false) }
+    Surface(
+        shadowElevation = 4.dp, // Elevation applied here instead
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.padding(8.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Card(
+            onClick = { onClick(notification.id) },
+            colors = CardDefaults.cardColors(
+                containerColor = WhiteDefault
+            ),
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(10.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    notification.timestamp.atZone(ZoneId.systemDefault())?.let {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = OrangeDefault,
+                                        fontWeight = FontWeight.SemiBold)) {
+                                    append("#" + notification.type)
+                                }
+                                append( " - " + it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")))},
+                            textAlign = TextAlign.Start,
+                            color = BrownDefault,
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    if (!expand) Text(
+                        text = notification.title,
+                        textAlign = TextAlign.Start,
+                        color = BrownDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "ID: " + notification.id,
+                        textAlign = TextAlign.Start,
+                        color = GreyDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (expand) Text(
+                        text = notification.title,
+                        textAlign = TextAlign.Start,
+                        color = BrownDefault,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                IconButton(onClick = { expand = !expand }) {
+                    if (!expand) Icon(
+                        Icons.Default.ExpandMore,
+                        contentDescription = "Expand",
+                        tint = BrownDefault
+                    )
+                    else Icon(
+                        Icons.Default.ExpandLess,
+                        contentDescription = "Collapse",
+                        tint = BrownDefault
+                    )
+                }
+            }
+            if (expand) {
                 Text(
-                    text = notification.timestamp,
+                    text = notification.content,
                     textAlign = TextAlign.Start,
                     color = BrownDefault,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
                 )
-                Text(
-                    text = notification.title,
-                    textAlign = TextAlign.Start,
-                    color = BrownDefault,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            IconButton(onClick = { onEditClick(notification.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
-            }
-            IconButton(onClick = { onDeleteClick(notification.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
+                notification.createAt.atZone(ZoneId.systemDefault())?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Ngày tạo: ")
+                            }
+                            append(it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")))
+                        },
+                        color = GreyDefault,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
+                notification.updateAt.atZone(ZoneId.systemDefault())?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Ngày cập nhật: ")
+                            }
+                            append(it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")))
+                        },
+                        color = GreyDefault,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }
@@ -446,14 +531,15 @@ fun NotificationItemPreview() {
             id = "1",
             title = "Test Notification",
             content = "This is a test notification",
-            timestamp = "12:00 10/01/2025",
+            timestamp = Instant.now(),
             isRead = false,
-            icon = Icons.Default.DoneAll
+            icon = Icons.Default.DoneAll,
+            createAt = Instant.now(),
+            updateAt = Instant.now(),
+            type = "ORDER_DELIVERING"
 
         ),
         onClick = {},
-        onEditClick = {},
-        onDeleteClick = {}
     )
 }
 
@@ -465,25 +551,29 @@ fun ListNotificationScreenPreview() {
         onBackClick = {},
         onNotificationClick = {},
         onAddNotificationClick = {},
-        onEditNotificationClick = {},
-        onDeleteNotificationClick = {},
         onHomeClick = {},
         mockData = listOf(
             Notification(
                 id = "1",
                 title = "Test Notification",
                 content = "This is a test notification",
-                timestamp = "12:00 10/01/2025",
+                timestamp = Instant.now(),
                 isRead = false,
-                icon = Icons.Default.DoneAll
+                icon = Icons.Default.DoneAll,
+                createAt = Instant.now(),
+                updateAt = Instant.now(),
+                type = "ORDER_DELIVERING"
             ),
             Notification(
                 id = "2",
                 title = "Test Notification 2",
                 content = "This is a test notification 2",
-                timestamp = "12:00 10/01/2025",
+                timestamp = Instant.now(),
                 isRead = false,
-                icon = Icons.Default.DoneAll
+                icon = Icons.Default.DoneAll,
+                createAt = Instant.now(),
+                updateAt = Instant.now(),
+                type = "ORDER_DELIVERING"
             )
         )
     )

@@ -37,9 +37,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mam.entity.Notification
@@ -52,6 +55,9 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authorization.NotificationViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun NotificationScreen(
@@ -223,14 +229,16 @@ fun NotificationItem(notification: Notification) {
                         )
                     )
             ){
-                Icon(
-                    imageVector = notification.icon,
-                    contentDescription = "Done",
-                    tint = WhiteDefault,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center)
-                )
+                notification.icon?.let {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = "Done",
+                        tint = WhiteDefault,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.Center)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -246,12 +254,25 @@ fun NotificationItem(notification: Notification) {
                     color = BrownDefault,
                     fontSize = Variables.BodySizeMedium
                 )
-                Text(
-                    notification.timestamp ?: "",
-                    color = BrownDefault,
-                    fontSize = Variables.BodySizeMedium,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                notification.timestamp.atZone(ZoneId.systemDefault())?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                                append(notification.title)
+                            }
+                            append(
+                                " - " + it.format(
+                                    DateTimeFormatter.ofPattern(
+                                        "HH:mm dd/MM/yyyy"
+                                    )
+                                )
+                            )
+                        },
+                        color = BrownDefault,
+                        fontSize = Variables.BodySizeMedium,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
@@ -266,7 +287,7 @@ fun PreviewNotificationScreen() {
                 id = "1",
                 title = "Đơn hàng đã hoàn tất",
                 content = "Đơn hàng nước chanh đã giao tới bạn!",
-                timestamp = "12:00 15/04/2025",
+                timestamp = Instant.now(),
                 isRead = false,
                 icon = Icons.Filled.DoneAll
             ),
@@ -274,7 +295,7 @@ fun PreviewNotificationScreen() {
                 id = "2",
                 title = "Đơn hàng đã hoàn tất",
                 content = "Đơn hàng nước cam đã được giao tới bạn!",
-                timestamp = "09:00 10/04/2025",
+                timestamp = Instant.now(),
                 isRead = true,
                 icon = Icons.Filled.DoneAll
             )

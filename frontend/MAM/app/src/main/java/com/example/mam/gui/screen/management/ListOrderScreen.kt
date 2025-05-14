@@ -94,7 +94,6 @@ fun ListOrderScreen(
     onBackClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
     onOrderClick: (String) -> Unit = {},
-    onAddOrderClick: () -> Unit = {},
     onEditOrderClick: (String) -> Unit = {},
     onDeleteOrderClick: (String) -> Unit = {},
     mockData: List<Order>? = null,
@@ -369,20 +368,6 @@ fun ListOrderScreen(
 
             }
         }
-        IconButton(
-            onClick = onAddOrderClick,
-            modifier = Modifier
-                .padding(16.dp)
-                .size(40.dp)
-                .align(Alignment.BottomEnd)
-                .background(OrangeDefault, RoundedCornerShape(50))
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = WhiteDefault
-            )
-        }
     }
 }
 
@@ -409,7 +394,7 @@ fun OrderItem(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
             AsyncImage(
                 model = owner.avatarUrl,
@@ -504,7 +489,6 @@ fun PreviewListOrderScreen() {
         viewModel = ListOrderViewModel(),
         onBackClick = {},
         onOrderClick = {},
-        onAddOrderClick = {},
         onEditOrderClick = {},
         onDeleteOrderClick = {},
         mockData = listOf(
