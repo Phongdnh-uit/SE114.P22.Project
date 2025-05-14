@@ -218,9 +218,9 @@ fun ProfileScreen(
                             .innerShadow(
                                 color = GreyDark,
                                 bordersRadius = 25.dp,
-                                blurRadius = 4.dp,
+                                blurRadius = 10.dp,
                                 offsetX = 0.dp,
-                                offsetY = 4.dp,
+                                offsetY = 10.dp,
                             )
                             .background(OrangeDefault, CircleShape)
                     ) {
