@@ -1,6 +1,7 @@
 package com.example.mam.services
 
 import com.example.mam.entity.Notification
+import com.example.mam.entity.Order
 import com.example.mam.entity.User
 import com.example.mam.entity.authorization.request.SignInRequest
 import com.example.mam.entity.authorization.response.SignInResponse
@@ -21,6 +22,8 @@ interface APIservice {
     suspend fun getNotifications(): List<Notification>
     @GET("user/profile")
     suspend fun getUser(): User
+    @GET("order")
+    suspend fun getOrders(): List<Order>
     @Multipart
     @PUT("user/avatar")
     suspend fun uploadAvatar(
