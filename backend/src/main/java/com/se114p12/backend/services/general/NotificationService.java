@@ -4,7 +4,7 @@ import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.general.Notification;
 import com.se114p12.backend.entities.general.NotificationUser;
 import com.se114p12.backend.entities.general.NotificationUserId;
-import com.se114p12.backend.dto.general.NotificationRequest;
+import com.se114p12.backend.dto.general.NotificationRequestDTO;
 import com.se114p12.backend.dto.nofitication.NotificationResponse;
 import com.se114p12.backend.repository.authentication.UserRepository;
 import com.se114p12.backend.repository.general.EmitterRepository;
@@ -30,7 +30,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationUserRepository notificationUserRepository;
 
-    public NotificationResponse pushNotification(NotificationRequest request) {
+    public NotificationResponse pushNotification(NotificationRequestDTO request) {
         Notification notification = new Notification()
                 .setType(request.getType())
                 .setTitle(request.getTitle())

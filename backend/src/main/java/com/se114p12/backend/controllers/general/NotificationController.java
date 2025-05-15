@@ -1,6 +1,6 @@
 package com.se114p12.backend.controllers.general;
 
-import com.se114p12.backend.dto.general.NotificationRequest;
+import com.se114p12.backend.dto.general.NotificationRequestDTO;
 import com.se114p12.backend.dto.nofitication.NotificationResponse;
 import com.se114p12.backend.services.general.NotificationService;
 import com.se114p12.backend.util.JwtUtil;
@@ -20,7 +20,7 @@ public class NotificationController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/send")
-    public ResponseEntity<NotificationResponse> send(@RequestBody NotificationRequest request) {
+    public ResponseEntity<NotificationResponse> send(@RequestBody NotificationRequestDTO request) {
         return ResponseEntity.ok(notificationService.pushNotification(request));
     }
 
