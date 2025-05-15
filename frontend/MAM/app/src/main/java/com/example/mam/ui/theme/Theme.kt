@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 object Variables {
     val HeadlineMediumSize = 28.sp
     val HeadlineMediumLineHeight = 36.sp
+    val BodySizeBig = 20.sp
     val BodySizeMedium = 16.sp
     val BodySizeSmall = 14.sp
     val BodyFontWeightRegular = 400

@@ -1,55 +1,83 @@
 package com.example.mam.gui.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mam.entity.Product
+import com.example.mam.entity.VarianceOption
 import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.BrownLight
 import com.example.mam.ui.theme.GreyDark
+import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.Transparent
 import com.example.mam.ui.theme.WhiteDefault
+import kotlinx.coroutines.launch
 
 @Composable
 fun UnderlinedClickableText(
@@ -60,11 +88,11 @@ fun UnderlinedClickableText(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val annotatedText = buildAnnotatedString {
         withStyle(style = SpanStyle(color = color)) {
             append(text)
         }
+        append("   ")
         // Đánh dấu phần cần click
         pushStringAnnotation(tag = "CLICK", annotation = "clicked")
         withStyle(style = SpanStyle(
@@ -77,14 +105,18 @@ fun UnderlinedClickableText(
         pop()
     }
 
+
     ClickableText(
         text = annotatedText,
+        style = TextStyle(
+            textAlign = TextAlign.Center),
         onClick = { offset ->
             annotatedText.getStringAnnotations(tag = "CLICK", start = offset, end = offset)
                 .firstOrNull()?.let {
                     onClick()
                 }
         },
+        modifier = modifier
 
         // style mặc định cho đoạn text
     )
@@ -94,30 +126,34 @@ fun UnderlinedClickableText(
 fun InnerShadowFilledButton(
     text: String,
     icon: ImageVector?= null,
+    image: Int ?= null,
     isEnable: Boolean = true,
     onClick: () -> Unit,
     modifier: Modifier
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
+    val isPressed = remember { mutableStateOf(false) }
     Button(
         colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
         enabled = isEnable,
-        onClick = onClick,
+        onClick = {
+            isPressed.value = true
+            onClick()
+        },
         modifier = modifier
+            .bounceClick()
             .then(
-            if (!isPressed && isEnable) Modifier.innerShadow(
-                color = GreyDark,
-                bordersRadius = 25.dp,
-                blurRadius = 4.dp,
-                offsetX = 0.dp,
-                offsetY = 4.dp,
-                spread = 0.dp,
-            )
-                .clip(RoundedCornerShape(25.dp))
-            else Modifier
-        ),
-        interactionSource = interactionSource,
+                if (isEnable) Modifier
+                    .innerShadow(
+                        color = GreyDark,
+                        bordersRadius = 25.dp,
+                        blurRadius = 4.dp,
+                        offsetX = 0.dp,
+                        offsetY = 4.dp,
+                        spread = 0.dp,
+                    )
+                    .clip(RoundedCornerShape(25.dp))
+                else Modifier
+            ),
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
     ){
         icon?.let {
@@ -125,7 +161,18 @@ fun InnerShadowFilledButton(
                 imageVector = icon,
                 contentDescription = null,
                 tint = WhiteDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+        image?.let {
+            Icon(
+                painter = painterResource(image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
             )
         }
         Text(
@@ -140,6 +187,9 @@ fun OuterShadowFilledButton(
     text: String,
     fontSize: TextUnit = 16.sp,
     isEnable: Boolean = true,
+    color: Color = OrangeDefault,
+    textColor: Color = WhiteDefault,
+    tintIcon: Color = WhiteDefault,
     //borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = BrownDark),
     shadowColor: Color = BrownDark,
     blurRadius: Dp = 4.dp,
@@ -147,42 +197,106 @@ fun OuterShadowFilledButton(
     offsetY: Dp = 4.dp,
     spread: Dp = 0.dp,
     icon: ImageVector ?= null,
+    image: Int ?= null,
     onClick: () -> Unit,
+                    modifier: Modifier
+        ){
+//    val isPressed = remember { mutableStateOf(false) }
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = color),
+                //border = borderStroke,
+                onClick = onClick,
+                enabled = isEnable,
+                modifier = modifier
+                    .then(
+                        if (isEnable) Modifier
+                            .outerShadow(
+                                color = shadowColor,
+                                bordersRadius = 25.dp,
+                                blurRadius = blurRadius,
+                                offsetX = offsetX,
+                                offsetY = offsetY,
+                                spread = spread,
+                            ) else modifier
+                    ),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
+            ){
+                icon?.let {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = tintIcon,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                image?.let {
+                    Icon(
+                        painter = painterResource(image),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                Text(
+                    text = text,
+                    fontSize = fontSize,
+                    color = textColor
+        )
+    }
+}
+
+@Composable
+fun NormalButtonWithIcon(
+    text: String,
+    fontSize: TextUnit = 14.sp,
+    isEnable: Boolean = true,
+    color: Color = OrangeDefault,
+    textColor: Color = WhiteDefault,
+    tintIcon: Color = WhiteDefault,
+    icon: ImageVector ?= null,
+    image: Int ?= null,
+    onClick: () -> Unit,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
     modifier: Modifier
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
     Button(
-        colors = ButtonDefaults.buttonColors(containerColor = OrangeDefault),
-        //border = borderStroke,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
         onClick = onClick,
         enabled = isEnable,
-        modifier = modifier.then(
-            if (!isPressed && isEnable) Modifier.outerShadow(
-                color = shadowColor,
-                bordersRadius = 25.dp,
-                blurRadius = blurRadius,
-                offsetX = offsetX,
-                offsetY = offsetY,
-                spread = spread,
-            ) else modifier
-        ),
-        interactionSource = interactionSource,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
-    ){
-        icon?.let {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = WhiteDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                fontSize = fontSize,
+                color = textColor,
             )
+
+            Spacer(modifier = Modifier.weight(1f)) // đẩy icon sang cuối
+
+            icon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    tint = tintIcon,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            image?.let {
+                Icon(
+                    painter = painterResource(image),
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
-        Text(
-            text = text,
-            fontSize = fontSize,
-            color = WhiteDefault
-        )
     }
 }
 
@@ -191,36 +305,43 @@ fun BasicOutlinedButton(
     text: String,
     foregroundColor: Color = BrownDefault,
     icon: ImageVector ?= null,
+    image: Int ?= null,
     isEnable: Boolean = true,
     onClick: () -> Unit,
     modifier: Modifier
 ){
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
-    val bordercolor = if (isEnable && !isPressed) foregroundColor else WhiteDefault
-    val foreground = if (!isPressed) foregroundColor else WhiteDefault
-        val background = if (!isPressed) Transparent else OrangeDefault
+    val bordercolor = if (isEnable) foregroundColor else WhiteDefault
     OutlinedButton(
-        colors = ButtonDefaults.buttonColors(containerColor = background),
+        colors = ButtonDefaults.buttonColors(containerColor = Transparent),
         border = BorderStroke( width = 2.dp, color = bordercolor),
         enabled = isEnable,
         onClick = onClick,
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-        interactionSource = interactionSource
+//        interactionSource = interactionSource
     ){
         icon?.let {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = BrownDefault,
-                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+        image?.let {
+            Image(
+                painter = painterResource(image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
             )
         }
         Text(
             text = text,
-            color = foreground
+            color = foregroundColor
         )
     }
 }
@@ -229,33 +350,35 @@ fun BasicOutlinedButton(
 fun CircleIconButton(
     backgroundColor: Color ?= null,
     foregroundColor: Color ?= null,
-    icon: ImageVector,
+    icon: ImageVector ?= null,
+    image: Int ?= null,
     isEnable: Boolean = true,
     shadow: String ?= null,
     onClick: () -> Unit,
     modifier: Modifier,
 ){
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
     IconButton (
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = backgroundColor ?: OrangeDefault
         ),
         enabled = isEnable,
         onClick = onClick,
-        modifier = modifier.size(50.dp)
+        modifier = modifier
+            .size(40.dp)
+            .focusable(false)
             .then(
-                if (shadow.equals("inner")){
-                    Modifier.innerShadow(
-                        color = GreyDark,
-                        bordersRadius = 25.dp,
-                        blurRadius = 4.dp,
-                        offsetX = 0.dp,
-                        offsetY = 4.dp,
-                        spread = 0.dp,
-                    ).clip(RoundedCornerShape(25.dp))
-                }
-                else if(shadow.equals("outer")){
+                if (shadow.equals("inner")) {
+                    Modifier
+                        .innerShadow(
+                            color = GreyDark,
+                            bordersRadius = 25.dp,
+                            blurRadius = 4.dp,
+                            offsetX = 0.dp,
+                            offsetY = 4.dp,
+                            spread = 0.dp,
+                        )
+                        .clip(RoundedCornerShape(25.dp))
+                } else if (shadow.equals("outer")) {
                     Modifier.outerShadow(
                         color = GreyDark,
                         bordersRadius = 25.dp,
@@ -264,29 +387,40 @@ fun CircleIconButton(
                         offsetY = 4.dp,
                         spread = 0.dp,
                     )
-                }
-                else Modifier
+                } else Modifier
             ),
-        interactionSource = interactionSource,
     ){
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = foregroundColor ?: WhiteDefault,
-            modifier = Modifier.size(40.dp)
-        )
+        icon?.let {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = foregroundColor ?: WhiteDefault,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+        image?.let {
+            Icon(
+                painter = painterResource(image),
+                contentDescription = null,
+                tint = foregroundColor ?: WhiteDefault,
+                modifier = Modifier.size(30.dp)
+            )
+        }
     }
 }
 
 @Composable
 fun QuantitySelectionButton(
     count: Int,
-    onValueChange: (Int) -> Unit // Callback để cập nhật giá trị bên ngoài
+    onValueIncr: () -> Unit = {},
+    onValueDecr: () -> Unit = {},
+    modifier: Modifier = Modifier// Callback để cập nhật giá trị bên ngoài
 ) {
-    Box(modifier = Modifier
+    Box(modifier = modifier
         .outerShadow() // Đổ bóng lên nền
         .background(OrangeDefault, shape = RoundedCornerShape(50))
-        .padding(0.dp)) {
+        .padding(0.dp)
+        .wrapContentHeight()) {
         Row(
             modifier = Modifier
                 .padding(0.dp)
@@ -297,7 +431,7 @@ fun QuantitySelectionButton(
             // Nút Giảm (-)
             CircleIconButton(
                 icon = Icons.Filled.Remove, // Thay bằng icon phù hợp
-                onClick = { if (count > 0) onValueChange(count - 1) },
+                onClick = { if (count > 1) onValueDecr()},
                 modifier = Modifier
             )
 
@@ -306,9 +440,8 @@ fun QuantitySelectionButton(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .background(Color.White, shape = RoundedCornerShape(50))
-                    .wrapContentWidth()
+                    .wrapContentSize()
                     .padding(0.dp)
-                    .height(50.dp)
             ){
                 Text(
                     text = "$count",
@@ -318,16 +451,318 @@ fun QuantitySelectionButton(
                     color = OrangeDefault,
                     modifier = Modifier
                         .padding(10.dp)
-                        .wrapContentWidth()
+                        .wrapContentSize()
                         .defaultMinSize(minWidth = 30.dp)
                 )
             }
             // Nút Tăng (+)
             CircleIconButton(
                 icon = Icons.Filled.Add, // Thay bằng icon phù hợp
-                onClick = { onValueChange(count + 1) },
+                onClick = { onValueIncr() },
                 modifier = Modifier
             )
         }
     }
+}
+
+@Composable
+fun ProductClientListItem(
+    item: Product,
+    onClick: (Product) -> Unit =  {Product ->},
+    color: Color = WhiteDefault,
+    modifier: Modifier = Modifier){
+    Card(
+        enabled = item.isAvailable,
+        colors = CardColors(color, BrownDefault, GreyLight.copy(0.5f), GreyDark.copy(0.5f)),
+        onClick = { onClick(item) },
+//        elevation = CardDefaults.cardElevation(
+//            defaultElevation = 4.dp,
+//        ),
+        modifier = Modifier
+            .height(80.dp)
+            .fillMaxWidth(0.9f)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxSize()
+        ) {
+            Image(
+                painter = painterResource(item.img),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = item.name,
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(top = 5.dp)
+                )
+                Text(
+                    text = if (item.isAvailable) item.getPriceToString() else "Hết sản phẩm",
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(bottom = 5.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomRadioButton(
+    selectedColor: Color = BrownDefault,
+    unSelectedColor: Color = BrownLight,
+    foregroundColor: Color = WhiteDefault,
+    selectedIcon: ImageVector ?= null,
+    selected: Boolean,
+    onClick: () -> Unit,
+    text: String,
+    modifier: Modifier,
+) {
+    val backgroundColor = if (selected) selectedColor else unSelectedColor // Màu nâu
+    val textColor = foregroundColor
+    val icon = if (selected) selectedIcon else null
+
+    Row(
+        modifier = Modifier
+            .background(backgroundColor, shape = RoundedCornerShape(50.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+        Text(
+            text = text,
+            color = textColor,
+            fontWeight = if(selected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+fun RadioOption(
+    modifier: Modifier = Modifier,
+    title: String,
+    options: List<VarianceOption>,
+    defaultOption: VarianceOption = options.first() ,
+    onClick: (VarianceOption) -> Unit,
+) {
+    var temp: VarianceOption by remember { mutableStateOf(defaultOption) }
+    Column(
+        modifier = modifier.wrapContentHeight()
+    ) {
+        Text(
+            text = title,
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            color = BrownDefault,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(vertical = 10.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            items(options) { option ->
+                CustomRadioButton(
+                    text = option.value,
+                    selected = option == temp,
+                    selectedIcon = Icons.Default.Check,
+                    onClick = {
+                        temp = option
+                        onClick(option) },
+                    modifier = Modifier
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PizzaSizeOption(
+    modifier: Modifier = Modifier,
+    title: String,
+    options: List<VarianceOption>,
+    defaultOption: VarianceOption = options.first() ,
+    @DrawableRes image: Int,
+    onClick: (VarianceOption) -> Unit,
+    ) {
+        val scope = rememberCoroutineScope()
+        val state = rememberLazyListState()
+        var temp: VarianceOption by remember { mutableStateOf(defaultOption) }
+        Column(
+            modifier = modifier.wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp,
+                color = BrownDefault,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+            )
+            LazyRow(
+                state = state,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .width(200.dp)
+                    .wrapContentHeight()
+                    .padding(bottom = 10.dp)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) { // Always consume pointer events
+                                val event = awaitPointerEvent()
+                                event.changes.forEach { it.consume() }
+                            }
+                        }
+                    }
+            ) {
+                items(options){
+                    val size: Double = (it.value.filter { it.isDigit() }.toDouble() * 3 + 15)/ 100
+                    Box(
+                        modifier = Modifier.size(200.dp),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Image(
+                            painter = painterResource(image),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize(size.toFloat())
+                        )
+                    }
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight()
+                    .background(BrownLight, shape = RoundedCornerShape(50.dp))
+            ) {
+                options.forEach() { option ->
+                    CustomRadioButton(
+                        text = option.value,
+                        selected = option == temp,
+                        onClick = {
+                            temp = option
+                            scope.launch {
+                                state.animateScrollToItem(options.indexOf(option))
+                            }
+                            onClick(option) },
+                        modifier = Modifier
+                    )
+                }
+            }
+        }
+}
+
+@Composable
+fun CustomToggleButton(
+    modifier: Modifier = Modifier,
+    text: String = "",
+    onSelect: () -> Unit,
+    onUnselect: () -> Unit,
+) {
+    // Define the colors based on the toggle state
+
+    var isSelected: Boolean by remember { mutableStateOf(false) }
+    val backgroundColor = if (isSelected) BrownDefault else BrownLight
+    val textColor = WhiteDefault
+    // Create the button
+    Box(
+        modifier = modifier
+            .background(backgroundColor, shape = RoundedCornerShape(50.dp))
+            .clickable {
+                isSelected = !isSelected
+                if (isSelected) onSelect()
+                else onUnselect()
+            }
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = textColor,
+            fontWeight = if(isSelected)FontWeight.Bold else FontWeight.Normal,
+            fontSize = 16.sp
+        )
+    }
+}
+
+@Composable
+fun MultiChoiceOption(
+    modifier: Modifier = Modifier,
+    title: String,
+    options: List<VarianceOption>,
+    onSelect: (VarianceOption) -> Unit,
+    onUnselect: (VarianceOption) -> Unit,
+) {
+    Column(
+        modifier = modifier.wrapContentHeight()
+    ) {
+        Text(
+            text = title,
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            color = BrownDefault,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(vertical = 10.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            items(options) { option ->
+                CustomToggleButton(
+                    text = option.value,
+                    onSelect = { onSelect(option) },
+                    onUnselect = { onUnselect(option) }
+                )
+            }
+        }
+    }
+}
+@Preview
+@Composable
+fun ButtonPreview(){
+
 }
