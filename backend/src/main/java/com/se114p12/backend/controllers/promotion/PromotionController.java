@@ -1,9 +1,9 @@
-package com.se114p12.backend.controllers.general;
+package com.se114p12.backend.controllers.promotion;
 
-import com.se114p12.backend.dto.general.PromotionRequestDTO;
-import com.se114p12.backend.dto.general.PromotionResponseDTO;
-import com.se114p12.backend.entities.general.Promotion;
-import com.se114p12.backend.services.general.PromotionService;
+import com.se114p12.backend.dto.promotion.PromotionRequestDTO;
+import com.se114p12.backend.dto.promotion.PromotionResponseDTO;
+import com.se114p12.backend.entities.promotion.Promotion;
+import com.se114p12.backend.services.promotion.PromotionService;
 import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.tags.Tag;

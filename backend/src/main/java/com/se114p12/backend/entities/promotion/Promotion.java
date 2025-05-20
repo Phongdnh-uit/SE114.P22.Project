@@ -1,4 +1,4 @@
-package com.se114p12.backend.entities.general;
+package com.se114p12.backend.entities.promotion;
 
 import com.se114p12.backend.entities.BaseEntity;
 import jakarta.persistence.Entity;
@@ -15,9 +15,6 @@ import java.time.Instant;
 @Entity
 @Table(name = "promotions")
 public class Promotion extends BaseEntity {
-
-    @NotBlank
-    private String name;
 
     private String description;
 

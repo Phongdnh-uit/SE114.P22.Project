@@ -1,6 +1,5 @@
-package com.se114p12.backend.dto.general;
+package com.se114p12.backend.dto.promotion;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -8,9 +7,6 @@ import java.time.Instant;
 
 @Data
 public class PromotionRequestDTO {
-
-    @NotBlank
-    private String name;
 
     private String description;
 

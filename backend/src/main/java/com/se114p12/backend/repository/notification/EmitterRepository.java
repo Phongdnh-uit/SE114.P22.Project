@@ -1,4 +1,4 @@
-package com.se114p12.backend.repository.general;
+package com.se114p12.backend.repository.notification;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

@@ -1,7 +1,7 @@
-package com.se114p12.backend.repository.general;
+package com.se114p12.backend.repository.notification;
 
-import com.se114p12.backend.entities.general.NotificationUser;
-import com.se114p12.backend.entities.general.NotificationUserId;
+import com.se114p12.backend.entities.notification.NotificationUser;
+import com.se114p12.backend.entities.notification.NotificationUserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

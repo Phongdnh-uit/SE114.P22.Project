@@ -1,8 +1,8 @@
-package com.se114p12.backend.controllers.general;
+package com.se114p12.backend.controllers.notification;
 
-import com.se114p12.backend.dto.general.NotificationRequestDTO;
-import com.se114p12.backend.dto.nofitication.NotificationResponse;
-import com.se114p12.backend.services.general.NotificationService;
+import com.se114p12.backend.dto.nofitication.NotificationRequestDTO;
+import com.se114p12.backend.dto.nofitication.NotificationResponseDTO;
+import com.se114p12.backend.services.notification.NotificationService;
 import com.se114p12.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class NotificationController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/send")
-    public ResponseEntity<NotificationResponse> send(@RequestBody NotificationRequestDTO request) {
+    public ResponseEntity<NotificationResponseDTO> send(@RequestBody NotificationRequestDTO request) {
         return ResponseEntity.ok(notificationService.pushNotification(request));
     }
 
@@ -31,9 +31,9 @@ public class NotificationController {
     // }
 
     @GetMapping("/me")
-    public ResponseEntity<List<NotificationResponse>> getMyNotifications() {
+    public ResponseEntity<List<NotificationResponseDTO>> getMyNotifications() {
         Long userId = jwtUtil.getCurrentUserId();
-        List<NotificationResponse> responses = notificationService.getNotificationsByUserId(userId)
+        List<NotificationResponseDTO> responses = notificationService.getNotificationsByUserId(userId)
                 .stream()
                 .map(notification -> notificationService.toResponse(notification, userId))
                 .collect(Collectors.toList());

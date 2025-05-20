@@ -1,8 +1,8 @@
-package com.se114p12.backend.mapper.general;
+package com.se114p12.backend.mapper.promotion;
 
-import com.se114p12.backend.dto.general.PromotionRequestDTO;
-import com.se114p12.backend.dto.general.PromotionResponseDTO;
-import com.se114p12.backend.entities.general.Promotion;
+import com.se114p12.backend.dto.promotion.PromotionRequestDTO;
+import com.se114p12.backend.dto.promotion.PromotionResponseDTO;
+import com.se114p12.backend.entities.promotion.Promotion;
 import com.se114p12.backend.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

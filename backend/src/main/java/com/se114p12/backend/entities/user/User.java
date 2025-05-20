@@ -4,7 +4,7 @@ import com.se114p12.backend.entities.BaseEntity;
 import com.se114p12.backend.entities.authentication.Role;
 import com.se114p12.backend.entities.authentication.Verification;
 import com.se114p12.backend.entities.cart.Cart;
-import com.se114p12.backend.entities.general.NotificationUser;
+import com.se114p12.backend.entities.notification.NotificationUser;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.UserStatus;
 import jakarta.persistence.*;

@@ -1,11 +1,11 @@
-package com.se114p12.backend.services.general;
+package com.se114p12.backend.services.promotion;
 
-import com.se114p12.backend.dto.general.PromotionRequestDTO;
-import com.se114p12.backend.dto.general.PromotionResponseDTO;
-import com.se114p12.backend.entities.general.Promotion;
+import com.se114p12.backend.dto.promotion.PromotionRequestDTO;
+import com.se114p12.backend.dto.promotion.PromotionResponseDTO;
+import com.se114p12.backend.entities.promotion.Promotion;
 import com.se114p12.backend.exception.ResourceNotFoundException;
-import com.se114p12.backend.mapper.general.PromotionMapper;
-import com.se114p12.backend.repository.general.PromotionRepository;
+import com.se114p12.backend.mapper.promotion.PromotionMapper;
+import com.se114p12.backend.repository.promotion.PromotionRepository;
 import com.se114p12.backend.vo.PageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

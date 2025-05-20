@@ -1,15 +1,15 @@
-package com.se114p12.backend.services.general;
+package com.se114p12.backend.services.notification;
 
 import com.se114p12.backend.entities.user.User;
-import com.se114p12.backend.entities.general.Notification;
-import com.se114p12.backend.entities.general.NotificationUser;
-import com.se114p12.backend.entities.general.NotificationUserId;
-import com.se114p12.backend.dto.general.NotificationRequestDTO;
-import com.se114p12.backend.dto.nofitication.NotificationResponse;
+import com.se114p12.backend.entities.notification.Notification;
+import com.se114p12.backend.entities.notification.NotificationUser;
+import com.se114p12.backend.entities.notification.NotificationUserId;
+import com.se114p12.backend.dto.nofitication.NotificationRequestDTO;
+import com.se114p12.backend.dto.nofitication.NotificationResponseDTO;
 import com.se114p12.backend.repository.authentication.UserRepository;
-import com.se114p12.backend.repository.general.EmitterRepository;
-import com.se114p12.backend.repository.general.NotificationRepository;
-import com.se114p12.backend.repository.general.NotificationUserRepository;
+import com.se114p12.backend.repository.notification.EmitterRepository;
+import com.se114p12.backend.repository.notification.NotificationRepository;
+import com.se114p12.backend.repository.notification.NotificationUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationUserRepository notificationUserRepository;
 
-    public NotificationResponse pushNotification(NotificationRequestDTO request) {
+    public NotificationResponseDTO pushNotification(NotificationRequestDTO request) {
         Notification notification = new Notification()
                 .setType(request.getType())
                 .setTitle(request.getTitle())
@@ -60,7 +60,6 @@ public class NotificationService {
                     emitterRepository.remove(user.getUsername());
                 }
             });
-
         }
 
         notificationRepository.save(notification); // lưu lại với receivers
@@ -101,8 +100,8 @@ public class NotificationService {
         return notificationUserRepository.countByUserIdAndIsReadFalse(userId);
     }
 
-    public NotificationResponse toResponse(Notification notification, Long userId) {
-        NotificationResponse response = new NotificationResponse();
+    public NotificationResponseDTO toResponse(Notification notification, Long userId) {
+        NotificationResponseDTO response = new NotificationResponseDTO();
         response.setId(notification.getId());
         response.setType(notification.getType());
         response.setTitle(notification.getTitle());

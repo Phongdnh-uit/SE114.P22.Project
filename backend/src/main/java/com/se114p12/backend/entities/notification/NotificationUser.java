@@ -1,4 +1,4 @@
-package com.se114p12.backend.entities.general;
+package com.se114p12.backend.entities.notification;
 
 import com.se114p12.backend.entities.user.User;
 import jakarta.persistence.*;
