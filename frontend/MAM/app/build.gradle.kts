@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+
 }
 
 android {
@@ -51,10 +53,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.espresso.core)
+    implementation(libs.play.services.maps)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
@@ -63,5 +65,13 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.material3)
+    implementation(libs.accompanist.navigation.animation)
+    implementation("com.mapbox.maps:android:11.11.0")
+    implementation("com.mapbox.extension:maps-compose:11.11.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
 }

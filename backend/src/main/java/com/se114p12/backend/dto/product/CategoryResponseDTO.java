@@ -9,4 +9,5 @@ import lombok.EqualsAndHashCode;
 public class CategoryResponseDTO extends BaseResponseDTO {
     private String name;
     private String description;
+    private String imageUrl;
 }

@@ -19,4 +19,6 @@ public class Variation extends BaseEntity {
     @Column(nullable = false, length = 255)
     @NotBlank
     private String name;
+
+    private boolean isMultipleChoice;
 }

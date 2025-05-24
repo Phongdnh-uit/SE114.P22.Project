@@ -20,4 +20,7 @@ public class ProductCategory extends BaseEntity {
 
     @OneToMany(mappedBy = "category")
     private List<Product> product;
+
+    @Column(length = 500)
+    private String imageUrl;
 }
