@@ -52,7 +52,7 @@ public class MailService {
                 "verifyLink", "http://localhost:8080/api/v1/auth/verify-email?code=" + activationCode,
                 "email", email
         );
-        sendEmailFromTemplate(email, "Verify email", "verify-email", model);
+        sendEmailFromTemplate(email, "Verify email", "mail/verify-email", model);
     }
 
 //    @Async
