@@ -49,10 +49,10 @@ public class AuthController {
   private final VerificationService verificationService;
 
   @Operation(summary = "Register a new user")
-  @ApiResponse(
-      responseCode = "201",
-      description = "User registered successfully",
-      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+    @ApiResponse(
+        responseCode = "201",
+        description = "User registered successfully",
+        content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
   @ErrorResponse
   @PostMapping("/register")
   @ResponseBody
@@ -65,10 +65,6 @@ public class AuthController {
       summary = "Login with Google OAuth2",
       description =
           "Login using Google OAuth2 credentials. The Google ID token is sent in the request body.")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Login successful",
-      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
   @ErrorResponse
   @PostMapping("/oauth2/google")
   @ResponseBody
@@ -96,10 +92,10 @@ public class AuthController {
   @Operation(
       summary = "Login with credentialId and password",
       description = "credentialId is usually the email or phone number or username")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Login successful",
-      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
+    @ApiResponse(
+        responseCode = "200",
+        description = "User logged in successfully",
+        content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
   @ErrorResponse
   @PostMapping("/login")
   @ResponseBody
@@ -128,10 +124,10 @@ public class AuthController {
   }
 
   @Operation(summary = "Get current user information")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Current user information retrieved successfully",
-      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Current user information retrieved successfully",
+        content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
   @ErrorResponse
   @GetMapping("/me")
   @ResponseBody
@@ -140,10 +136,10 @@ public class AuthController {
   }
 
   @Operation(summary = "Refresh access token using refresh token")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Access token refreshed successfully",
-      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Access token refreshed successfully",
+        content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
   @ErrorResponse
   @PostMapping("/refresh")
   @ResponseBody
@@ -162,10 +158,10 @@ public class AuthController {
   }
 
   @Operation(summary = "Log out user")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Logout successfully",
-      content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(
+        responseCode = "200",
+        description = "User logged out successfully",
+        content = @Content(schema = @Schema(implementation = String.class)))
   @ErrorResponse
   @PostMapping("/logout")
   @ResponseBody
@@ -183,10 +179,10 @@ public class AuthController {
   }
 
   @Operation(summary = "Change user password")
-  @ApiResponse(
-      responseCode = "200",
-      description = "Password changed successfully",
-      content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password changed successfully",
+        content = @Content(schema = @Schema(implementation = String.class)))
   @ErrorResponse
   @PostMapping("/change-password")
   @ResponseBody

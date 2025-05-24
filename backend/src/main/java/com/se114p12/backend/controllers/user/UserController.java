@@ -1,5 +1,6 @@
 package com.se114p12.backend.controllers.user;
 
+import com.se114p12.backend.annotations.ErrorResponse;
 import com.se114p12.backend.dto.user.UserRequestDTO;
 import com.se114p12.backend.dto.user.UserResponseDTO;
 import com.se114p12.backend.entities.user.User;
@@ -8,8 +9,9 @@ import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +29,11 @@ public class UserController {
   private final UserService userService;
 
   @Operation(summary = "Get all users", description = "Retrieve a paginated list of all users")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
-        @ApiResponse(responseCode = "400", description = "Bad request"),
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved list of users",
+      content = @Content(schema = @Schema(implementation = PageVO.class)))
+  @ErrorResponse
   @GetMapping
   public ResponseEntity<PageVO<UserResponseDTO>> getAllUsers(
       @ParameterObject Pageable pageable,
@@ -40,23 +42,22 @@ public class UserController {
   }
 
   @Operation(summary = "Get user by ID", description = "Retrieve a user by their ID")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved user",
+      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+  @ErrorResponse
   @GetMapping("/{id}")
   public ResponseEntity<UserResponseDTO> getUserById(@PathVariable("id") Long id) {
     return ResponseEntity.ok(userService.getUserById(id));
   }
 
   @Operation(summary = "Update user", description = "Update an existing user by their ID")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully updated user"),
-        @ApiResponse(responseCode = "400", description = "Bad request"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully updated user",
+      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+  @ErrorResponse
   @PutMapping("/{id}")
   public ResponseEntity<UserResponseDTO> updateUser(
       @PathVariable("id") Long id, @Valid @RequestBody UserRequestDTO userRequestDTO) {
@@ -64,11 +65,11 @@ public class UserController {
   }
 
   @Operation(summary = "Delete user", description = "Delete a user by their ID")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "204", description = "Successfully deleted user"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-      })
+  @ApiResponse(
+      responseCode = "204",
+      description = "Successfully deleted user",
+      content = @Content(schema = @Schema(implementation = Void.class)))
+  @ErrorResponse
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
     userService.delete(id);
@@ -76,11 +77,11 @@ public class UserController {
   }
 
   @Operation(summary = "Assign role to user", description = "Assign a role to a user by their ID")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "204", description = "Successfully assigned role to user"),
-        @ApiResponse(responseCode = "404", description = "User or role not found"),
-      })
+  @ApiResponse(
+      responseCode = "204",
+      description = "Successfully assigned role to user",
+      content = @Content(schema = @Schema(implementation = Void.class)))
+  @ErrorResponse
   @PostMapping("/{id}/assign-role/{roleId}")
   public ResponseEntity<Void> assignRoleToUser(
       @PathVariable("id") Long userId, @PathVariable("roleId") Long roleId) {

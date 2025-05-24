@@ -1,5 +1,6 @@
 package com.se114p12.backend.controllers.product;
 
+import com.se114p12.backend.annotations.ErrorResponse;
 import com.se114p12.backend.dto.product.CategoryRequestDTO;
 import com.se114p12.backend.dto.product.CategoryResponseDTO;
 import com.se114p12.backend.entities.product.ProductCategory;
@@ -8,6 +9,8 @@ import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +39,7 @@ public class ProductCategoryController {
             responseCode = "200",
             description = "Successfully retrieved product categories"),
       })
+  @ErrorResponse
   @GetMapping
   public ResponseEntity<PageVO<CategoryResponseDTO>> getAllProductCategories(
       @ParameterObject Pageable pageable,
@@ -48,11 +52,11 @@ public class ProductCategoryController {
   @Operation(
       summary = "Get product category by ID",
       description = "Retrieve a product category by its ID.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved product category"),
-        @ApiResponse(responseCode = "404", description = "Product category not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved product category",
+      content = @Content(schema = @Schema(implementation = CategoryResponseDTO.class)))
+  @ErrorResponse
   @GetMapping("/{id}")
   public ResponseEntity<CategoryResponseDTO> getProductCategoryById(@PathVariable("id") Long id) {
     return ResponseEntity.ok(productCategoryService.findById(id));
@@ -61,11 +65,11 @@ public class ProductCategoryController {
   @Operation(
       summary = "Create a new product category",
       description = "Create a new product category.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "201", description = "Successfully created product category"),
-        @ApiResponse(responseCode = "400", description = "Invalid input data")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully created product category",
+      content = @Content(schema = @Schema(implementation = CategoryResponseDTO.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping(consumes = {"multipart/form-data"})
   public ResponseEntity<CategoryResponseDTO> createProductCategory(
@@ -76,12 +80,11 @@ public class ProductCategoryController {
   @Operation(
       summary = "Update a product category",
       description = "Update an existing product category.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully updated product category"),
-        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-        @ApiResponse(responseCode = "404", description = "Product category not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully updated product category",
+      content = @Content(schema = @Schema(implementation = CategoryResponseDTO.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping(
       value = "/{id}",
@@ -94,11 +97,11 @@ public class ProductCategoryController {
   @Operation(
       summary = "Delete a product category",
       description = "Delete a product category by its ID.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully deleted product category"),
-        @ApiResponse(responseCode = "404", description = "Product category not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully deleted product category",
+      content = @Content(schema = @Schema(implementation = Void.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteProductCategory(@PathVariable("id") Long id) {

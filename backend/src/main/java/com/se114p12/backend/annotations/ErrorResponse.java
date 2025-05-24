@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
     description = "Error response",
     content =
         @Content(
-            mediaType = "application/json",
             schema = @Schema(implementation = ErrorVO.class),
             examples = {
               @ExampleObject(

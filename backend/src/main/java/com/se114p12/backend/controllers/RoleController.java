@@ -1,5 +1,6 @@
 package com.se114p12.backend.controllers;
 
+import com.se114p12.backend.annotations.ErrorResponse;
 import com.se114p12.backend.dto.role.RoleRequestDTO;
 import com.se114p12.backend.dto.role.RoleResponseDTO;
 import com.se114p12.backend.entities.authentication.Role;
@@ -8,8 +9,9 @@ import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +33,11 @@ public class RoleController {
       summary = "Get all roles",
       description =
           "Retrieve a paginated list of all roles. Only accessible to users with the ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved roles"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - User does not have the required role")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved roles",
+      content = @Content(schema = @Schema(implementation = PageVO.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<PageVO<RoleResponseDTO>> getAllRoles(
@@ -51,14 +51,11 @@ public class RoleController {
   @Operation(
       summary = "Get role by ID",
       description = "Retrieve a role by its ID. Only accessible to users with the ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved role"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - User does not have the required role"),
-        @ApiResponse(responseCode = "404", description = "Role not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved role",
+      content = @Content(schema = @Schema(implementation = RoleResponseDTO.class)))
+  @ErrorResponse
   @GetMapping("/{id}")
   public ResponseEntity<RoleResponseDTO> getRoleById(@PathVariable("id") Long id) {
     return ResponseEntity.ok(roleService.getRoleById(id));
@@ -67,13 +64,13 @@ public class RoleController {
   @Operation(
       summary = "Create a new role",
       description = "Create a new role. Only accessible to users with the ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully created role"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - User does not have the required role")
-      })
+  @ApiResponse(
+      responseCode = "201",
+      description = "Successfully created role",
+      content =
+          @Content(
+              schema = @Schema(implementation = RoleResponseDTO.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<RoleResponseDTO> createRole(
@@ -84,14 +81,13 @@ public class RoleController {
   @Operation(
       summary = "Update a role",
       description = "Update an existing role. Only accessible to users with the ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Successfully updated role"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - User does not have the required role"),
-        @ApiResponse(responseCode = "404", description = "Role not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully updated role",
+      content =
+          @Content(
+              schema = @Schema(implementation = RoleResponseDTO.class)))
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<RoleResponseDTO> updateRole(
@@ -102,14 +98,8 @@ public class RoleController {
   @Operation(
       summary = "Delete a role",
       description = "Delete a role by its ID. Only accessible to users with the ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "204", description = "Successfully deleted role"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - User does not have the required role"),
-        @ApiResponse(responseCode = "404", description = "Role not found")
-      })
+  @ApiResponse(responseCode = "204", description = "Successfully deleted role")
+  @ErrorResponse
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteRole(@PathVariable("id") Long id) {
