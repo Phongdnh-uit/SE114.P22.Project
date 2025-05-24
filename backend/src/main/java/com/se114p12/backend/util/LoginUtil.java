@@ -54,13 +54,23 @@ public class LoginUtil {
 
   public User getUserByCredentialId(String credentialId) {
     LoginType loginType = checkCredentialIdType(credentialId);
-    Optional<User> userOptional = switch (loginType) {
-        case PHONE -> userRepository.findByPhone(credentialId);
-        case EMAIL -> userRepository.findByEmail(credentialId);
-        case USERNAME -> userRepository.findByUsername(credentialId);
-        default -> Optional.empty();
-    };
-      return userOptional.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    // Normalize the input to ensure consistent matching
+    credentialId = normalizeInput(credentialId);
+    if (loginType == LoginType.PHONE) {
+      if (credentialId.startsWith("0")) {
+        credentialId = credentialId.substring(1);
+        credentialId = "+84" + credentialId;
+      }
+    }
+
+    Optional<User> userOptional =
+        switch (loginType) {
+          case PHONE -> userRepository.findByPhone(credentialId);
+          case EMAIL -> userRepository.findByEmail(credentialId);
+          case USERNAME -> userRepository.findByUsername(credentialId);
+          default -> Optional.empty();
+        };
+    return userOptional.orElseThrow(() -> new ResourceNotFoundException("User not found"));
   }
 
   private static String normalizeInput(String input) {

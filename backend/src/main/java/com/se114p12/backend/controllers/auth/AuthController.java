@@ -101,6 +101,13 @@ public class AuthController {
     return ResponseEntity.ok().body(loginResponseDTO);
   }
 
+  @Operation(summary = "Lấy thông tin người dùng hiện tại")
+  @GetMapping("/me")
+  @ResponseBody
+  public ResponseEntity<UserResponseDTO> getCurrentUser() {
+    return ResponseEntity.ok().body(userService.getCurrentUser());
+  }
+
   @Operation(summary = "Đổi mã access token qua refresh token")
   @PostMapping("/refresh")
   @ResponseBody
@@ -130,7 +137,7 @@ public class AuthController {
   @GetMapping("/verify-email")
   public String verifyEmail(@RequestParam(value = "code") String code) {
     userService.verifyEmail(code);
-    return "mail/verify-email-success";
+    return "verify-email-success";
   }
 
   @Operation(summary = "Thay đổi mật khẩu")

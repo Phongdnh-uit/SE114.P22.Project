@@ -33,4 +33,6 @@ public interface UserService {
   void assignRoleToUser(Long userId, Long roleId);
 
   void updateUserStatus(Long id, UserStatus status);
+
+  UserResponseDTO getCurrentUser();
 }
