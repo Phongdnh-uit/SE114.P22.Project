@@ -1,6 +1,7 @@
 package com.se114p12.backend.controllers.auth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.se114p12.backend.annotations.ErrorResponse;
 import com.se114p12.backend.dto.authentication.*;
 import com.se114p12.backend.dto.user.UserResponseDTO;
 import com.se114p12.backend.entities.authentication.RefreshToken;
@@ -17,8 +18,9 @@ import com.se114p12.backend.services.general.SMSService;
 import com.se114p12.backend.services.user.UserService;
 import com.se114p12.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -47,12 +49,11 @@ public class AuthController {
   private final VerificationService verificationService;
 
   @Operation(summary = "Register a new user")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "201", description = "User registered successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "409", description = "Email already exists")
-      })
+  @ApiResponse(
+      responseCode = "201",
+      description = "User registered successfully",
+      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+  @ErrorResponse
   @PostMapping("/register")
   @ResponseBody
   public ResponseEntity<UserResponseDTO> register(
@@ -60,6 +61,15 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(registerRequestDTO));
   }
 
+  @Operation(
+      summary = "Login with Google OAuth2",
+      description =
+          "Login using Google OAuth2 credentials. The Google ID token is sent in the request body.")
+  @ApiResponse(
+      responseCode = "200",
+      description = "Login successful",
+      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
+  @ErrorResponse
   @PostMapping("/oauth2/google")
   @ResponseBody
   public ResponseEntity<AuthResponseDTO> loginWithGoogle(
@@ -86,12 +96,11 @@ public class AuthController {
   @Operation(
       summary = "Login with credentialId and password",
       description = "credentialId is usually the email or phone number or username")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Login successful"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized, invalid credentials")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Login successful",
+      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
+  @ErrorResponse
   @PostMapping("/login")
   @ResponseBody
   public ResponseEntity<AuthResponseDTO> login(
@@ -119,12 +128,11 @@ public class AuthController {
   }
 
   @Operation(summary = "Get current user information")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Current user information retrieved"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated"),
-        @ApiResponse(responseCode = "404", description = "User not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Current user information retrieved successfully",
+      content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+  @ErrorResponse
   @GetMapping("/me")
   @ResponseBody
   public ResponseEntity<UserResponseDTO> getCurrentUser() {
@@ -132,12 +140,11 @@ public class AuthController {
   }
 
   @Operation(summary = "Refresh access token using refresh token")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Access token refreshed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized, invalid refresh token")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Access token refreshed successfully",
+      content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
+  @ErrorResponse
   @PostMapping("/refresh")
   @ResponseBody
   public ResponseEntity<AuthResponseDTO> refreshToken(
@@ -155,12 +162,11 @@ public class AuthController {
   }
 
   @Operation(summary = "Log out user")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Logout successful"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized, invalid refresh token")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Logout successfully",
+      content = @Content(schema = @Schema(implementation = String.class)))
+  @ErrorResponse
   @PostMapping("/logout")
   @ResponseBody
   public ResponseEntity<String> logout(
@@ -170,12 +176,6 @@ public class AuthController {
   }
 
   @Operation(summary = "Verification email")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Verification email sent successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "404", description = "User not found")
-      })
   @GetMapping("/verify-email")
   public String verifyEmail(@RequestParam(value = "code") String code) {
     userService.verifyEmail(code);
@@ -183,12 +183,11 @@ public class AuthController {
   }
 
   @Operation(summary = "Change user password")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Password changed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad request, validation error"),
-        @ApiResponse(responseCode = "404", description = "User not found")
-      })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Password changed successfully",
+      content = @Content(schema = @Schema(implementation = String.class)))
+  @ErrorResponse
   @PostMapping("/change-password")
   @ResponseBody
   public ResponseEntity<String> changePassword(
