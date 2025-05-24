@@ -6,6 +6,10 @@ import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.services.product.CategoryServiceImpl;
 import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,47 +19,90 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "Product Category Module")
+@Tag(name = "Product Category Module", description = "APIs for managing product categories")
 @RequestMapping("/api/v1/product-categories")
 @RestController
 @RequiredArgsConstructor
 public class ProductCategoryController {
-    private final CategoryServiceImpl productCategoryService;
+  private final CategoryServiceImpl productCategoryService;
 
-    @GetMapping
-    public ResponseEntity<PageVO<CategoryResponseDTO>> getAllProductCategories(
-            @ParameterObject Pageable pageable,
-            @Filter Specification<ProductCategory> specification) {
-        return ResponseEntity.ok(productCategoryService.getAll(specification,
-                pageable.isPaged() ? pageable : Pageable.unpaged()));
-    }
+  @Operation(
+      summary = "Get all product categories",
+      description = "Retrieve a list of all product categories.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved product categories"),
+      })
+  @GetMapping
+  public ResponseEntity<PageVO<CategoryResponseDTO>> getAllProductCategories(
+      @ParameterObject Pageable pageable,
+      @Filter @Parameter(name = "filter") Specification<ProductCategory> specification) {
+    return ResponseEntity.ok(
+        productCategoryService.getAll(
+            specification, pageable.isPaged() ? pageable : Pageable.unpaged()));
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> getProductCategoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(productCategoryService.findById(id));
-    }
+  @Operation(
+      summary = "Get product category by ID",
+      description = "Retrieve a product category by its ID.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved product category"),
+        @ApiResponse(responseCode = "404", description = "Product category not found")
+      })
+  @GetMapping("/{id}")
+  public ResponseEntity<CategoryResponseDTO> getProductCategoryById(@PathVariable("id") Long id) {
+    return ResponseEntity.ok(productCategoryService.findById(id));
+  }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<CategoryResponseDTO> createProductCategory(
-           @Valid @ModelAttribute CategoryRequestDTO dto) {
-        return ResponseEntity.ok(productCategoryService.create(dto));
-    }
+  @Operation(
+      summary = "Create a new product category",
+      description = "Create a new product category.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "Successfully created product category"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data")
+      })
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping(consumes = {"multipart/form-data"})
+  public ResponseEntity<CategoryResponseDTO> createProductCategory(
+      @Valid @ModelAttribute CategoryRequestDTO dto) {
+    return ResponseEntity.ok(productCategoryService.create(dto));
+  }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
-    public ResponseEntity<CategoryResponseDTO> updateProductCategory(
-            @PathVariable Long id,
-            @Valid @ModelAttribute CategoryRequestDTO dto) {
-        return ResponseEntity.ok(productCategoryService.update(id, dto));
-    }
+  @Operation(
+      summary = "Update a product category",
+      description = "Update an existing product category.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated product category"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "404", description = "Product category not found")
+      })
+  @PreAuthorize("hasRole('ADMIN')")
+  @PutMapping(
+      value = "/{id}",
+      consumes = {"multipart/form-data"})
+  public ResponseEntity<CategoryResponseDTO> updateProductCategory(
+      @PathVariable("id") Long id, @Valid @ModelAttribute CategoryRequestDTO dto) {
+    return ResponseEntity.ok(productCategoryService.update(id, dto));
+  }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductCategory(@PathVariable Long id) {
-        productCategoryService.delete(id);
-        return ResponseEntity.ok().build();
-    }
+  @Operation(
+      summary = "Delete a product category",
+      description = "Delete a product category by its ID.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully deleted product category"),
+        @ApiResponse(responseCode = "404", description = "Product category not found")
+      })
+  @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteProductCategory(@PathVariable("id") Long id) {
+    productCategoryService.delete(id);
+    return ResponseEntity.ok().build();
+  }
 }
