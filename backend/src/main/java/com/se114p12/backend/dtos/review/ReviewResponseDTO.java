@@ -7,7 +7,7 @@ import org.springframework.lang.Nullable;
 
 @Data
 public class ReviewResponseDTO extends BaseResponseDTO {
-    private OrderResponseDTO order;   // Đơn hàng được đánh giá
+    private Long orderId;           // Chỉ cần ID của đơn hàng
 
     private Integer rate;          // Số sao đánh giá
     private String content;        // Nội dung đánh giá

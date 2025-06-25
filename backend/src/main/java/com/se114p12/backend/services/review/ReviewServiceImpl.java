@@ -23,6 +23,29 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMapper reviewMapper;
 
     @Override
+    @Transactional(readOnly = true)
+    public PageVO<ReviewResponseDTO> getReviews(Pageable pageable) {
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+        return convertToPageVO(reviewPage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageVO<ReviewResponseDTO> getReviewsByOrder(Long orderId, Pageable pageable) {
+        Page<Review> reviewPage = reviewRepository.findByOrderId(orderId, pageable);
+        return convertToPageVO(reviewPage);
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponseDTO replyToReview(Long reviewId, String reply) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("Review not found"));
+        review.setReply(reply);
+        return reviewMapper.toResponse(reviewRepository.save(review));
+    }
+
+    @Override
     @Transactional
     public ReviewResponseDTO createReview(ReviewRequestDTO request) {
         Order order = orderRepository.findById(request.getOrderId())
@@ -38,26 +61,21 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public PageVO<ReviewResponseDTO> getReviews(int page, int size) {
-        Page<Review> reviewPage = reviewRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()));
-        return convertToPageVO(reviewPage);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public PageVO<ReviewResponseDTO> getReviewsByOrder(Long orderId, int page, int size) {
-        Page<Review> reviewPage = reviewRepository.findByOrderId(orderId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
-        return convertToPageVO(reviewPage);
-    }
-
-    @Override
     @Transactional
-    public ReviewResponseDTO replyToReview(Long reviewId, String reply) {
-        Review review = reviewRepository.findById(reviewId)
+    public ReviewResponseDTO updateReview(Long id, ReviewRequestDTO request) {
+        Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Review not found"));
-        review.setReply(reply);
-        return reviewMapper.toResponse(reviewRepository.save(review));
+
+        if (review.getReply() != null) {
+            throw new IllegalStateException("This order was already replied to");
+        }
+
+        review.setRate(request.getRate());
+        review.setContent(request.getContent());
+        review.setReply(request.getReply());
+
+        Review updatedReview = reviewRepository.save(review);
+        return reviewMapper.toResponse(updatedReview);
     }
 
     @Override

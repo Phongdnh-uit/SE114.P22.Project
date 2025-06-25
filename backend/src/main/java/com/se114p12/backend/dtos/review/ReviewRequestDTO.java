@@ -14,7 +14,7 @@ public class ReviewRequestDTO {
     @Max(5)
     private Integer rate;
 
-    @NotBlank
+    @Nullable
     private String content;
 
     @Nullable

@@ -10,4 +10,9 @@ public interface OrderMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "shipper.id", target = "shipperId")
     OrderResponseDTO entityToResponseDTO(Order order);
+
+    // Ánh xạ từ Order entity sang orderId
+    default Long map(Order order) {
+        return order != null ? order.getId() : null;
+    }
 }

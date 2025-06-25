@@ -6,8 +6,8 @@ import com.se114p12.backend.mappers.order.OrderMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {OrderMapper.class})
+@Mapper(componentModel = "spring", uses = OrderMapper.class)
 public interface ReviewMapper {
-    @Mapping(source = "order", target = "order")
+    @Mapping(source = "order", target = "orderId")
     ReviewResponseDTO toResponse(Review review);
 }
