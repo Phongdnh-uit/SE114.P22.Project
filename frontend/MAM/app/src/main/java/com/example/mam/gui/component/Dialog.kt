@@ -52,6 +52,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.data.UserPreferencesRepository
+import com.example.mam.dto.review.ReviewRequest
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDefault
@@ -252,7 +253,7 @@ fun LoadingAlertDialog() {
 @Composable
 fun OrderRatingDialog(
     orderId: Long,
-    onSubmit: (Int, String) -> Unit,
+    onSubmit: (ReviewRequest) -> Unit,
     onDismiss: () -> Unit
 ) {
     var rating by remember { mutableStateOf(0) }
@@ -318,7 +319,7 @@ fun OrderRatingDialog(
                     ),
                     label = {
                         Text(
-                            text = "Nội dung đánh giá",
+                            text = "Nhận xét",
                             color = BrownDefault,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -342,7 +343,13 @@ fun OrderRatingDialog(
                     disabledContentColor = GreyDefault.copy(alpha = 0.5f)
                 ),
                 onClick = {
-                    onSubmit(rating, comment)
+                    onSubmit(
+                        ReviewRequest(
+                            orderId = orderId,
+                            rate = rating,
+                            content = comment
+                        )
+                    )
                 },
                 enabled = rating > 0
             ) {
@@ -368,8 +375,9 @@ fun PreviewDialog() {
     Column {
         OrderRatingDialog(
             orderId = 12345L,
-            onSubmit = { rating, comment ->
-                // Handle submit action
+            onSubmit = { reviewRequest ->
+                // Handle review submission
+                println("Review submitted: $reviewRequest")
             },
             onDismiss = {}
         )

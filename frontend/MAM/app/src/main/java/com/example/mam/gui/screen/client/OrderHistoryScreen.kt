@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -327,106 +328,5 @@ fun OrderHistoryItem(order: OrderResponse, onClick: () -> Unit = {}) {
     }
 }
 
- @Composable
- fun OrderRating(
-     onEditClick: (ReviewResponse) -> Unit = {},
-     review: ReviewResponse
- ){
-     var isEdit by remember { mutableStateOf(false) }
-     var rating by remember { mutableIntStateOf(review.rate) }
-     var comment by remember { mutableStateOf(review.content) }
-     Column(
-         modifier = Modifier
-             .fillMaxWidth()
-             .wrapContentSize(Alignment.Center),
-         verticalArrangement = Arrangement.spacedBy(8.dp),
-         horizontalAlignment = Alignment.CenterHorizontally
-     ) {
-         Row(
-             modifier = Modifier.padding(vertical = 8.dp),
-             horizontalArrangement = Arrangement.spacedBy(4.dp)
-         ) {
-             repeat(5) { index ->
-                 Icon(
-                     imageVector = if (index < rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                     contentDescription = null,
-                     tint = OrangeDefault,
-                     modifier = Modifier
-                         .size(32.dp)
-                         .clickable {
-                             if (isEdit) rating = index + 1 }
-                 )
-             }
-         }
-         OutlinedTextField(
-             value = comment,
-             onValueChange = { comment = it },
-             readOnly = !isEdit,
-             textStyle = TextStyle(
-                 color = BrownDefault,
-                 fontSize = 14.sp,
-                 fontWeight = FontWeight.Normal,
-             ),
-             colors = OutlinedTextFieldDefaults.colors(
-                 focusedBorderColor = BrownDefault,
-                 unfocusedBorderColor = GreyDefault,
-             ),
-             label = {
-                 Text(
-                     text = "Nội dung đánh giá",
-                     color = BrownDefault,
-                     fontSize = 14.sp,
-                     fontWeight = FontWeight.SemiBold,
-                     modifier = Modifier
-                 )
-             },
-             trailingIcon = {
-                    if (!isEdit)  {
-                        IconButton(
-                            colors = IconButtonColors(
-                                containerColor = WhiteDefault,
-                                contentColor = BrownDefault,
-                                disabledContentColor = BrownDefault,
-                                disabledContainerColor = WhiteDefault
-                            ),
-                            onClick = { isEdit = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Chỉnh sửa đánh giá")
-                        }
-                    }
-             },
-             shape = RoundedCornerShape(20.dp),
-             modifier = Modifier.fillMaxWidth(),
-             keyboardOptions = KeyboardOptions.Default.copy(
-                 keyboardType = KeyboardType.Text,
-                 imeAction = ImeAction.Done
-             ),
-         )
-         if(isEdit){
-             OuterShadowFilledButton(
-                 text = "Lưu đánh giá",
-                 onClick = {
-                     isEdit = false
-                 },
-                 textColor = WhiteDefault,
-                 color = OrangeDefault,
-                 shadowColor = GreyDark,
-                 modifier = Modifier
-                     .fillMaxWidth(0.9f)
-                     .padding(5.dp)
-             )
-         }
-     }
- }
 
- @Preview
-@Composable
- fun Review() {
-     OrderRating(
-         review = ReviewResponse(
-             id = 1,
-             rate = 4,
-             content = "Đánh giá sản phẩm rất tốt, giao hàng nhanh chóng.",
-         )
-     )
- }
 

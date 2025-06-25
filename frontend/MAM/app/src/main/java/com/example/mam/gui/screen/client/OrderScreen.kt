@@ -2,7 +2,9 @@ package com.example.mam.gui.screen.client
 
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowBack
@@ -31,12 +34,15 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentPasteOff
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.HowToReg
 import androidx.compose.material.icons.outlined.Inventory
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.LocalShipping
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -48,6 +54,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -55,6 +62,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,6 +76,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,12 +86,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.yml.charts.common.extensions.isNotNull
 import coil.compose.AsyncImage
 import com.example.mam.R
 import com.example.mam.dto.cart.CartItemResponse
 import com.example.mam.dto.order.OrderDetailResponse
+import com.example.mam.dto.review.ReviewRequest
+import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OrderItemContainer
+import com.example.mam.gui.component.OrderRatingDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.QuantitySelectionButton
 import com.example.mam.gui.component.outerShadow
@@ -112,13 +126,37 @@ fun OrderScreen(
     val order = viewModel.order.collectAsStateWithLifecycle().value
     val shipper = viewModel.shipper.collectAsStateWithLifecycle().value
     val user = viewModel.user.collectAsStateWithLifecycle().value
+    val review = viewModel.review.collectAsStateWithLifecycle().value
     val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
 
+    val isReviewing = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    LaunchedEffect(isReviewing) {
+        viewModel.loadReview()
+    }
     LaunchedEffect(Unit) {
         viewModel.loadOrder()
     }
+    if (isReviewing.value) {
+        OrderRatingDialog(
+            orderId = order.id,
+            onDismiss = { isReviewing.value = false },
+            onSubmit = { reviewRequest ->
+                scope.launch {
+                    val result = viewModel.createReview(reviewRequest)
+                    if (result == 1) {
+                        Toast.makeText(context, "MaM xin cảm ơn", Toast.LENGTH_SHORT).show()
+                        isReviewing.value = false
+                    } else {
+                        Toast.makeText(context, "Không thể gửi đánh giá", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+        )
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -470,7 +508,7 @@ fun OrderScreen(
             item {
                 Text(
                     text = "Danh sách sản phẩm",
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     color = BrownDefault,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -484,82 +522,223 @@ fun OrderScreen(
                     item = item
                 )
             }
-        }
-    }
-}
-
-    @Composable
-    fun OrderItem(
-        item: OrderDetailResponse,
-        modifier: Modifier = Modifier,
-    ) {
-        Surface(
-            shadowElevation = 4.dp, // Elevation applied here instead
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = WhiteDefault
-                ),
-                modifier = Modifier
-                    .animateContentSize()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier
-                ) {
-                    AsyncImage(
-                        model = item.getRealUrl(), // Đây là URL từ API
-                        contentDescription = null,
-                        placeholder = painterResource(R.drawable.ic_mam_logo),
-                        contentScale = ContentScale.Crop,
+            if (review != null) {
+                item {
+                    Text(
+                        text = "Đánh giá của bạn",
+                        fontSize = 16.sp,
+                        color = BrownDefault,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .padding(8.dp)
-                            .size(80.dp)
-                            .clip(CircleShape)
+                            .padding(start = 10.dp)
+                            .fillMaxWidth()
                     )
-                    Column(
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .weight(1f)
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Top,
-                            modifier = Modifier.fillMaxWidth().padding(0.dp, 8.dp, 8.dp, 8.dp)
-                        ) {
-                            Text(
-                                text = item.productName + " *" + item.quantity,
-                                textAlign = TextAlign.Start,
-                                color = BrownDefault,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            if (item.variationInfo != null)
-                                Text(
-                                    text = item.variationInfo,
-                                    textAlign = TextAlign.Start,
-                                    color = GreyDefault,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                        }
-                        Text(
-                            text = item.getPrice(),
-                            textAlign = TextAlign.End,
-                            color = OrangeDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                }
+                item {
+                    OrderRating(
+                        review = review,
+                        onEditClick = { reviewRequest ->
+                            scope.launch {
+                                if (viewModel.updateReview(
+                                        review.id,
+                                        ReviewRequest(
+                                            orderId = review.orderId,
+                                            rate = reviewRequest.rate,
+                                            content = reviewRequest.content,
+                                        )) == 1) {
+                                    Toast.makeText(
+                                        context,
+                                        "Đánh giá đã được cập nhật",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    viewModel.loadReview() // Reload review after update
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Không thể cập nhật đánh giá",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
+                }
+            } else if (order.orderStatus == "COMPLETED") {
+                item {
+                    OuterShadowFilledButton(
+                        text = "Đánh giá đơn hàng",
+                        icon = Icons.Default.Star,
+                        onClick = { isReviewing.value = true },
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
                 }
             }
         }
     }
+}
+
+@Composable
+fun OrderRating(
+    onEditClick: (ReviewRequest) -> Unit = {},
+    review: ReviewResponse,
+    modifier: Modifier = Modifier
+){
+    var isEdit by remember { mutableStateOf(false) }
+    var rate by remember { mutableIntStateOf(review.rate) }
+    var comment by remember { mutableStateOf(review.content)}
+    var reply by remember { mutableStateOf(review.reply) }
+    Surface(
+        color = WhiteDefault,
+        shadowElevation = 4.dp, // Elevation applied here instead
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Column(
+            modifier = modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                repeat(5) { index ->
+                    Icon(
+                        imageVector = if (index < rate) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                        tint = OrangeDefault,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable {
+                                if (isEdit) rate = index + 1
+                            }
+                    )
+                }
+            }
+            comment?.let {
+                OutlinedTextField(
+                    value = it,
+                    onValueChange = { comment = it },
+                    readOnly = !isEdit,
+                    textStyle = TextStyle(
+                        color = BrownDefault,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BrownDefault,
+                        unfocusedBorderColor = GreyDefault,
+                    ),
+                    label = {
+                        Text(
+                            text = "Nhận xét",
+                            color = BrownDefault,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                        )
+                    },
+                    trailingIcon = {
+                        if (!isEdit && reply.isNullOrEmpty()) {
+                            IconButton(
+                                colors = IconButtonColors(
+                                    containerColor = WhiteDefault,
+                                    contentColor = BrownDefault,
+                                    disabledContentColor = BrownDefault,
+                                    disabledContainerColor = WhiteDefault
+                                ),
+                                onClick = { isEdit = true }) {
+                                Icon(Icons.Default.Edit, contentDescription = "Chỉnh sửa đánh giá")
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                )
+            }
+            if (isEdit && reply == null) {
+                OuterShadowFilledButton(
+                    text = "Lưu đánh giá",
+                    onClick = {
+                        isEdit = false
+                        onEditClick(
+                            ReviewRequest(
+                                orderId = review.orderId,
+                                rate = rate,
+                                content = comment,
+                                reply = reply
+                            )
+                        )
+                    },
+                    textColor = WhiteDefault,
+                    color = OrangeDefault,
+                    shadowColor = GreyDark,
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(5.dp)
+                )
+            }
+            reply?.let {
+                Row {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_mam_logo),
+                        contentDescription = "MAM Logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(GreyAvaDefault)
+                    )
+                    OutlinedTextField(
+                        value = it,
+                        onValueChange = { },
+                        readOnly = true,
+                        textStyle = TextStyle(
+                            color = BrownDefault,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrownDefault,
+                            unfocusedBorderColor = GreyDefault,
+                        ),
+                        label = {
+                            Text(
+                                text = "Phản hồi từ MAM",
+                                color = BrownDefault,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                            )
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun OrderRatingPreview() {
+    OrderRating(
+        review = ReviewResponse(
+            orderId = 1,
+            rate = 4,
+            content = "Món ăn rất ngon, giao hàng nhanh chóng!",
+//            reply = "Cảm ơn bạn đã đánh giá!"
+        )
+    )
+}

@@ -12,6 +12,7 @@ import com.example.mam.MAMApplication
 import com.example.mam.data.Constant
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.order.OrderResponse
+import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.shipper.ShipperResponse
 import com.example.mam.dto.user.UserResponse
 import com.example.mam.repository.BaseRepository
@@ -42,6 +43,9 @@ class ManageOrderViewModel(
 
     private val _order = MutableStateFlow<OrderResponse>(OrderResponse())
     val order = _order.asStateFlow()
+
+    private val _review = MutableStateFlow<ReviewResponse?>(null)
+    val review = _review.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -168,6 +172,8 @@ class ManageOrderViewModel(
         }
 
     }
+
+
     suspend fun cancelOrder() :Int {
         try {
             val response = BaseRepository(userPreferencesRepository).orderRepository.cancelOrder(_orderID.value)
@@ -186,6 +192,70 @@ class ManageOrderViewModel(
             return 0
             // Handle exception
         }
+    }
+
+
+    suspend fun loadReview() {
+        try {
+            Log.d("Order", "Bắt đầu lấy đánh giá")
+            Log.d(
+                "Order",
+                "DSAccessToken: ${userPreferencesRepository.accessToken.first()}"
+            )
+            Log.d("Order", "${_orderID.value}")
+            val response =
+                BaseRepository(userPreferencesRepository).orderRepository.getReviewByOrderId(_orderID.value)
+            Log.d("Order", "Status code: ${response.code()}")
+            if (response.isSuccessful) {
+                val review = response.body()
+                if (review != null) {
+                    _review.value = review
+                    Log.d("Order", "Lấy đánh giá thành công: ${review.rate}, ${review.content}")
+                } else {
+                    Log.d("Order", "Không có đánh giá cho đơn hàng này")
+                }
+            } else {
+                Log.d("Order", "Lấy đánh giá thất bại: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            Log.d("Order", "Không thể lấy đánh giá: ${e.message}")
+        } finally {
+            Log.d("Order", "Kết thúc lấy đánh giá")
+        }
+    }
+
+    suspend fun reply(content: String) : Int {
+        try {
+            Log.d("Order", "Bắt đầu trả lời đánh giá")
+            Log.d(
+                "Order",
+                "DSAccessToken: ${userPreferencesRepository.accessToken.first()}"
+            )
+            val response = _review.value?.let {
+                BaseRepository(userPreferencesRepository)
+                    .orderRepository
+                    .replyToReview(it.id, content)
+            }
+            if (response != null) {
+                Log.d("Order", "Status code: ${response.code()}")
+            }
+            if (response != null) {
+                if (response.isSuccessful) {
+                    loadReview()
+                    return 1
+                } else {
+                    Log.d("Order", "Trả lời đánh giá thất bại: ${response.errorBody()?.string()}")
+                    return 0
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("Order", "Không thể trả lời đánh giá: ${e.message}")
+            return 0
+        }
+        finally {
+            Log.d("Order", "Kết thúc trả lời đánh giá")
+        }
+        return 0
     }
 
     companion object {
