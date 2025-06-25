@@ -14,6 +14,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -55,7 +57,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .setOrder(order)
                 .setRate(request.getRate())
                 .setContent(request.getContent())
-                .setReply(request.getReply());
+                .setReply(null);
 
         return reviewMapper.toResponse(reviewRepository.save(review));
     }
@@ -66,13 +68,13 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Review not found"));
 
-        if (review.getReply() != null) {
+        if (review.getReply() != null && !review.getReply().isEmpty()) {
             throw new IllegalStateException("This order was already replied to");
         }
 
         review.setRate(request.getRate());
         review.setContent(request.getContent());
-        review.setReply(request.getReply());
+        review.setReply(null);
 
         Review updatedReview = reviewRepository.save(review);
         return reviewMapper.toResponse(updatedReview);
