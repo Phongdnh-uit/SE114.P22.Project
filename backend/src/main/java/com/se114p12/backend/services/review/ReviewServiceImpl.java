@@ -33,9 +33,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageVO<ReviewResponseDTO> getReviewsByOrder(Long orderId, Pageable pageable) {
-        Page<Review> reviewPage = reviewRepository.findByOrderId(orderId, pageable);
-        return convertToPageVO(reviewPage);
+    public ReviewResponseDTO getReviewsByOrder(Long orderId) {
+        Review reviewPage = reviewRepository.findByOrderId(orderId);
+        return reviewMapper.toResponse(reviewPage);
     }
 
     @Override
@@ -56,7 +56,9 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = new Review()
                 .setOrder(order)
                 .setRate(request.getRate())
-                .setContent(request.getContent())
+                .setContent((request.getContent() == null
+                        || request.getContent().trim().isEmpty())
+                        ? null : request.getContent().trim())
                 .setReply(null);
 
         return reviewMapper.toResponse(reviewRepository.save(review));
@@ -74,7 +76,6 @@ public class ReviewServiceImpl implements ReviewService {
 
         review.setRate(request.getRate());
         review.setContent(request.getContent());
-        review.setReply(null);
 
         Review updatedReview = reviewRepository.save(review);
         return reviewMapper.toResponse(updatedReview);

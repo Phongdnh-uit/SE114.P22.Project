@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 public interface ReviewService {
     PageVO<ReviewResponseDTO> getReviews(Pageable pageable);
 
-    PageVO<ReviewResponseDTO> getReviewsByOrder(Long orderId, Pageable pageable);
+    ReviewResponseDTO getReviewsByOrder(Long orderId);
 
     ReviewResponseDTO replyToReview(Long reviewId, String reply);
 

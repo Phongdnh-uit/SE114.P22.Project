@@ -45,10 +45,8 @@ public class ReviewController {
     })
     @ErrorResponse
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<PageVO<ReviewResponseDTO>> getReviewsByOrder(
-            @PathVariable Long orderId, @ParameterObject Pageable pageable
-    ) {
-        return ResponseEntity.ok(reviewService.getReviewsByOrder(orderId, pageable));
+    public ResponseEntity<ReviewResponseDTO> getReviewsByOrder(@PathVariable Long orderId) {
+        return ResponseEntity.ok(reviewService.getReviewsByOrder(orderId));
     }
 
     @Operation(summary = "Create a reply to the review", description = "Add new content to the reply")
