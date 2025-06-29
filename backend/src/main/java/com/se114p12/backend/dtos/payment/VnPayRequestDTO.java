@@ -6,10 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VnPayRequestDTO {
+    private Long orderId;
     private String orderInfo;
     private String orderType;
-    private String txnRef;
-    private int amount;
+    //private String txnRef;
     private String bankCode;
     private String language;
 
@@ -28,4 +28,6 @@ public class VnPayRequestDTO {
     private String invCompany;
     private String invTaxCode;
     private String invType;
+
+    private String returnUrl;
 }
