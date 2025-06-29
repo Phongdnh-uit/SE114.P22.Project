@@ -234,7 +234,7 @@ class CheckOutViewModel(
             val response = BaseRepository(userPreferencesRepository).paymentRepository.createPayment(request)
             Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
             if (response.isSuccessful) {
-                Log.d("CheckOutViewModel", "Payment created successfully")
+                Log.d("CheckOutViewModel", "Payment created successfully url: ${response.body()?.get("data")}")
                 return response.body()?.get("data") as? String ?: ""
             } else {
                 Log.d("CheckOutViewModel", "Failed to create payment (BE): ${response.errorBody()?.string()}")

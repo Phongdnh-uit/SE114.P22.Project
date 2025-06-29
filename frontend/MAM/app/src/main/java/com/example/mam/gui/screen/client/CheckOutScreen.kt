@@ -2,6 +2,7 @@ package com.example.mam.gui.screen.client
 
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -478,17 +479,18 @@ fun CheckOutScreen(
                                         Toast.makeText(context, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show()
                                         if (selectedPaymentOption == "VNPAY"){
                                             val vnpayUrl = viewModel.createPayment(result)
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(vnpayUrl))
-                                            context.startActivity(intent)
+                                            if (!vnpayUrl.isNullOrBlank()) {
+                                                WebView(context).loadUrl(vnpayUrl)
+                                            } else {
+                                                Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                         onCheckOutClicked()
                                     } else {
                                         Toast.makeText(context, "Đặt hàng thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
                                     }
                                     onCheckOutClicked()
-                                }
-
-                                      },
+                                } },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )
                     }

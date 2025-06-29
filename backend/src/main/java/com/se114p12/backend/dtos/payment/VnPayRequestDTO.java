@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VnPayRequestDTO {
-    private String orderId;
+    private Long orderId;
     private String orderInfo;
     private String orderType;
     private String bankCode;
