@@ -62,6 +62,15 @@ class CheckOutViewModel(
 
     val _paymentOption = MutableStateFlow("") // Default payment option
     val paymentOption = _paymentOption.asStateFlow()
+
+    val _isPaying = MutableStateFlow(false)
+    val isPaying = _isPaying.asStateFlow()
+
+    fun setIsPaying(isPaying: Boolean) {
+        _isPaying.value = isPaying
+        Log.d("CheckOutViewModel", "Payment state updated: $isPaying")
+    }
+
     private fun setTotal(){
         val total = _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
             ?: BigDecimal.ZERO)
@@ -201,16 +210,36 @@ class CheckOutViewModel(
             Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
             if (response.isSuccessful) {
                 Log.d("CheckOutViewModel", "Order created successfully")
-                return 1 // Success
+                return response.body()?.id?.toInt() ?: -1 // Success
             } else {
                 Log.d("CheckOutViewModel", "Failed to check out (BE): ${response.errorBody()?.string()}")
-                return 0 // Failure
+                return -1 // Failure
             }
         }
         catch (e: Exception) {
             e.printStackTrace()
             Log.d("CheckOutViewModel", "Failed to check out: ${e.message}")
-            return 0
+            return -1
+        }
+    }
+
+    suspend fun createPayment(orderId: Int ): Int {
+        try {
+            val request = vnpayRequest(orderId.toLong(),orderId.toString(), "Thanhtoanhoadon",  )
+            Log.d("CheckOutViewModel", "Creating payment for order ID: $orderId")
+            val response = BaseRepository(userPreferencesRepository).paymentRepository.createPayment(orderId)
+            Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("CheckOutViewModel", "Payment created successfully")
+                return response.body()?.id?.toInt() ?: -1 // Success
+            } else {
+                Log.d("CheckOutViewModel", "Failed to create payment (BE): ${response.errorBody()?.string()}")
+                return -1 // Failure
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CheckOutViewModel", "Failed to create payment: ${e.message}")
+            return -1
         }
     }
 

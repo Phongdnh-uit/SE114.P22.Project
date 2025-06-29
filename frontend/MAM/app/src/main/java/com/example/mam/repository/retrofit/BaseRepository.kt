@@ -7,6 +7,7 @@ import com.example.mam.repository.CartItemRepository
 import com.example.mam.repository.CartRepository
 import com.example.mam.repository.NotificationRepository
 import com.example.mam.repository.OrderRepository
+import com.example.mam.repository.PaymentRepository
 import com.example.mam.repository.ProductCategoryRepository
 import com.example.mam.repository.ProductRepository
 import com.example.mam.repository.PromotionRepository
@@ -73,5 +74,8 @@ class BaseRepository(userPreferencesRepository: UserPreferencesRepository) {
     }
     val stastiticRepository: StastiticRepository by lazy {
         privateRetrofit.create(StastiticRepository::class.java)
+    }
+    val paymentRepository: PaymentRepository by lazy {
+        privateRetrofit.create(PaymentRepository::class.java)
     }
 }

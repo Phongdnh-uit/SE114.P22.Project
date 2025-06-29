@@ -79,6 +79,7 @@ import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OrderItemContainer
 import com.example.mam.gui.component.OuterShadowFilledButton
+import com.example.mam.gui.component.PaymentLoadingAlertDialog
 import com.example.mam.gui.component.innerShadow
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -116,6 +117,7 @@ fun CheckOutScreen(
     val scope = rememberCoroutineScope()
 
     var paymentExpanded by remember { mutableStateOf(false) }
+    val isPaying = viewModel.isPaying.collectAsStateWithLifecycle().value
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.loadCart()
@@ -123,6 +125,10 @@ fun CheckOutScreen(
         viewModel.loadUser()
         viewModel.loadAddress()
         viewModel.loadDiscounts()
+    }
+
+    if (isPaying) {
+        PaymentLoadingAlertDialog()
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -466,10 +472,10 @@ fun CheckOutScreen(
                             onClick = {
                                 scope.launch {
                                     val result = viewModel.checkOut()
-                                    if (result == 1) {
+                                    if (result != -1) {
                                         Toast.makeText(context, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show()
                                         if (selectedPaymentOption == "VNPAY"){
-                                            
+
                                         }
                                         onCheckOutClicked()
                                     } else {
