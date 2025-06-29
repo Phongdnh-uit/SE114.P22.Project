@@ -9,7 +9,6 @@ public class VnPayRequestDTO {
     private Long orderId;
     private String orderInfo;
     private String orderType;
-    //private String txnRef;
     private String bankCode;
     private String language;
 
@@ -29,5 +28,5 @@ public class VnPayRequestDTO {
     private String invTaxCode;
     private String invType;
 
-    private String returnUrl;
+    private String redirectUrl;
 }
