@@ -1,7 +1,6 @@
 package com.example.mam.viewmodel.management
 
 import android.content.Context
-import android.icu.util.UniversalTimeScale.toBigDecimal
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -20,7 +19,7 @@ import com.example.mam.dto.variation.VariationOptionRequest
 import com.example.mam.dto.variation.VariationOptionResponse
 import com.example.mam.dto.variation.VariationRequest
 import com.example.mam.dto.variation.VariationResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import com.example.mam.viewmodel.ImageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +29,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.math.BigDecimal
 import java.time.Instant
 
 class ManageProductViewModel(

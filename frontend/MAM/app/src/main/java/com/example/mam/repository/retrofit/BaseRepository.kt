@@ -1,6 +1,21 @@
-package com.example.mam.repository
+package com.example.mam.repository.retrofit
 
 import com.example.mam.data.UserPreferencesRepository
+import com.example.mam.repository.AuthPrivateRepository
+import com.example.mam.repository.AuthPublicRepository
+import com.example.mam.repository.CartItemRepository
+import com.example.mam.repository.CartRepository
+import com.example.mam.repository.NotificationRepository
+import com.example.mam.repository.OrderRepository
+import com.example.mam.repository.ProductCategoryRepository
+import com.example.mam.repository.ProductRepository
+import com.example.mam.repository.PromotionRepository
+import com.example.mam.repository.ShipperRepository
+import com.example.mam.repository.StastiticRepository
+import com.example.mam.repository.UserPromotionRepository
+import com.example.mam.repository.UserRepository
+import com.example.mam.repository.VariationOptionRepository
+import com.example.mam.repository.VariationRepository
 
 //BaseService để khởi tạo Retrofit client và gọi các service
 class BaseRepository(userPreferencesRepository: UserPreferencesRepository) {

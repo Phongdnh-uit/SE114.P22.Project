@@ -1,4 +1,4 @@
-package com.example.mam.repository
+package com.example.mam.repository.retrofit
 
 import android.util.Log
 import com.example.mam.data.UserPreferencesRepository

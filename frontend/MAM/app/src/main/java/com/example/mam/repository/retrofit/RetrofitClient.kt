@@ -1,4 +1,4 @@
-package com.example.mam.repository
+package com.example.mam.repository.retrofit
 
 import com.example.mam.data.Constant.BASE_URL
 import com.example.mam.data.UserPreferencesRepository

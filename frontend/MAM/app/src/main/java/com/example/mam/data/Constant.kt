@@ -1,15 +1,5 @@
 package com.example.mam.data
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.LocalOffer
-import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.RestaurantMenu
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.graphics.vector.ImageVector
-
 object Constant {
     const val BASE_URL = "http://192.168.123.12:8080/api/v1/"
     const val STORAGE_URL = BASE_URL + "storage/images?url="
@@ -22,7 +12,7 @@ object Constant {
         ORDER_STATUS,
         PAYMENT_METHOD,
     }
-    enum class OrderStatus {
+    enum class notiStatus {
         GENERAL,              // Thông báo chung
         ORDER_PLACED,         // Đơn hàng đã được đặt
         ORDER_RECEIVED,          // Đơn hàng đã được tiếp nhận

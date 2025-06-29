@@ -468,6 +468,9 @@ fun CheckOutScreen(
                                     val result = viewModel.checkOut()
                                     if (result == 1) {
                                         Toast.makeText(context, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show()
+                                        if (selectedPaymentOption == "VNPAY"){
+                                            
+                                        }
                                         onCheckOutClicked()
                                     } else {
                                         Toast.makeText(context, "Đặt hàng thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()

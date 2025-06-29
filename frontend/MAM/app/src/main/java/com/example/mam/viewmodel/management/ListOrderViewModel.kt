@@ -13,7 +13,7 @@ import com.example.mam.dto.order.OrderRequest
 import com.example.mam.dto.order.OrderResponse
 import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.user.UserResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
