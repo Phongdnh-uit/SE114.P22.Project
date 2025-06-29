@@ -1,12 +1,11 @@
 package com.example.mam.dto.payment
 
-data class VnPayRequestDTO (
+data class VnPayRequest (
     val orderId: Long = 0L,
-    val orderInfo: String? = null,
-    val orderType: String? = null,
-    val txnRef: String? = null,
-    val bankCode: String? = null,
-    val language: String? = null,
+    val orderInfo: String? = orderId.toString(),
+    val orderType: String? = "billpayment",
+    val bankCode: String? = "NCB",
+    val language: String? = "vn",
 
     val billingMobile: String? = null,
     val billingEmail: String? = null,
@@ -23,4 +22,6 @@ data class VnPayRequestDTO (
     val invCompany: String? = null,
     val invTaxCode: String? = null,
     val invType: String? = null,
+
+    val returnUrl : String,
 )

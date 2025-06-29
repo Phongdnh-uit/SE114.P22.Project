@@ -1,5 +1,7 @@
 package com.example.mam.gui.screen.client
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -475,7 +477,9 @@ fun CheckOutScreen(
                                     if (result != -1) {
                                         Toast.makeText(context, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show()
                                         if (selectedPaymentOption == "VNPAY"){
-
+                                            val vnpayUrl = viewModel.createPayment(result)
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(vnpayUrl))
+                                            context.startActivity(intent)
                                         }
                                         onCheckOutClicked()
                                     } else {

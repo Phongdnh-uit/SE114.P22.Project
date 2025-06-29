@@ -38,7 +38,8 @@ fun PaymentResultScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            if (isSuccess) "Thanh toán thành công!" else "Thanh toán thất bại! $responseCode, $transactionStatus",
+            //if (isSuccess) "Thanh toán thành công!" else "Thanh toán thất bại! $responseCode, $transactionStatus",
+            uri.toString(),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,

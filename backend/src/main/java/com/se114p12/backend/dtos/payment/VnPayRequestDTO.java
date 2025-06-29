@@ -27,6 +27,7 @@ public class VnPayRequestDTO {
     private String invCompany;
     private String invTaxCode;
     private String invType;
-    
+
+    private String returnUrl;
 
 }
