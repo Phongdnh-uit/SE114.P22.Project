@@ -96,4 +96,17 @@ public class CartController {
         cartService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Count cart items of current user", description = "Get the number of items in current user's cart")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully counted items", content = @Content(schema = @Schema(implementation = Integer.class))),
+            @ApiResponse(responseCode = "404", description = "Cart not found")
+    })
+    @ErrorResponse
+    @GetMapping("/me/count")
+    public ResponseEntity<Integer> countCartItemsOfCurrentUser() {
+        Long userId = jwtUtil.getCurrentUserId();
+        int itemCount = cartService.countCartItemsByUserId(userId);
+        return ResponseEntity.ok(itemCount);
+    }
 }

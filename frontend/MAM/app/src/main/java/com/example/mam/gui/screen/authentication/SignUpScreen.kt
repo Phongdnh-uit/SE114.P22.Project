@@ -42,6 +42,7 @@ import com.example.mam.R
 import com.example.mam.dto.authentication.SignUpRequest
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.EditFieldType1
+import com.example.mam.gui.component.LoadingAlertDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordFieldType1
 import com.example.mam.gui.component.UnderlinedClickableText
@@ -66,6 +67,10 @@ fun SignUpScreen(
     val context = LocalContext.current
     val signUpState: SignUpRequest by viewModel.signUpState.collectAsStateWithLifecycle()
     val repeatPassword: String by viewModel.repeatPassword.collectAsStateWithLifecycle()
+    val isLoading =  viewModel.isLoading.collectAsStateWithLifecycle().value
+    if (isLoading) {
+        LoadingAlertDialog()
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -213,6 +218,7 @@ fun SignUpScreen(
                         text = "Đăng Ký",
                         isEnable = viewModel.isSignUpButtonEnable(),
                         onClick = {
+                            viewModel.triggerLoading()
                             scope.launch{
                                 val result = viewModel.signUp()
                                 if (result == 1){
@@ -221,6 +227,7 @@ fun SignUpScreen(
                                         "Đăng ký thành công! Vui lòng xác thực qua mail để tiếp tục",
                                         Toast.LENGTH_LONG
                                     ).show()
+                                    viewModel.resetLoading()
                                     onSignInClicked()
                                 }
                                 else {
@@ -229,6 +236,7 @@ fun SignUpScreen(
                                         "Đăng ký thất bại",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    viewModel.resetLoading()
                                 }
                             }
                         },

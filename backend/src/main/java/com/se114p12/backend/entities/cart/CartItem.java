@@ -6,6 +6,8 @@ import com.se114p12.backend.entities.product.Product;
 import com.se114p12.backend.entities.variation.VariationOption;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
@@ -23,7 +25,11 @@ public class CartItem extends BaseEntity {
   @JoinColumn(name = "product_id", nullable = false)
   private Product product;
 
-  @NotNull private Long quantity;
+  @NotNull
+  private Long quantity;
+
+  @NotNull
+  private BigDecimal price;
 
   @ManyToMany
   @JoinTable(

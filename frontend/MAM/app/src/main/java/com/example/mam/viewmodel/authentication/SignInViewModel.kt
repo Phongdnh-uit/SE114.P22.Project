@@ -31,6 +31,9 @@ class SignInViewModel(
     private val _signInState = MutableStateFlow(SignInRequest())
     val signInState = _signInState.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     private val _me = MutableStateFlow(UserResponse())
 
     fun setUsername(it: String) {
@@ -39,6 +42,14 @@ class SignInViewModel(
 
     fun setSIPassword(it: String) {
         _signInState.update { state -> state.copy(password = it.trim()) }
+    }
+
+    fun triggerLoading() {
+        _isLoading.value = true
+    }
+
+    fun resetLoading() {
+        _isLoading.value = false
     }
 
     suspend fun SignIn(): Int {
@@ -63,7 +74,7 @@ class SignInViewModel(
                 userPreferencesRepository.saveAccessToken(token?.accessToken ?: "", token?.refreshToken ?:"")
                 Log.d("LOGIN", "DSAccessToken: ${accessToken.first()}")
                 Log.d("LOGIN", "DSRefreshToken: ${refreshToken.first()}")
-
+                _isLoading.value = false
                 return if (_me.value.status == "DELETED") -1
                 else if (_me.value.status == "BLOCKED") -2
                 else if (_me.value.status == "PENDING") -3
@@ -73,15 +84,18 @@ class SignInViewModel(
             }
             else{
                 Log.e("LOGIN", "Đăng nhập thất bại với mã lỗi: ${response.errorBody()?.string()}")
+                _isLoading.value = false
                 return 0
             }
         } catch (e: Exception) {
             Log.e("LOGIN", "Lỗi khi đăng nhập: ${e.message}")
+            _isLoading.value = false
             return 0
         }
     }
 
     suspend fun signInWithFirebase(idToken: String): Int {
+        Log.d("LOGIN", "ID Token: $idToken")
         try {
             val request = FirebaseLoginRequest(idToken)
             // Gọi service đăng nhập với Firebase
@@ -101,7 +115,7 @@ class SignInViewModel(
                 userPreferencesRepository.saveAccessToken(token?.accessToken ?: "", token?.refreshToken ?:"")
                 Log.d("LOGIN", "DSAccessToken: ${accessToken.first()}")
                 Log.d("LOGIN", "DSRefreshToken: ${refreshToken.first()}")
-
+                _isLoading.value = false
                 return if (_me.value.status == "DELETED") -1
                 else if (_me.value.status == "BLOCKED") -2
                 else if (_me.value.status == "PENDING") -3
@@ -110,10 +124,12 @@ class SignInViewModel(
                 else 0
             } else {
                 Log.e("LOGIN", "Đăng nhập thất bại với mã lỗi: ${response.errorBody()?.string()}")
+                _isLoading.value = false
                 return 0
             }
         } catch (e: Exception) {
             Log.e("LOGIN", "Lỗi khi đăng nhập với Firebase: ${e.message}")
+            _isLoading.value = false
             return 0
         }
     }
@@ -127,13 +143,16 @@ class SignInViewModel(
             )
             if (response.isSuccessful) {
                 Log.d("LOGIN", "Email xác thực đã được gửi lại thành công.")
+                _isLoading.value = false
                 return 1
             } else {
                 Log.e("LOGIN", "Gửi lại email xác thực thất bại: ${response.errorBody()?.string()}")
+                _isLoading.value = false
                 return 0
             }
         } catch (e: Exception) {
             Log.e("LOGIN", "Lỗi khi gửi lại email xác thực: ${e.message}")
+            _isLoading.value = false
             return 0
         }
     }

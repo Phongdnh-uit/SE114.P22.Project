@@ -1,6 +1,7 @@
 package com.se114p12.backend.controllers.delivery;
 
 import com.se114p12.backend.configs.ShopLocationConfig;
+import com.se114p12.backend.constants.AppConstant;
 import com.se114p12.backend.dtos.delivery.DeliveryRequestDTO;
 import com.se114p12.backend.dtos.delivery.DeliveryResponseDTO;
 import com.se114p12.backend.services.delivery.MapService;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Delivery Module", description = "APIs for managing deliveries")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/delivery")
+@RequestMapping(AppConstant.API_BASE_PATH + "/delivery")
 public class DeliveryController {
 
     private final MapService mapboxService;

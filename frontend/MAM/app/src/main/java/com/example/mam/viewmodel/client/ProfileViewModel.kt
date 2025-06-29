@@ -95,9 +95,9 @@ class ProfileViewModel(
             val currentUser = _user.value
             Log.d("ME", "Ma nguoi dung ${_user.value.id}, ${currentUser.id}, ${_userId.value}")
             val fullname = currentUser.fullname.toRequestBody("text/plain".toMediaType())
-            Log.d("ME", "ID: ${currentUser.fullname}")
+            Log.d("ME", "fullname: ${currentUser.fullname}")
             val username = currentUser.username.toRequestBody("text/plain".toMediaType())
-            Log.d("ME", "ID: ${currentUser.username}")
+            Log.d("ME", "username: ${currentUser.username}")
             val email = currentUser.email.toRequestBody("text/plain".toMediaType())
             Log.d("ME", "ID: ${currentUser.email}")
             val phone = currentUser.phone.toRequestBody("text/plain".toMediaType())

@@ -15,4 +15,6 @@ public interface CartService {
     void delete(Long id);
 
     boolean existsByIdAndUserId(Long id, Long userId);
+
+    int countCartItemsByUserId(Long userId);
 }

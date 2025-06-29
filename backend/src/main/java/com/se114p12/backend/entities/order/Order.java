@@ -1,5 +1,7 @@
 package com.se114p12.backend.entities.order;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.se114p12.backend.entities.review.Review;
 import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.entities.shipper.Shipper;
 import com.se114p12.backend.enums.OrderStatus;
@@ -60,6 +62,10 @@ public class Order extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "shipper_id")
     private Shipper shipper;
+
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Review review;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails;

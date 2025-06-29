@@ -93,6 +93,8 @@ class CartViewModel(
                     variationOptionIds = item.variationOptionIds
                 )
             )
+            Log.d("CartViewModel", "Increasing item quantity for ID: ${item.id}")
+            Log.d("CartViewModel", "Product ID: ${item.productId}, Current Quantity: ${item.quantity}, New Quantity: ${item.quantity + 1}, Variation Options: ${item.variationOptionIds}")
             Log.d("CartViewModel", "Response Code: ${response.code()}")
             if (response.isSuccessful){
                 _cart.value.cartItems.find { it.id == item.id }?.let {

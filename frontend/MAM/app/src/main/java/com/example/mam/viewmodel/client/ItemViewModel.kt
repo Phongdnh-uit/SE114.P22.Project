@@ -42,6 +42,30 @@ class ItemViewModel(
     private val _selectedOptions = MutableStateFlow<List<VariationOptionResponse>>(emptyList())
     val selectedOptions = _selectedOptions.asStateFlow()
 
+    private val _cartCount = MutableStateFlow<Int>(0)
+    val cartCount = _cartCount.asStateFlow()
+
+    suspend fun loadCartCount() {
+        try {
+            val response = BaseRepository(userPreferencesRepository).cartRepository.getMyCartCount()
+            Log.d("ItemViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                val count = response.body()
+                if (count != null) {
+                    _cartCount.value = count
+                    Log.d("ItemViewModel", "Cart count loaded: $count")
+                } else {
+                    Log.d("ItemViewModel", "No cart found")
+                }
+            } else {
+                Log.d("ItemViewModel", "Failed to load cart count: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("ItemViewModel", "Failed to load cart count: ${e.message}")
+        }
+    }
+
     fun setQuantity(newQuantity: Int) {
         if (newQuantity > 0) {
             _quantity.value = newQuantity

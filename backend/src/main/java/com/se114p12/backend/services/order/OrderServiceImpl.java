@@ -34,6 +34,7 @@ import com.se114p12.backend.repositories.shipper.ShipperRepository;
 import com.se114p12.backend.services.delivery.MapService;
 import com.se114p12.backend.services.promotion.UserPromotionService;
 import com.se114p12.backend.util.JwtUtil;
+import com.se114p12.backend.util.VnPayUtils;
 import com.se114p12.backend.vo.PageVO;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
@@ -180,6 +181,9 @@ public class OrderServiceImpl implements OrderService {
         (totalPrice.compareTo(BigDecimal.ZERO) >= 0) ? totalPrice : BigDecimal.ZERO);
 
     order = orderRepository.save(order);
+
+    order.setTxnRef(VnPayUtils.generateTxnRef("ORD"));
+    orderRepository.save(order);
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
@@ -330,6 +334,21 @@ public class OrderServiceImpl implements OrderService {
               return variationName + ": " + values;
             })
         .collect(Collectors.joining(", "));
+  }
+
+  // OrderServiceImpl.java
+  @Override
+  @Transactional
+  public void markPaymentCompleted(String txnRef) {
+    Order order = orderRepository.findByTxnRef(txnRef)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+    // chỉ ghi nếu chưa ghi
+    if (order.getPaymentStatus() != PaymentStatus.COMPLETED) {
+      order.setPaymentStatus(PaymentStatus.COMPLETED);
+      order.setOrderStatus(OrderStatus.PENDING);     // giao hàng chưa bắt đầu
+      orderRepository.save(order);
+    }
   }
 
   // ============================ NEO4J RECOMMEND SYSTEM ============================

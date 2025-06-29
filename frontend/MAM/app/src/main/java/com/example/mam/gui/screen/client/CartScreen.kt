@@ -239,7 +239,6 @@ fun CartScreen(
                                     item = item,
                                     onClick = { onAdditionalProductClicked(item.id)},
                                 )
-
                             }
                         }
                     }

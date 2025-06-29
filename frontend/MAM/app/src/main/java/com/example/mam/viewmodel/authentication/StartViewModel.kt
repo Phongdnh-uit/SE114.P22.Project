@@ -25,6 +25,9 @@ class StartViewModel(
     private val _phoneNumber = MutableStateFlow("")
     val phoneNumber = _phoneNumber
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading
+
 
     fun setPhoneNumber(it: String) {
         _phoneNumber.value = it
@@ -36,10 +39,20 @@ class StartViewModel(
         return regex.matches(phoneNumber)
     }
 
+    fun triggerLoading() {
+        _isLoading.value = true
+    }
+
+    fun resetLoading() {
+        _isLoading.value = false
+    }
+
     suspend fun RegisterWithFireBase(idToken: String): Int {
+        _isLoading.value = true
         Log.d("FIREBASE", "ID Token: $idToken")
         if (idToken.isEmpty()) {
             Log.d("FIREBASE", "No ID token found, returning 0")
+            _isLoading.value = false
             return 0
         }
         try {
@@ -52,13 +65,16 @@ class StartViewModel(
             Log.d("FIREBASE", "Status Code: $statusCode")
             if (response.isSuccessful) {
                 val user = response.body()
+                _isLoading.value = false
                 return 1
             } else {
                 Log.d("FIREBASE", "Status error: ${response.errorBody()?.string()}")
+                _isLoading.value = false
                 return 0
             }
         } catch (e: Exception) {
             Log.e("FIREBASE", "Lỗi khi đăng nhập bằng Firebase: ${e.message}")
+            _isLoading.value = false
             return 0
         }
     }
@@ -85,14 +101,17 @@ class StartViewModel(
                     Log.d("REFRESH", "DSAccessToken: ${accessToken.first()}")
                     Log.d("REFRESH", "DSRefreshToken: ${refreshToken.first()}")
                     val me = BaseRepository(userPreferencesRepository).authPrivateRepository.getUserInfo().body()!!
+                    _isLoading.value = false
                     return if (me.role.name == "ADMIN") 1
                     else 2
                 } else {
                     Log.d("REFRESH", "Status Code: $statusCode")
+                    _isLoading.value = false
                     return 0
                 }
             } catch (e: Exception) {
                 Log.e("REFRESH", "Lỗi khi refresh: ${e.message}")
+                _isLoading.value = false
                 return 0
             }
         }

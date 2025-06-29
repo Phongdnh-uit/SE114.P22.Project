@@ -81,6 +81,7 @@ fun ItemScreen(
     val variances = viewModel.variances.collectAsStateWithLifecycle().value
     val optionsMap = viewModel.optionsMap.collectAsStateWithLifecycle().value
     val selectedOptions = viewModel.selectedOptions.collectAsStateWithLifecycle().value
+    val cartCount = viewModel.cartCount.collectAsStateWithLifecycle().value
     var total by remember { mutableStateOf("") }
 
     LaunchedEffect(selectedOptions, quantity) {
@@ -91,6 +92,10 @@ fun ItemScreen(
         viewModel.loadVariances()
         viewModel.loadOptions()
         total = viewModel.getTotalPrice()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCartCount()
     }
 
     val context = LocalContext.current
@@ -152,6 +157,8 @@ fun ItemScreen(
                     backgroundColor = OrangeLighter,
                     foregroundColor = OrangeDefault,
                     icon = Icons.Outlined.ShoppingCart,
+                    isBadges = true,
+                    badgesCount = cartCount,
                     shadow = "outer",
                     onClick = onCartClicked,
                     modifier = Modifier
@@ -227,27 +234,7 @@ fun ItemScreen(
                     )
                 }
                 items(variances){ option ->
-                    if (option.isMultipleChoice ){
-                        var selectedOption: VariationOptionResponse
-                        optionsMap[option.id]?.let {
-                            LaunchedEffect(it) {
-                                viewModel.selectRatioOption( it.first())
-                            }
-                            RadioOption(
-                                title = option.name,
-                                options = it,
-                                onClick = { option ->
-                                    selectedOption = option
-                                    viewModel.selectRatioOption(option)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 10.dp)
-                            )
-                        }
-                    }
-                    else if(option.name == "Kích cỡ" && item.categoryName == "Pizza") {
-                        var sizeOption: VariationOptionResponse
+                    if(option.name == "Kích cỡ" && item.categoryName == "Pizza") {
                         optionsMap[option.id]?.let {
                             LaunchedEffect(it) {
                                 viewModel.selectRatioOption( it.first())
@@ -256,10 +243,26 @@ fun ItemScreen(
                                 title = option.name,
                                 options = it,
                                 onClick = { option ->
-                                    sizeOption = option
                                     viewModel.selectRatioOption(option)
                                 },
                                 image = R.drawable.ic_size_pizza,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.dp)
+                            )
+                        }
+                    }
+                    else if (!option.isMultipleChoice){
+                        optionsMap[option.id]?.let {
+                            LaunchedEffect(it) {
+                                viewModel.selectRatioOption( it.first())
+                            }
+                            RadioOption(
+                                title = option.name,
+                                options = it,
+                                onClick = { option ->
+                                    viewModel.selectRatioOption(option)
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 10.dp)
@@ -330,6 +333,7 @@ fun ItemScreen(
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 onAddClick()
+                                viewModel.loadCartCount()
                             } else {
                                 Toast.makeText(
                                     context,

@@ -32,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -372,22 +374,46 @@ fun CircleIconButton(
     image: Int ?= null,
     isEnable: Boolean = true,
     shadow: String ?= null,
+    isBadges: Boolean = false,
+    badgesCount: Int = 0,
     onClick: () -> Unit,
     modifier: Modifier,
 ){
-    IconButton (
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = backgroundColor ?: OrangeDefault
-        ),
-        enabled = isEnable,
-        onClick = onClick,
-        modifier = modifier
-            .size(40.dp)
-            .focusable(false)
-            .then(
-                if (shadow.equals("inner")) {
-                    Modifier
-                        .innerShadow(
+    BadgedBox(
+        badge = {
+            if (isBadges && badgesCount > 0) {
+                Badge {
+                    Text(
+                        text = if (badgesCount <= 99)badgesCount.toString() else "99+",
+                    )
+                }
+            }
+        },
+        modifier = modifier.wrapContentSize()
+    ) {
+        IconButton(
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = backgroundColor ?: OrangeDefault
+            ),
+            enabled = isEnable,
+            onClick = onClick,
+            modifier = Modifier
+                .size(40.dp)
+                .focusable(false)
+                .then(
+                    if (shadow.equals("inner")) {
+                        Modifier
+                            .innerShadow(
+                                color = GreyDark,
+                                bordersRadius = 25.dp,
+                                blurRadius = 4.dp,
+                                offsetX = 0.dp,
+                                offsetY = 4.dp,
+                                spread = 0.dp,
+                            )
+                            .clip(RoundedCornerShape(25.dp))
+                    } else if (shadow.equals("outer")) {
+                        Modifier.outerShadow(
                             color = GreyDark,
                             bordersRadius = 25.dp,
                             blurRadius = 4.dp,
@@ -395,34 +421,25 @@ fun CircleIconButton(
                             offsetY = 4.dp,
                             spread = 0.dp,
                         )
-                        .clip(RoundedCornerShape(25.dp))
-                } else if (shadow.equals("outer")) {
-                    Modifier.outerShadow(
-                        color = GreyDark,
-                        bordersRadius = 25.dp,
-                        blurRadius = 4.dp,
-                        offsetX = 0.dp,
-                        offsetY = 4.dp,
-                        spread = 0.dp,
-                    )
-                } else Modifier
-            ),
-    ){
-        icon?.let {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = foregroundColor ?: WhiteDefault,
-                modifier = Modifier.size(30.dp)
-            )
-        }
-        image?.let {
-            Icon(
-                painter = painterResource(image),
-                contentDescription = null,
-                tint = foregroundColor ?: WhiteDefault,
-                modifier = Modifier.size(30.dp)
-            )
+                    } else Modifier
+                ),
+        ) {
+            icon?.let {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = foregroundColor ?: WhiteDefault,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            image?.let {
+                Icon(
+                    painter = painterResource(image),
+                    contentDescription = null,
+                    tint = foregroundColor ?: WhiteDefault,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
     }
 }

@@ -1,8 +1,7 @@
 package com.example.mam.dto.review
 data class ReviewRequest(
-    val userId: Long,
-    val productId: Long,
+    val orderId: Long,
     val rate: Int,
-    val content: String,
-    val reply: String
+    val content: String ?= null,
+    val reply: String ?= null
 )

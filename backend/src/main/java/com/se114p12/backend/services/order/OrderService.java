@@ -27,4 +27,6 @@ public interface OrderService {
   void delete(Long id);
 
   void markOrderAsDelivered(Long orderId);
+
+  void markPaymentCompleted(String txnRef);
 }

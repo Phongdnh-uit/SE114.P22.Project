@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,10 +36,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mam.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import com.example.mam.GoogleSignInUtils
+import com.example.mam.gui.component.LoadingAlertDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.SignUpDialog
 import com.example.mam.gui.component.UnderlinedClickableText
@@ -66,6 +69,8 @@ fun StartScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
+    var isGoogleRegister by remember { mutableStateOf(false) }
 
     var phoneNumber by remember { mutableStateOf("") }
     var idToken by remember { mutableStateOf("") }
@@ -82,6 +87,10 @@ fun StartScreen(
 
     }
 
+    if (isLoading) {
+        isGoogleRegister = false
+        LoadingAlertDialog()
+    }
     LaunchedEffect(Unit) {
         scope.launch {
             if (viewModel.getAccessToken() == 1) {
@@ -112,7 +121,7 @@ fun StartScreen(
             .verticalScroll(scrollState)
             //.padding(WindowInsets.ime.asPaddingValues())
     ) {
-        var isGoogleRegister by remember { mutableStateOf(false) }
+
         if (isGoogleRegister) {
             SignUpDialog(
                 title = "Đăng ký qua Google",
@@ -120,10 +129,15 @@ fun StartScreen(
                 viewModel = viewModel,
                 onDismiss = { isGoogleRegister = false },
                 onConfirm = {
+                    viewModel.triggerLoading()
                     GoogleSignInUtils.getGoogleIdToken(
                         context = context,
                         scope = scope,
                         launcher = launcher,
+                        timeout = {
+                            isGoogleRegister = false
+                            viewModel.resetLoading()
+                        },
                         handle = { token ->
                             idToken = token
                             scope.launch {
@@ -135,6 +149,7 @@ fun StartScreen(
                                         "Đăng ký thành công",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    onSignInClicked()
                                     isGoogleRegister = false
                                 } else {
                                     Toast.makeText(
@@ -195,7 +210,6 @@ fun StartScreen(
                     color = WhiteDefault,
                     textColor = BrownDefault,
                     onClick = {
-
                         isGoogleRegister =true
                     },
                     modifier = Modifier

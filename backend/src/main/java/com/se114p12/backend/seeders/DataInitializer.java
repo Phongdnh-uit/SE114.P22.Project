@@ -30,6 +30,6 @@ public class DataInitializer implements ApplicationRunner {
             .findByName(RoleName.ADMIN.getValue())
             .orElseThrow(() -> new IllegalStateException("Admin role not found")));
 
-    // categoryInitializer.initializeCategories();
+    //categoryInitializer.initializeCategories();
   }
 }

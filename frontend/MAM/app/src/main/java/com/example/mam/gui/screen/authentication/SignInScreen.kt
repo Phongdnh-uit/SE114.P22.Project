@@ -47,6 +47,7 @@ import com.example.mam.R
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.EditField
+import com.example.mam.gui.component.LoadingAlertDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordField
 import com.example.mam.gui.component.UnderlinedClickableText
@@ -70,6 +71,7 @@ fun SignInScreen(
     modifier: Modifier = Modifier
 ) {
     val signInState = viewModel.signInState.collectAsStateWithLifecycle().value
+    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -89,7 +91,9 @@ fun SignInScreen(
     var isShowDeletedDialog by remember { mutableStateOf(false)}
     var isShowBlockedDialog by remember { mutableStateOf(false)}
     var isShowPendingDialog by remember { mutableStateOf(false)}
-
+    if (isLoading) {
+        LoadingAlertDialog()
+    }
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -214,6 +218,7 @@ fun SignInScreen(
                 text = "Đăng nhập",
                 onClick = {
                     scope.launch {
+                        viewModel.triggerLoading()
                         val result = viewModel.SignIn()
                         if (result == 2) {
                             Toast.makeText(
@@ -265,10 +270,14 @@ fun SignInScreen(
             OuterShadowFilledButton(
                 text = "Đăng nhập với Google",
                 onClick = {
+                    viewModel.triggerLoading()
                    GoogleSignInUtils.getGoogleIdToken(
                         context = context,
                         scope = scope,
                         launcher = launcher,
+                        timeout = {
+                            viewModel.resetLoading()
+                        },
                         handle = { idToken ->
                             scope.launch {
                                 val result = viewModel.signInWithFirebase(idToken)
