@@ -9,6 +9,9 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: pro
+    volumes:
+      - ${FIREBASE_CONFIG}:/app/config/firebase.json:ro
+      - ${STORAGE_PATH}:/app/storage
     depends_on:
       mysql:
         condition: service_healthy
