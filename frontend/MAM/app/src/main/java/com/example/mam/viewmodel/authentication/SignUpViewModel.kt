@@ -22,6 +22,17 @@ class SignUpViewModel(
     private val _repeatPassword = MutableStateFlow("")
     val repeatPassword = _repeatPassword.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    fun triggerLoading() {
+        _isLoading.value = true
+    }
+
+    fun resetLoading() {
+        _isLoading.value = false
+    }
+
     fun setName(it: String) {
         _signUpState.update { state -> state.copy(fullname = it) }
     }

@@ -24,13 +24,13 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted = false")
 public class Product extends BaseEntity {
   @ManyToOne
-  @JoinColumn(name = "category_id", nullable = false)
+  @JoinColumn(name = "category_id", nullable = true)
   @JsonBackReference
   private ProductCategory category;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
-  private List<Variation> variations;
+  private List<Variation> variations = new ArrayList<>();
 
   @Column(nullable = false, length = 255)
   @NotBlank

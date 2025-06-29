@@ -1,8 +1,9 @@
 package com.example.mam.gui.screen.authentication
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,24 +42,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mam.GoogleSignInUtils
 import com.example.mam.R
-import com.example.mam.dto.authentication.SendVerifyEmailRequest
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.EditField
+import com.example.mam.gui.component.LoadingAlertDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PasswordField
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
+import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authentication.SignInViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun SignInScreen(
@@ -70,14 +71,29 @@ fun SignInScreen(
     modifier: Modifier = Modifier
 ) {
     val signInState = viewModel.signInState.collectAsStateWithLifecycle().value
+    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        GoogleSignInUtils.getGoogleIdToken(
+            context = context,
+            scope = scope,
+            launcher = null,
+            handle = { token ->
+
+            }
+        )
+
+    }
+
     var isShowDeletedDialog by remember { mutableStateOf(false)}
     var isShowBlockedDialog by remember { mutableStateOf(false)}
     var isShowPendingDialog by remember { mutableStateOf(false)}
-
+    if (isLoading) {
+        LoadingAlertDialog()
+    }
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -202,6 +218,7 @@ fun SignInScreen(
                 text = "Đăng nhập",
                 onClick = {
                     scope.launch {
+                        viewModel.triggerLoading()
                         val result = viewModel.SignIn()
                         if (result == 2) {
                             Toast.makeText(
@@ -246,7 +263,73 @@ fun SignInScreen(
                 },
                 isEnable = (signInState.password.isNotEmpty() && signInState.credentialId.isNotEmpty()),
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.7f)
+                    .height(40.dp),
+            )
+
+            OuterShadowFilledButton(
+                text = "Đăng nhập với Google",
+                onClick = {
+                    viewModel.triggerLoading()
+                   GoogleSignInUtils.getGoogleIdToken(
+                        context = context,
+                        scope = scope,
+                        launcher = launcher,
+                        timeout = {
+                            viewModel.resetLoading()
+                        },
+                        handle = { idToken ->
+                            scope.launch {
+                                val result = viewModel.signInWithFirebase(idToken)
+                                if (result == 2) {
+                                    Toast.makeText(
+                                        context,
+                                        "Đăng nhập thành công",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    onSignInClicked()
+
+                                } else if (result == 1) {
+                                    Toast.makeText(
+                                        context,
+                                        "Đăng nhập thành công",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    onSignInManager()
+                                } else if (result == -1) {
+                                    Toast.makeText(
+                                        context,
+                                        "Tài khoản của bạn đã bị xóa",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    isShowDeletedDialog = true
+                                } else if (result == -2) {
+                                    Toast.makeText(
+                                        context,
+                                        "Tài khoản của bạn đã bị khóa",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    isShowBlockedDialog = true
+                                } else if (result == -3) {
+                                    isShowPendingDialog = true
+                                }
+                                else {
+                                    Toast.makeText(
+                                        context,
+                                        "Đăng nhập thất bại",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+
+                    )
+                },
+                color = WhiteDefault,
+                textColor = BrownDefault,
+                image = R.drawable.ic_google,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
                     .height(40.dp),
             )
             Spacer(Modifier.height(10.dp))

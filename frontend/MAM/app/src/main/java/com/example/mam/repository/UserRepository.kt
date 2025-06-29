@@ -8,6 +8,7 @@ import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
@@ -31,6 +32,11 @@ interface UserRepository {
 
     @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") userId: String): Response<Unit>
+
+    @PATCH("users/{id}/status")
+    suspend fun updateUserStatus(
+        @Path("id") userId: Long,
+        @Query("status") status: String): Response<Void>
 
     @POST("users/{id}/assign-role/{roleId}")
     suspend fun assignRoleToUser(

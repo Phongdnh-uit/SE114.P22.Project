@@ -35,6 +35,7 @@ public interface CartItemMapper {
         if (entity.getProduct() != null) {
             dto.setProductName(entity.getProduct().getName());
             dto.setImageUrl(entity.getProduct().getImageUrl());
+            dto.setPrice(entity.getPrice());
         }
 
         if (entity.getVariationOptions() != null && !entity.getVariationOptions().isEmpty()) {

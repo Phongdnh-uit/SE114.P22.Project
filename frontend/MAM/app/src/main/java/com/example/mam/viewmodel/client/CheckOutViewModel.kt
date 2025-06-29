@@ -12,6 +12,7 @@ import com.example.mam.data.Constant
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.cart.CartResponse
 import com.example.mam.dto.order.OrderRequest
+import com.example.mam.dto.product.ProductResponse
 import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.dto.user.UserResponse
 import com.example.mam.repository.BaseRepository
@@ -41,6 +42,9 @@ class CheckOutViewModel(
     private val _address = MutableStateFlow("")
     val address = _address.asStateFlow()
 
+    private val _latitude = MutableStateFlow(0.0)
+    private val _longitude = MutableStateFlow(0.0)
+
     private val _discount = MutableStateFlow<PromotionResponse?>(null)
     val discount = _discount.asStateFlow()
 
@@ -48,6 +52,7 @@ class CheckOutViewModel(
         mutableListOf(
         )
     )
+
     val discountList = _discountList.asStateFlow()
 
     private val _note = MutableStateFlow<String?>(null)
@@ -56,7 +61,7 @@ class CheckOutViewModel(
     private val _paymentOptions = MutableStateFlow<MutableList<String>>(mutableListOf())
     val paymentOptions = _paymentOptions.asStateFlow()
 
-    val _paymentOption = MutableStateFlow(_paymentOptions.value.firstOrNull() ?: "Tiền mặt")
+    val _paymentOption = MutableStateFlow("") // Default payment option
     val paymentOption = _paymentOption.asStateFlow()
     private fun setTotal(){
         val total = _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
@@ -71,13 +76,22 @@ class CheckOutViewModel(
         setTotal()
     }
 
-    fun setAddress(address: String){
+    fun setAddress(address: String) {
         _address.value = address
-        viewModelScope.launch {
-            userPreferencesRepository.saveAddress(_address.value)
-        }
     }
 
+    fun setLatitude(latitude: Double) {
+        _latitude.value = latitude
+    }
+    fun setLongitude(longitude: Double) {
+        _longitude.value = longitude
+    }
+
+    fun setAdressAndCoordinates() {
+        viewModelScope.launch {
+            userPreferencesRepository.saveAddress(_address.value, _longitude.value, _latitude.value)
+        }
+    }
     fun setupPaymentOption(option: String){
         _paymentOption.value = option
     }
@@ -89,6 +103,8 @@ class CheckOutViewModel(
     fun loadAddress(){
         viewModelScope.launch {
             if(userPreferencesRepository.address.map { it }.first().isNotEmpty()) _address.value = userPreferencesRepository.address.map { it }.first()
+            if(userPreferencesRepository.latitude.map { it }.first() != 0.0) _latitude.value = userPreferencesRepository.latitude.map { it }.first()
+            if(userPreferencesRepository.longitude.map { it }.first() != 0.0) _longitude.value = userPreferencesRepository.longitude.map { it }.first()
         }
     }
 
@@ -142,6 +158,7 @@ class CheckOutViewModel(
             )
             if (response.isSuccessful) {
                 _paymentOptions.value = response.body()?.get(Constant.metadata.PAYMENT_METHOD.name)?.map { it }?.toMutableList() ?: mutableListOf()
+                _paymentOption.value = _paymentOptions.value[0]
                 Log.d("CheckOutViewModel", "Payment options loaded: ${_paymentOptions.value.size} options")
             } else {
                 Log.d("CheckOutViewModel", "Failed to load payment options: ${response.errorBody()?.string()}")
@@ -159,9 +176,7 @@ class CheckOutViewModel(
                 _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() }.toDouble()
             )
             if (response.isSuccessful) {
-                _discountList.value = _discountList.value.toMutableList().apply {
-                    addAll(response.body() ?: mutableListOf())
-                }
+                _discountList.value = response.body()?.toMutableList() ?: mutableListOf()
                 Log.d("CheckOutViewModel", "Discounts loaded: ${_discountList.value.size} promotions")
             } else {
                 Log.d("CheckOutViewModel", "Failed to load discounts: ${response.errorBody()?.string()}")
@@ -175,6 +190,8 @@ class CheckOutViewModel(
     suspend fun checkOut(): Int{
         try{
             val request = OrderRequest(
+                _latitude.value,
+                _longitude.value,
                 _address.value,
                 _note.value,
                 _paymentOption.value,
@@ -187,7 +204,7 @@ class CheckOutViewModel(
                 Log.d("CheckOutViewModel", "Order created successfully")
                 return 1 // Success
             } else {
-                Log.d("CheckOutViewModel", "Failed to check out: ${response.errorBody()?.string()}")
+                Log.d("CheckOutViewModel", "Failed to check out (BE): ${response.errorBody()?.string()}")
                 return 0 // Failure
             }
         }

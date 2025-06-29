@@ -48,4 +48,11 @@ public class CartServiceImpl implements CartService {
     public boolean existsByIdAndUserId(Long id, Long userId) {
         return cartRepository.existsByIdAndUserId(id, userId);
     }
+
+    @Override
+    public int countCartItemsByUserId(Long userId) {
+        return cartRepository.findByUserId(userId)
+                .map(cart -> cart.getCartItems().size())
+                .orElse(0);
+    }
 }

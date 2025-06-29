@@ -1,7 +1,11 @@
 package com.se114p12.backend.services.authentication;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.se114p12.backend.dtos.authentication.AuthResponseDTO;
+import com.se114p12.backend.dtos.authentication.FirebaseLoginRequestDTO;
 import com.se114p12.backend.dtos.authentication.ForgotPasswordRequestDTO;
 import com.se114p12.backend.dtos.authentication.GoogleLoginRequestDTO;
 import com.se114p12.backend.dtos.authentication.LoginRequestDTO;
@@ -95,6 +99,35 @@ public class AuthServiceImpl implements AuthService {
     AuthResponseDTO authenticationResponseDTO = new AuthResponseDTO();
     authenticationResponseDTO.setAccessToken(accessToken);
     authenticationResponseDTO.setRefreshToken(refreshToken);
+    return authenticationResponseDTO;
+  }
+
+  @Override
+  public AuthResponseDTO loginWithFirebase(FirebaseLoginRequestDTO firebaseLoginRequestDTO) {
+    FirebaseToken decodedToken;
+    try {
+      decodedToken = FirebaseAuth.getInstance().verifyIdToken(firebaseLoginRequestDTO.getIdToken());
+    } catch (FirebaseAuthException e) {
+      throw new BadRequestException("Invalid Firebase ID token");
+    }
+
+    String email = decodedToken.getEmail();
+
+    User user =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    //     create access token
+    String accessToken = jwtUtil.generateAccessToken(user.getId());
+
+    // create refresh token
+    String refreshToken = refreshTokenService.generateRefreshToken(user.getId()).getToken();
+
+    AuthResponseDTO authenticationResponseDTO = new AuthResponseDTO();
+    authenticationResponseDTO.setAccessToken(accessToken);
+    authenticationResponseDTO.setRefreshToken(refreshToken);
+    authenticationResponseDTO.setUser(userMapper.entityToResponse(user));
     return authenticationResponseDTO;
   }
 

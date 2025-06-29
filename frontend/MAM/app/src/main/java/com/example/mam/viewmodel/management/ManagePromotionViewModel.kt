@@ -28,7 +28,7 @@ class ManagePromotionViewModel(
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
 
-    private val _value = MutableStateFlow(0)
+    private val _value = MutableStateFlow("")
     val value = _value.asStateFlow()
 
     private val _startDate = MutableStateFlow<Instant>(Instant.now())
@@ -37,7 +37,7 @@ class ManagePromotionViewModel(
     private val _endDate = MutableStateFlow<Instant>(Instant.now())
     val endDate = _endDate.asStateFlow()
 
-    private val _minValue = MutableStateFlow(BigDecimal.ZERO)
+    private val _minValue = MutableStateFlow("")
     val minValue = _minValue.asStateFlow()
 
     private val _createAt = MutableStateFlow(Instant.now())
@@ -57,7 +57,7 @@ class ManagePromotionViewModel(
         _description.value = description
     }
 
-    fun setValue(value: Int) {
+    fun setValue(value: String) {
         _value.value = value
     }
 
@@ -77,7 +77,7 @@ class ManagePromotionViewModel(
         return (_endDate.value.isAfter(_startDate.value) && _endDate.value.isAfter(Instant.now())) || _endDate.value == _startDate.value
     }
 
-    fun setMinValue(minValue: BigDecimal) {
+    fun setMinValue(minValue: String) {
         _minValue.value = minValue
     }
 
@@ -94,7 +94,7 @@ class ManagePromotionViewModel(
                 description = _description.value,
                 startDate = _startDate.value.toString(),
                 endDate = _endDate.value.toString(),
-                minValue = _minValue.value,
+                minValue = _minValue.value.toBigDecimal(),
                 discountValue = _value.value.toBigDecimal()
             )
 
@@ -109,7 +109,8 @@ class ManagePromotionViewModel(
                     _description.value = promotion.description
                     _startDate.value = Instant.parse(promotion.startDate)
                     _endDate.value = Instant.parse(promotion.endDate)
-                    _minValue.value = promotion.minValue
+                    _minValue.value = promotion.minValue.toString()
+                    _value.value = promotion.discountValue.toString()
                 }
                 return 1
             } else {
@@ -123,17 +124,6 @@ class ManagePromotionViewModel(
             _isLoading.value = false
             Log.d("Promotion", "Kết thúc them khuyen mai")
         }
-    }
-
-    fun clearData() {
-        _code.value = ""
-        _description.value = ""
-        _value.value = 0
-        _startDate.value = Instant.now()
-        _endDate.value = Instant.now()
-        _minValue.value = BigDecimal.ZERO
-        _createAt.value = Instant.now()
-        _updateAt.value = Instant.now()
     }
 
     companion object {

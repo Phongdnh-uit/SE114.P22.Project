@@ -386,6 +386,17 @@ fun MainNavHost(
                         ) { address ->
                             viewModel.setAddress(address)
                         }
+                        navController.previousBackStackEntry?.savedStateHandle?.getLiveData<Double>("latitude")?.observe(
+                            backStackEntry
+                        ) { latitude ->
+                            viewModel.setLatitude(latitude)
+                        }
+                        navController.previousBackStackEntry?.savedStateHandle?.getLiveData<Double>("longitude")?.observe(
+                            backStackEntry
+                        ) { longitude ->
+                            viewModel.setLongitude(longitude)
+                            viewModel.setAdressAndCoordinates()
+                        }
                     },
                     viewModel = viewModel
                 )
@@ -399,8 +410,10 @@ fun MainNavHost(
             ){
                 MapScreen(
                     onBackClicked = {navController.popBackStack()},
-                    onSelectClicked = { address ->
+                    onSelectClicked = { address, latitude, longitude ->
                         navController.previousBackStackEntry?.savedStateHandle?.set("address", address)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("latitude", latitude)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("longitude", longitude)
                         navController.popBackStack()
                     },
                 )
@@ -861,21 +874,6 @@ fun MainNavHost(
                 )
             }
             composable(
-                route = "AddUser",
-                enterTransition = defaultTransitions(),
-                exitTransition = defaultExitTransitions(),
-                popEnterTransition = defaultPopEnterTransitions(),
-                popExitTransition = defaultPopExitTransitions()
-            ) { backStackEntry ->
-                val viewModel: ManageUserViewModel = viewModel(backStackEntry, factory = ManageUserViewModel.Factory)
-                ManageUserScreen(
-                    viewModel = viewModel,
-                    onBackClick = {navController.popBackStack()},
-                    isAdd = true,
-                    isEdit = false,
-                )
-            }
-            composable(
                 route = "EditUser/{userId}",
                 arguments = listOf(navArgument("userId") { type = NavType.LongType }),
                 enterTransition = defaultTransitions(),
@@ -887,7 +885,6 @@ fun MainNavHost(
                 ManageUserScreen(
                     viewModel = viewModel,
                     onBackClick = {navController.popBackStack()},
-                    isAdd = false,
                     isEdit = true,
                 )
             }
@@ -903,7 +900,6 @@ fun MainNavHost(
                 ManageUserScreen(
                     viewModel = viewModel,
                     onBackClick = {navController.popBackStack()},
-                    isAdd = false,
                     isEdit = false,
                 )
             }

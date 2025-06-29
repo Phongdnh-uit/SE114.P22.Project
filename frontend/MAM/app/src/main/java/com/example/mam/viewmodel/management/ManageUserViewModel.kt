@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
+import com.example.mam.data.Constant
 import com.example.mam.data.Constant.BASE_IMAGE
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.repository.BaseRepository
@@ -19,6 +20,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.time.Instant
 
@@ -52,7 +57,7 @@ class ManageUserViewModel(
     private val _phone = MutableStateFlow<String>("")
     val phone = _phone.asStateFlow()
 
-    private val _statusList = MutableStateFlow<List<String>>(listOf("Active", "Inactive", "Blocked" , "Deleted"))
+    private val _statusList = MutableStateFlow<List<String>>(listOf())
     val statusList = _statusList.asStateFlow()
 
     private val _status = MutableStateFlow<String>("")
@@ -71,21 +76,6 @@ class ManageUserViewModel(
         _userName.value = userName
     }
 
-    fun isUserNameValid(): String {
-        val name = _userName.value.trim()
-        val regex = "^[\\p{L}0-9 ]+$".toRegex()
-        if (name.length > 50) {
-            return "Tên quá dài (>50 ký tự)" // Name is too long
-        }
-        else if (name.length < 5) {
-            return "Tên quá ngắn (<5 ký tự)" // Name is too short
-        }
-        else if (!regex.matches(name)) {
-            return "Tên không hợp lệ" // Name contains invalid characters
-        }
-        return "" // Name is valid
-    }
-
     fun setUserImage(imgUrl: String) {
         _userImage.value = imgUrl
     }
@@ -94,48 +84,12 @@ class ManageUserViewModel(
         _fullName.value = fullName
     }
 
-    fun isFullNameValid(): String {
-        val name = _fullName.value.trim()
-        val regex = "^[\\p{L} ]+$".toRegex()
-        if (name.length > 50) {
-            return "Tên quá dài (>50 ký tự)" // Name is too long
-        }
-        else if (name.length < 5) {
-            return "Tên quá ngắn (<5 ký tự)" // Name is too short
-        }
-        else if (!regex.matches(name)) {
-            return "Tên không hợp lệ" // Name contains invalid characters
-        }
-        return "" // Name is valid
-    }
-
     fun setEmail(email: String) {
         _email.value = email
     }
 
-    fun isEmailValid(): String {
-        val email = _email.value.trim()
-        val regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
-        if (!regex.matches(email)) {
-            return "Email không hợp lệ" // Email contains invalid characters
-        }
-        return "" // Email is valid
-    }
-    fun setRole(role: String) {
-        _role.value = role
-    }
-
     fun setPhone(phone: String) {
         _phone.value = phone
-    }
-
-    fun isPhoneValid(): String {
-        val phone = _phone.value.trim()
-        val regex = "^0\\d{9}$".toRegex()
-        if (!regex.matches(phone)) {
-            return "Số điện thoại không hợp lệ" // Phone contains invalid characters
-        }
-        return "" // Phone is valid
     }
 
     fun setStatus(status: String) {
@@ -150,6 +104,13 @@ class ManageUserViewModel(
                 "User",
                 "DSAccessToken: ${userPreferencesRepository.accessToken.first()}"
             )
+            val statusList = BaseRepository(userPreferencesRepository)
+                .authPublicRepository.getMetadata(listOf(Constant.metadata.USER_STATUS.name))
+            if (statusList.isSuccessful) {
+                _statusList.value = statusList.body()?.get(Constant.metadata.USER_STATUS.name) ?: listOf()
+            } else {
+                Log.d("User", "Lấy danh sách trạng thái thất bại: ${statusList.errorBody()?.string()}")
+            }
             val response = BaseRepository(userPreferencesRepository)
                     .userRepository
                     .getUserById(_userID.value)
@@ -181,62 +142,31 @@ class ManageUserViewModel(
         }
     }
 
-    fun clear() {
-        _userID.value = 0
-        _userName.value = ""
-        _userImage.value = ""
-        _fullName.value = ""
-        _email.value = ""
-        _role.value = ""
-        _phone.value = ""
-        _status.value = ""
-        _createAt.value = Instant.now()
-        _updateAt.value = Instant.now()
+    suspend fun updateUserStatus(): Int {
+        _isLoading.value = true
+        try {
+            Log.d("User", "Bắt đầu cập nhật trạng thái Nguoi dung")
+            Log.d(
+                "User",
+                "DSAccessToken: ${userPreferencesRepository.accessToken.first()}"
+            )
+            val response = BaseRepository(userPreferencesRepository)
+                .userRepository.updateUserStatus(_userID.value, _status.value)
+            Log.d("User", "Status code: ${response.code()}")
+            if (response.isSuccessful) {
+                return 1 // Update successful
+            } else {
+                Log.d("User", "Cập nhật trạng thái thất bại: ${response.errorBody()?.string()}")
+                return 0 // Update failed
+            }
+        } catch (e: Exception) {
+            Log.d("User", "Không thể cập nhật trạng thái: ${e.message}")
+            return -1 // Error occurred
+        } finally {
+            _isLoading.value = false
+            Log.d("User", "Kết thúc cập nhật trạng thái Nguoi dung")
+        }
     }
-
-//    suspend fun updateUser(): Int {
-//        _isLoading.value = true
-//        try {
-//            Log.d("User", "Bắt đầu cap nhat Nguoi dung")
-//            Log.d(
-//                "User",
-//                "DSAccessToken: ${userPreferencesRepository.accessToken.first()}"
-//            )
-//            val userName = _userName.value.toRequestBody("text/plain".toMediaType())
-//            val fullName = _fullName.value.toRequestBody("text/plain".toMediaType())
-//            val email = _email.value.toRequestBody("text/plain".toMediaType())
-//            val phone = _phone.value.toRequestBody("text/plain".toMediaType())
-//            val role = _role.value.toRequestBody("text/plain".toMediaType())
-//            val status = _status.value.toRequestBody("text/plain".toMediaType())
-//            val imageFile = _userImageFile.value
-//            val requestFile = imageFile?.asRequestBody("image/*".toMediaType())
-//            val imagePart =
-//                requestFile?.let { MultipartBody.Part.createFormData("image", imageFile.name, it) }
-//
-//            val response = BaseService(userPreferencesRepository)
-//                .userService
-//                .updateUser(
-//                    _userID.value, userName, fullName, email, phone, imagePart, role
-//                )
-//            Log.d("User", "Status code: ${response.code()}")
-//            if (response.isSuccessful) {
-//                val user = response.body()
-//                if (user != null) {
-//                    _status.value = user.status
-//                }
-//                return 1
-//            } else {
-//                Log.d("User", "Cap nhat Nguoi dung thất bại: ${response.errorBody()?.string()}")
-//                return 0
-//            }
-//        } catch (e: Exception) {
-//            Log.d("User", "Không thể cap nhat Nguoi dung: ${e.message}")
-//            return 0
-//        } finally {
-//            _isLoading.value = false
-//            Log.d("User", "Kết thúc cap nhat Nguoi dung")
-//        }
-//    }
     fun addUser() {
         viewModelScope.launch {
             try {

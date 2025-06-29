@@ -1,6 +1,7 @@
 package com.se114p12.backend.services.authentication;
 
 import com.se114p12.backend.dtos.authentication.AuthResponseDTO;
+import com.se114p12.backend.dtos.authentication.FirebaseLoginRequestDTO;
 import com.se114p12.backend.dtos.authentication.ForgotPasswordRequestDTO;
 import com.se114p12.backend.dtos.authentication.GoogleLoginRequestDTO;
 import com.se114p12.backend.dtos.authentication.LoginRequestDTO;
@@ -15,6 +16,8 @@ public interface AuthService {
   AuthResponseDTO login(LoginRequestDTO loginRequestDTO);
 
   AuthResponseDTO loginWithGoogle(GoogleLoginRequestDTO googleLoginRequestDTO);
+
+  AuthResponseDTO loginWithFirebase(FirebaseLoginRequestDTO firebaseLoginRequestDTO);
 
   AuthResponseDTO refreshToken(RefreshTokenRequestDTO refreshTokenRequestDTO);
 

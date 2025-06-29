@@ -101,7 +101,7 @@ fun ForgetPasswordScreen(
                 )
                 // Text nằm giữa
                 Text(
-                    text = "Đổi mật khẩu",
+                    text = if(isForgot) "Quên mật khẩu" else "Đổi mật khẩu",
                     style = Typography.titleLarge,
                     modifier = Modifier.align(Alignment.Center)
                 )

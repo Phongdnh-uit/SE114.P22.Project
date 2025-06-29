@@ -74,19 +74,18 @@ class ListUserViewModel(
                     val page = response.body()
                     if (page != null){
                         allUsers.addAll(page.content)
-                        _user.value = allUsers.toMutableList()
+                        _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList()
                         if (page.page >= (page.totalPages - 1)) {
                             break // Stop looping when the last page is reached
                         }
                         currentPage++ // Move to the next page
-
                     }
                     else break
                 } else {
                     break // Stop loop on failure
                 }
             }
-            _user.value = allUsers.toMutableList() // Update UI with all categories
+            _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList() // Update UI with all categories
         } catch (e: Exception) {
         } finally {
             _isLoading.value = false
@@ -118,14 +117,14 @@ class ListUserViewModel(
                             break // Stop looping when the last page is reached
                         }
                         currentPage++ // Move to the next page
-                        _user.value = allUsers.toMutableList()
+                        _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList()
                     }
                     else break
                 } else {
                     break // Stop loop on failure
                 }
             }
-            _user.value = allUsers.toMutableList() // Update UI with all categories
+            _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList() // Update UI with all categories
         } catch (e: Exception) {
         } finally {
             _isLoading.value = false
@@ -140,18 +139,6 @@ class ListUserViewModel(
         _asc.value = !_asc.value
     }
 
-    fun loadSortingOptions() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                // Simulate network call
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
     suspend fun loadData() {
         _isLoading.value = true
         var currentPage = 0
@@ -169,14 +156,14 @@ class ListUserViewModel(
                             break // Stop looping when the last page is reached
                         }
                         currentPage++ // Move to the next page
-                        _user.value = allUsers.toMutableList()
+                        _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList()
                     }
                     else break
                 } else {
                     break // Stop loop on failure
                 }
             }
-            _user.value = allUsers.toMutableList() // Update UI with all categories
+            _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList() // Update UI with all categories
         } catch (e: Exception) {
         } finally {
             _isLoading.value = false

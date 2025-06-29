@@ -58,4 +58,7 @@ interface ProductRepository {
         @Query("size") size: Int? = null,
         @Query("sort") sort: List<String>? = null,
         @Query("filter") filter: String): Response<PageVO<ProductResponse>>
+
+    @GET("products/recommended")
+    suspend fun getRecommendedProducts(): Response<List<ProductResponse>>
 }

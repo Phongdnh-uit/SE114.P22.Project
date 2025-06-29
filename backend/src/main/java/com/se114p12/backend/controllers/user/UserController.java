@@ -5,6 +5,7 @@ import com.se114p12.backend.constants.AppConstant;
 import com.se114p12.backend.dtos.user.UserRequestDTO;
 import com.se114p12.backend.dtos.user.UserResponseDTO;
 import com.se114p12.backend.entities.user.User;
+import com.se114p12.backend.enums.UserStatus;
 import com.se114p12.backend.services.user.UserService;
 import com.se114p12.backend.vo.PageVO;
 import com.turkraft.springfilter.boot.Filter;
@@ -81,15 +82,29 @@ public class UserController {
 
   @Operation(summary = "Assign role to user", description = "Assign a role to a user by their ID")
   @ApiResponse(
-      responseCode = "204",
-      description = "Successfully assigned role to user",
-      content = @Content(schema = @Schema(implementation = Void.class)))
+          responseCode = "204",
+          description = "Successfully assigned role to user",
+          content = @Content(schema = @Schema(implementation = Void.class)))
   @ErrorResponse
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @PostMapping("/{id}/assign-role/{roleId}")
   public ResponseEntity<Void> assignRoleToUser(
-      @PathVariable("id") Long userId, @PathVariable("roleId") Long roleId) {
+          @PathVariable("id") Long userId, @PathVariable("roleId") Long roleId) {
     userService.assignRoleToUser(userId, roleId);
     return ResponseEntity.noContent().build();
+  }
+
+  @Operation(summary = "Update user status", description = "Update the status of a user by their ID")
+  @ApiResponse(
+          responseCode = "204",
+          description = "Successfully updated user status",
+          content = @Content(schema = @Schema(implementation = Void.class)))
+  @ErrorResponse
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<Void> updateStatus(
+          @PathVariable("id") Long userId, @RequestParam("status") String status) {
+    userService.updateUserStatus(userId, UserStatus.valueOf(status));
+      return ResponseEntity.noContent().build();
   }
 }

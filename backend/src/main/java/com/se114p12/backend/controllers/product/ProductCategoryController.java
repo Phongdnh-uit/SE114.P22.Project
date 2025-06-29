@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Product Category Module", description = "APIs for managing product categories")
-@RequestMapping(AppConstant.API_BASE_PATH + "product-categories")
+@RequestMapping(AppConstant.API_BASE_PATH + "/product-categories")
 @RestController
 @RequiredArgsConstructor
 public class ProductCategoryController {

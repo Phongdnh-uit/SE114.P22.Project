@@ -1,21 +1,31 @@
 package com.se114p12.backend.services.product;
 
+import com.se114p12.backend.constants.AppConstant;
 import com.se114p12.backend.dtos.product.ProductRequestDTO;
 import com.se114p12.backend.dtos.product.ProductResponseDTO;
 import com.se114p12.backend.entities.product.Product;
 import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.exceptions.ResourceNotFoundException;
 import com.se114p12.backend.mappers.product.ProductMapper;
+import com.se114p12.backend.neo4j.entities.CategoryNode;
+import com.se114p12.backend.neo4j.entities.ProductNode;
+import com.se114p12.backend.neo4j.repositories.ProductNeo4jRepository;
+import com.se114p12.backend.neo4j.services.RecommendService;
 import com.se114p12.backend.repositories.product.ProductCategoryRepository;
 import com.se114p12.backend.repositories.product.ProductRepository;
 import com.se114p12.backend.services.general.StorageService;
 import com.se114p12.backend.vo.PageVO;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +37,8 @@ public class ProductServiceImpl implements ProductService {
   private final ProductCategoryRepository productCategoryRepository;
   private final StorageService storageService;
   private final ProductMapper productMapper;
+  private final RecommendService recommendService;
+  private final ProductNeo4jRepository productNeo4jRepository;
 
   @Override
   public PageVO<ProductResponseDTO> getAllProducts(
@@ -79,28 +91,49 @@ public class ProductServiceImpl implements ProductService {
             .deleted(false)
             .build();
 
-    product.setImageUrl(storageService.store(dto.getImage(), "product-items"));
+    if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+      product.setImageUrl(storageService.store(dto.getImage(), AppConstant.PRODUCT_FOLDER));
+    }
+
     product = productRepository.save(product);
+
+    // Neo4j recommendation system
+    ProductNode productNode = new ProductNode();
+    CategoryNode categoryNode = new CategoryNode();
+    productNode.setId(product.getId());
+    categoryNode.setId(category.getId());
+    productNode.setCategory(categoryNode);
+    productNeo4jRepository.save(productNode);
 
     return productMapper.entityToResponse(product);
   }
 
   @Override
   public ProductResponseDTO update(Long id, ProductRequestDTO dto) {
-    Product existingProduct = productRepository.findById(id)
+    Product existingProduct =
+        productRepository
+            .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-    existingProduct.setName((dto.getName() == null || dto.getName().isEmpty())
-            ? existingProduct.getName() : dto.getName());
+    existingProduct.setName(
+        (dto.getName() == null || dto.getName().isEmpty())
+            ? existingProduct.getName()
+            : dto.getName());
 
-    existingProduct.setShortDescription((dto.getShortDescription() == null || dto.getShortDescription().isEmpty())
-            ? existingProduct.getShortDescription() : dto.getShortDescription() );
+    existingProduct.setShortDescription(
+        (dto.getShortDescription() == null || dto.getShortDescription().isEmpty())
+            ? existingProduct.getShortDescription()
+            : dto.getShortDescription());
 
-    existingProduct.setDetailDescription((dto.getDetailDescription() == null || dto.getDetailDescription().isEmpty())
-            ? existingProduct.getDetailDescription() : dto.getDetailDescription());
+    existingProduct.setDetailDescription(
+        (dto.getDetailDescription() == null || dto.getDetailDescription().isEmpty())
+            ? existingProduct.getDetailDescription()
+            : dto.getDetailDescription());
 
-    existingProduct.setOriginalPrice((dto.getOriginalPrice() == null)
-            ? existingProduct.getOriginalPrice() : dto.getOriginalPrice());
+    existingProduct.setOriginalPrice(
+        (dto.getOriginalPrice() == null)
+            ? existingProduct.getOriginalPrice()
+            : dto.getOriginalPrice());
 
     existingProduct.setUpdatedAt(Instant.now());
 
@@ -113,7 +146,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-      String fileUrl = storageService.store(dto.getImage(), "product-items");
+      String fileUrl = storageService.store(dto.getImage(), AppConstant.PRODUCT_FOLDER);
       existingProduct.setImageUrl(fileUrl);
     }
 
@@ -147,5 +180,32 @@ public class ProductServiceImpl implements ProductService {
             .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
     return productMapper.entityToResponse(product);
+  }
+
+  @Override
+  public List<ProductResponseDTO> getRecommendedProducts() {
+    List<Long> recommendedProductIds = recommendService.getRecommendProductIds();
+
+    Map<Long, Product> productMap =
+        productRepository.findAllById(recommendedProductIds).stream()
+            .collect(Collectors.toMap(Product::getId, product -> product));
+
+    List<Product> recommendedProducts =
+        recommendedProductIds.stream()
+            .map(productMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+    if (recommendedProducts.size() < 10) {
+      Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+      List<Product> additional = productRepository.findAll(pageable).getContent();
+      recommendedProducts.addAll(
+          additional.stream()
+              .filter(product -> !recommendedProductIds.contains(product.getId()))
+              .limit(10 - recommendedProducts.size())
+              .toList());
+    }
+
+    return recommendedProducts.stream().map(productMapper::entityToResponse).toList();
   }
 }

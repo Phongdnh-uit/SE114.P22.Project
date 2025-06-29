@@ -10,6 +10,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.order.OrderResponse
+import com.example.mam.dto.review.ReviewRequest
+import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.shipper.ShipperResponse
 import com.example.mam.dto.user.UserResponse
 import com.example.mam.repository.BaseRepository
@@ -30,6 +32,9 @@ class OrderViewModel(
 
     private val _shipper = MutableStateFlow<ShipperResponse?>(null)
     val shipper = _shipper.asStateFlow()
+
+    private val _review = MutableStateFlow<ReviewResponse?>(null)
+    val review = _review.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -112,6 +117,61 @@ class OrderViewModel(
             Log.d("OrderViewModel", "Failed to load order: ${e.message}")
         } finally {
             _isLoading.value = false
+        }
+    }
+
+    suspend fun loadReview() {
+        try {
+            val response = BaseRepository(userPreferencesRepository).orderRepository.getReviewByOrderId(orderId)
+            Log.d("OrderViewModel", "Loading review for order ID: $orderId, Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                _review.value = response.body()
+                Log.d("OrderViewModel", "Review loaded successfully")
+            } else {
+                Log.d("OrderViewModel", "Failed to load review (BE): ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("OrderViewModel", "Failed to load review: ${e.message}")
+        } finally {
+        }
+    }
+
+    suspend fun createReview(review: ReviewRequest): Int {
+        try {
+            val response = BaseRepository(userPreferencesRepository).orderRepository.createReview(review)
+            Log.d("OrderViewModel", "Creating review for order ID: $orderId, Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("OrderViewModel", "Review created successfully")
+                loadReview()
+                return 1
+            } else {
+                Log.d("OrderViewModel", "Failed to create review: ${response.errorBody()?.string()}")
+                return 0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("OrderViewModel", "Exception while creating review: ${e.message}")
+            return 0
+        }
+    }
+
+    suspend fun updateReview(reviewId: Long, review: ReviewRequest): Int {
+        try {
+            val response = BaseRepository(userPreferencesRepository).orderRepository.updateReview(reviewId, review)
+            Log.d("OrderViewModel", "Updating review with ID: $reviewId, Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("OrderViewModel", "Review updated successfully")
+                loadReview()
+                return 1
+            } else {
+                Log.d("OrderViewModel", "Failed to update review (BE): ${response.errorBody()?.string()}")
+                return 0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("OrderViewModel", "Exception while updating review: ${e.message}")
+            return 0
         }
     }
 

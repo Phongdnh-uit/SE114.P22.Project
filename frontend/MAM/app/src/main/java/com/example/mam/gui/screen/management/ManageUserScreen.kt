@@ -96,7 +96,6 @@ fun ManageUserScreen(
     onBackClick: () -> Unit,
     isPreview: Boolean = false,
     isEdit : Boolean = false,
-    isAdd: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val userId = viewModel.userID.collectAsStateWithLifecycle().value
@@ -122,17 +121,7 @@ fun ManageUserScreen(
         }
     } else null
     LaunchedEffect(Unit) {
-        if (!isAdd) {
-            viewModel.loadData()
-        } else {
-            viewModel.setUserName("")
-            viewModel.setUserImage("https://static.vecteezy.com/system/resources/previews/056/202/171/non_2x/add-image-or-photo-icon-vector.jpg")
-            viewModel.setFullName("")
-            viewModel.setEmail("")
-            viewModel.setRole("Admin")
-            viewModel.setPhone("")
-            viewModel.setStatus("")
-        }
+        viewModel.loadData()
     }
     Column(
         modifier = Modifier
@@ -151,51 +140,41 @@ fun ManageUserScreen(
                 foregroundColor = OrangeDefault,
                 icon = Icons.Outlined.ArrowBack,
                 shadow = "outer",
-                onClick = {
-                    if (isEditMode) {
-                        isEditMode = false
-                    } else {
-                        onBackClick()
-                    }
-                },
+                onClick = onBackClick,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(top = 16.dp, start = 16.dp)
             )
-            val isButtonEnable = if (isAdd || isEditMode) {
-                userName.isNotEmpty() && fullName.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty()
-                        && viewModel.isUserNameValid().isEmpty()
-                        && viewModel.isFullNameValid().isEmpty()
-                        && viewModel.isEmailValid().isEmpty()
-                        && viewModel.isPhoneValid().isEmpty()
-            } else true
-//            if (isButtonEnable) CircleIconButton(
-//                backgroundColor = OrangeLighter,
-//                foregroundColor = OrangeDefault,
-//                icon = if (isEditMode || isAdd) Icons.Default.Done else Icons.Default.Edit,
-//                shadow = "outer",
-//                onClick = {
-//                    scope.launch {
-//                        if (isEdit) {
-//                            val result = viewModel.updateUser()
-//                            Toast.makeText(
-//                                context,
-//                                when(result){
-//                                    1 -> "Chỉnh sửa thành công"
-//                                    else -> "Chỉnh sửa thất bại"
-//                                },
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                            onBackClick()
-//                        }
-//                    }
-//                },
-//                modifier = Modifier
-//                    .align(Alignment.TopEnd)
-//                    .padding(end = 16.dp, top = 16.dp)
-//            )
+             CircleIconButton(
+                backgroundColor = OrangeLighter,
+                foregroundColor = OrangeDefault,
+                icon = if (isEditMode) Icons.Default.Done else Icons.Default.Edit,
+                shadow = "outer",
+                onClick = {
+                    scope.launch {
+                        if (isEditMode) {
+                            val result = viewModel.updateUserStatus()
+                            Toast.makeText(
+                                context,
+                                when (result) {
+                                    1 -> "Chỉnh sửa thành công"
+                                    else -> "Chỉnh sửa thất bại"
+                                },
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            onBackClick()
+                        }
+                        else {
+                            isEditMode = true
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 16.dp, top = 16.dp)
+            )
             Text(
-                text = if (isAdd) "Thêm tài khoản" else if (isEditMode) "Chỉnh sửa tài khoản" else "Chi tiết tài khoản",
+                text = if (isEditMode) "Chỉnh sửa tài khoản" else "Chi tiết tài khoản",
                 style = Typography.titleLarge,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -237,7 +216,7 @@ fun ManageUserScreen(
             item {
                 Spacer(modifier = Modifier.size(20.dp))
             }
-            if (isLoading){
+            if (isLoading) {
                 item {
                     CircularProgressIndicator(
                         color = OrangeDefault,
@@ -246,8 +225,7 @@ fun ManageUserScreen(
                             .size(40.dp)
                     )
                 }
-            }
-            else {
+            } else {
                 item {
                     AsyncImage(
                         model = imgUrl,
@@ -260,32 +238,8 @@ fun ManageUserScreen(
                             .aspectRatio(1f)
                             .padding(8.dp)
                             .clip(RoundedCornerShape(50))
-                            .then(
-                                if (isEditMode || isAdd) {
-                                    Modifier.clickable {
-                                        val permission =
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                android.Manifest.permission.READ_MEDIA_IMAGES
-                                            } else {
-                                                android.Manifest.permission.READ_EXTERNAL_STORAGE
-                                            }
-                                        if (context.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED && activity != null) {
-                                            ActivityCompat.requestPermissions(
-                                                activity,
-                                                arrayOf(permission),
-                                                123
-                                            )
-                                        } else {
-                                            imagePicker?.launch("image/*")
-                                        }
-                                    }
-                                }
-                                else Modifier
-                            )
-
                     )
-                }
-                if (!isAdd) item {
+
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -342,7 +296,7 @@ fun ManageUserScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth().padding(horizontal = 16.dp)
-                    ){
+                    ) {
                         FilterChip(
                             selected = false,
                             onClick = { },
@@ -360,14 +314,15 @@ fun ManageUserScreen(
                             ),
                             modifier = Modifier
                         )
-                        Box(Modifier
-                            .zIndex(1f)
+                        Box(
+                            Modifier
+                                .zIndex(1f)
                         ) {
                             var statusExpanded by remember { mutableStateOf(false) }
                             FilterChip(
                                 selected = statusExpanded,
                                 onClick = {
-//                                    if (isEditMode || isAdd ) statusExpanded = !statusExpanded
+                                    if (isEditMode) statusExpanded = !statusExpanded
                                 },
                                 label = {
                                     Text(
@@ -378,7 +333,10 @@ fun ManageUserScreen(
                                     )
                                 },
                                 trailingIcon = {
-                                    //if (isEditMode || isAdd ) Icon(if (!statusExpanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp , contentDescription = "Expand")
+                                    if (isEditMode) Icon(
+                                        if (!statusExpanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp,
+                                        contentDescription = "Expand"
+                                    )
                                 },
                                 border = FilterChipDefaults.filterChipBorder(
                                     enabled = true,
@@ -405,8 +363,12 @@ fun ManageUserScreen(
                             ) {
                                 statusList.forEach { status ->
                                     DropdownMenuItem(
-                                        text = { Text(status,
-                                            color = BrownDefault) },
+                                        text = {
+                                            Text(
+                                                status,
+                                                color = BrownDefault
+                                            )
+                                        },
                                         onClick = {
                                             viewModel.setStatus(status)
                                             statusExpanded = false
@@ -420,7 +382,7 @@ fun ManageUserScreen(
                 item {
                     OutlinedTextField(
                         value = userName,
-                        readOnly = !((isEditMode && role == "Admin" ) || isAdd),
+                        readOnly = true,
                         onValueChange = {
                             viewModel.setUserName(it)
                         },
@@ -443,20 +405,10 @@ fun ManageUserScreen(
                                 modifier = Modifier
                             )
                         },
-                        supportingText = {
-                            if (viewModel.isUserNameValid().isNotEmpty() && userName.isNotEmpty()) {
-                                Text(
-                                    text = viewModel.isUserNameValid(),
-                                    color = ErrorColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier
-                                )
-                            }
-                        },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done),
+                            imeAction = ImeAction.Done
+                        ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -467,7 +419,7 @@ fun ManageUserScreen(
                 item {
                     OutlinedTextField(
                         value = fullName,
-                        readOnly = !((isEditMode && role == "Admin" ) || isAdd),
+                        readOnly = true,
                         onValueChange = {
                             viewModel.setFullName(it)
                         },
@@ -475,7 +427,7 @@ fun ManageUserScreen(
                             color = BrownDefault,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Normal,
-                            ),
+                        ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = BrownDefault,
                             unfocusedBorderColor = GreyDefault,
@@ -490,20 +442,10 @@ fun ManageUserScreen(
                                 modifier = Modifier
                             )
                         },
-                        supportingText = {
-                            if (viewModel.isFullNameValid().isNotEmpty() && fullName.isNotEmpty()) {
-                                Text(
-                                    text = viewModel.isFullNameValid(),
-                                    color = ErrorColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier
-                                )
-                            }
-                        },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done),
+                            imeAction = ImeAction.Done
+                        ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -514,7 +456,7 @@ fun ManageUserScreen(
                 item {
                     OutlinedTextField(
                         value = email,
-                        readOnly = !((isEditMode && role == "Admin" ) || isAdd),
+                        readOnly = true,
                         onValueChange = {
                             viewModel.setEmail(it)
                         },
@@ -537,20 +479,10 @@ fun ManageUserScreen(
                                 modifier = Modifier
                             )
                         },
-                        supportingText = {
-                            if (viewModel.isEmailValid().isNotEmpty() && email.isNotEmpty()) {
-                                Text(
-                                    text = viewModel.isEmailValid(),
-                                    color = ErrorColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier
-                                )
-                            }
-                        },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done),
+                            imeAction = ImeAction.Done
+                        ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -560,7 +492,7 @@ fun ManageUserScreen(
                 item {
                     OutlinedTextField(
                         value = phone,
-                        readOnly = !((isEditMode && role == "Admin" ) || isAdd),
+                        readOnly = true,
                         onValueChange = {
                             viewModel.setPhone(it)
                         },
@@ -583,20 +515,10 @@ fun ManageUserScreen(
                                 modifier = Modifier
                             )
                         },
-                        supportingText = {
-                            if (viewModel.isPhoneValid().isNotEmpty() && phone.isNotEmpty()) {
-                                Text(
-                                    text = viewModel.isPhoneValid(),
-                                    color = ErrorColor,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier
-                                )
-                            }
-                        },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done),
+                            imeAction = ImeAction.Done
+                        ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier
                             .fillMaxWidth()

@@ -11,6 +11,7 @@ import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.order.OrderRequest
 import com.example.mam.dto.order.OrderResponse
+import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.user.UserResponse
 import com.example.mam.repository.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,6 +170,22 @@ class ListOrderViewModel(
         } catch (e: Exception) {
             Log.e("ListOrderViewModel", "Exception loading owner of order: ${e.message}")
             return UserResponse()
+        }
+    }
+
+    suspend fun loadReviewOfOrder(id: Long): ReviewResponse{
+        try {
+            val response = BaseRepository(userPreferencesRepository)
+                .orderRepository.getReviewByOrderId(id)
+            if (response.isSuccessful) {
+                return response.body() ?: ReviewResponse()
+            } else {
+                Log.e("ListOrderViewModel", "Error loading review of order: ${response.errorBody()?.string()}")
+                return  ReviewResponse()
+            }
+        } catch (e: Exception) {
+            Log.e("ListOrderViewModel", "Exception loading review of order: ${e.message}")
+            return ReviewResponse()
         }
     }
 

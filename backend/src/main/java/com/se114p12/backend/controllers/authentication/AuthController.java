@@ -53,6 +53,18 @@ public class AuthController {
   }
 
   @Operation(
+      summary = "Login with Firebase",
+      description =
+          "Login using Firebase credentials. The Firebase ID token is sent in the request body.")
+  @ErrorResponse
+  @PostMapping("/oauth2/login/firebase")
+  @ResponseBody
+  public ResponseEntity<AuthResponseDTO> loginWithFirebase(
+      @Valid @RequestBody FirebaseLoginRequestDTO firebaseLoginRequestDTO) {
+    return ResponseEntity.ok(authService.loginWithFirebase(firebaseLoginRequestDTO));
+  }
+
+  @Operation(
       summary = "Register with Google OAuth2",
       description =
           "Register using Google OAuth2 credentials. The Google ID token is sent in the request"
@@ -64,6 +76,19 @@ public class AuthController {
       @Valid @RequestBody GoogleRegisterRequestDTO googleRegisterRequestDTO) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(userService.registerGoogleUser(googleRegisterRequestDTO));
+  }
+
+  @Operation(
+      summary = "Register with Firebase",
+      description =
+          "Register using Firebase credentials. The Firebase ID token is sent in the request body.")
+  @ErrorResponse
+  @PostMapping("/oauth2/register/firebase")
+  @ResponseBody
+  public ResponseEntity<UserResponseDTO> registerWithFirebase(
+      @Valid @RequestBody FirebaseRegisterRequestDTO firebaseRegisterRequestDTO) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(userService.registerFirebaseUser(firebaseRegisterRequestDTO));
   }
 
   @Operation(

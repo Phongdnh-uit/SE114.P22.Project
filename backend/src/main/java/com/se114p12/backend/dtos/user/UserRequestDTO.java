@@ -14,7 +14,7 @@ public class UserRequestDTO {
 
   @NotBlank
   @Pattern(
-      regexp = "^[a-zA-Z]+\\d*$",
+      regexp = "^[a-zA-Z][a-zA-Z0-9]*$",
       message = "Username must contains letters and numbers and must begin with a letter")
   private String username;
 

@@ -1,6 +1,8 @@
 package com.example.mam.gui.screen.authentication
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +19,16 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -29,9 +36,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mam.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImagePainter.State.Empty.painter
+import com.example.mam.GoogleSignInUtils
+import com.example.mam.gui.component.LoadingAlertDialog
 import com.example.mam.gui.component.OuterShadowFilledButton
+import com.example.mam.gui.component.SignUpDialog
 import com.example.mam.gui.component.UnderlinedClickableText
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -39,6 +51,7 @@ import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
+import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authentication.StartViewModel
 import kotlinx.coroutines.launch
 
@@ -56,6 +69,28 @@ fun StartScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
+    var isGoogleRegister by remember { mutableStateOf(false) }
+
+    var phoneNumber by remember { mutableStateOf("") }
+    var idToken by remember { mutableStateOf("") }
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        GoogleSignInUtils.getGoogleIdToken(
+            context = context,
+            scope = scope,
+            launcher = null,
+            handle = { token ->
+                idToken = token
+            }
+        )
+
+    }
+
+    if (isLoading) {
+        isGoogleRegister = false
+        LoadingAlertDialog()
+    }
     LaunchedEffect(Unit) {
         scope.launch {
             if (viewModel.getAccessToken() == 1) {
@@ -86,6 +121,49 @@ fun StartScreen(
             .verticalScroll(scrollState)
             //.padding(WindowInsets.ime.asPaddingValues())
     ) {
+
+        if (isGoogleRegister) {
+            SignUpDialog(
+                title = "Đăng ký qua Google",
+                message = "Nhập số điện thoại của bạn để đăng ký tài khoản",
+                viewModel = viewModel,
+                onDismiss = { isGoogleRegister = false },
+                onConfirm = {
+                    viewModel.triggerLoading()
+                    GoogleSignInUtils.getGoogleIdToken(
+                        context = context,
+                        scope = scope,
+                        launcher = launcher,
+                        timeout = {
+                            isGoogleRegister = false
+                            viewModel.resetLoading()
+                        },
+                        handle = { token ->
+                            idToken = token
+                            scope.launch {
+                                val result = viewModel.RegisterWithFireBase(idToken)
+                                if (result == 1) {
+                                    onGGSignUpClicked()
+                                    Toast.makeText(
+                                        context,
+                                        "Đăng ký thành công",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    onSignInClicked()
+                                    isGoogleRegister = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Đăng ký thất bại",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    )
+                },
+            )
+        }
         Image(
             painter = painterResource(id = R.drawable.ic_mam_foreground),
             contentDescription = null,
@@ -126,19 +204,22 @@ fun StartScreen(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
             ) {
-//                OuterShadowFilledButton(
-//                    text = "Đăng ký qua Google",
-//                    image = R.drawable.ic_google,
-//                    onClick = onGGSignUpClicked,
-//                    modifier = Modifier
-//                        .fillMaxWidth(0.8f)
-//                )
-//                HorizontalDivider(
-//                    color = BrownDefault,
-//                    modifier = Modifier
-//                        .fillMaxWidth(0.8f),
-//
-//                )
+                OuterShadowFilledButton(
+                    text = "Đăng ký qua Google",
+                    image = R.drawable.ic_google,
+                    color = WhiteDefault,
+                    textColor = BrownDefault,
+                    onClick = {
+                        isGoogleRegister =true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                )
+                HorizontalDivider(
+                    color = BrownDefault,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f),
+                )
                 OuterShadowFilledButton(
                     text = "Đăng ký",
                     onClick = onSignUpClicked,

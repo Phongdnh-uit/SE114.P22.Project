@@ -1,6 +1,7 @@
 package com.example.mam.gui.screen.management
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
@@ -409,172 +411,115 @@ fun ListOrderScreen(
 fun OrderItem(
     order: OrderResponse,
     viewModel: ListOrderViewModel,
-    isViewOnly : Boolean = true,
     onEditClick: (Long) -> Unit,
 ) {
     var owner by remember { mutableStateOf(UserResponse()) }
+    var rate by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
-         owner = viewModel.loadOwnerOfOrder(order.userId)
+        owner = viewModel.loadOwnerOfOrder(order.userId)
+        rate = viewModel.loadReviewOfOrder(order.id).rate
     }
     var expand by remember { mutableStateOf(false) }
-        Card(
-            onClick = { onEditClick(order.id) },
-            colors = CardDefaults.cardColors(
-                containerColor = WhiteDefault
-            ),
-            modifier = Modifier.padding(8.dp)
+    Card(
+        onClick = { onEditClick(order.id) },
+        colors = CardDefaults.cardColors(
+            containerColor = WhiteDefault
+        ),
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            AsyncImage(
+                model = owner.getRealURL(),
+                contentDescription = null,
+                placeholder = painterResource(R.drawable.ic_mam_logo),
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(GreyLight)
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(10.dp)
             ) {
-                AsyncImage(
-                    model = owner.getRealURL(),
-                    contentDescription = null,
-                    placeholder = painterResource(R.drawable.ic_mam_logo),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(GreyLight)
+                Text(
+                    text = order.orderStatus,
+                    textAlign = TextAlign.Start,
+                    color = OrangeDefault,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(10.dp)
-                ) {
+                Text(
+                    text = owner.fullname,
+                    textAlign = TextAlign.Start,
+                    color = BrownDefault,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Instant.parse(order.createdAt).atZone(ZoneId.systemDefault())?.let {
                     Text(
-                        text = order.orderStatus,
-                        textAlign = TextAlign.Start,
-                        color = OrangeDefault,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Text(
-                        text = owner.fullname,
+                        text = it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
                         textAlign = TextAlign.Start,
                         color = BrownDefault,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Instant.parse(order.createdAt).atZone(ZoneId.systemDefault())?.let {
-                        Text(
-                            text = it.format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
-                            textAlign = TextAlign.Start,
-                            color = BrownDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    Text(
-                        text = "Tổng tiền: " + order.getPriceToString(),
-                        textAlign = TextAlign.Start,
-                        color = BrownDefault,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                    if (order.orderStatus == "PENDING" ||
-                        order.orderStatus == "CONFIRMED" ||
-                        order.orderStatus == "PROCESSING")
-                        IconButton(onClick = { onEditClick(order.id) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
-                    }
-                    //                IconButton(onClick = { onDeleteClick(order.id) }) {
-                    //                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BrownDefault)
-                    //                }
+                Text(
+                    text = "Tổng tiền: " + order.getPriceToString(),
+                    textAlign = TextAlign.Start,
+                    color = BrownDefault,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            if (order.orderStatus == "PENDING" ||
+                order.orderStatus == "CONFIRMED" ||
+                order.orderStatus == "PROCESSING")
+                IconButton(onClick = { onEditClick(order.id) }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
+            }
+            if (order.orderStatus == "COMPLETED" && rate != 0) {
+                Text(
+                    text = rate.toString(),
+                    textAlign = TextAlign.Start,
+                    color = BrownDefault,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                )
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "History",
+                    tint = OrangeDefault,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                        .size(24.dp)
+                        .align(Alignment.CenterVertically)
+                )
             }
         }
     }
+}
 
-//@Preview
-//@Composable
-//fun PreviewOrderItem() {
-//    val order = Order(
-//        id = "1",
-//        userId = "1",
-//        orderDate = Instant.now(),
-//        paymentId = "1",
-//        shippingAddress = "123 Street",
-//        orderItems = mutableListOf(),
-//        totalPrice = 100000,
-//        note = "Note",
-//        orderStatus = 1,
-//        expectDeliveryTime = Instant.now(),
-//        actualDeliveryTime = Instant.now(),
-//        shipperId = "1"
-//    )
-//    OrderItem(
-//        order = order,
-//        onEditClick = {},
-//    )
-//}
-//
-//@Preview
-//@Composable
-//fun PreviewListOrderScreen() {
-//    ListOrderScreen(
-//        viewModel = ListOrderViewModel(),
-//        onBackClick = {},
-//        onEditOrderClick = {},
-//        mockData = listOf(
-//            Order(
-//                id = "1",
-//                userId = "1",
-//                orderDate = Instant.now(),
-//                paymentId = "1",
-//                shippingAddress = "123 Street",
-//                orderItems = mutableListOf(),
-//                totalPrice = 100000,
-//                note = "Note",
-//                orderStatus = 4,
-//                expectDeliveryTime = Instant.now(),
-//                actualDeliveryTime = Instant.now(),
-//                shipperId = "1"
-//            ),
-//            Order(
-//                id = "1",
-//                userId = "1",
-//                orderDate = Instant.now(),
-//                paymentId = "1",
-//                shippingAddress = "123 Street",
-//                orderItems = mutableListOf(),
-//                totalPrice = 100000,
-//                note = "Note",
-//                orderStatus = 1,
-//                expectDeliveryTime = Instant.now(),
-//                actualDeliveryTime = Instant.now(),
-//                shipperId = "1"
-//            ),
-//            Order(
-//                id = "1",
-//                userId = "1",
-//                orderDate = Instant.now(),
-//                paymentId = "1",
-//                shippingAddress = "123 Street",
-//                orderItems = mutableListOf(),
-//                totalPrice = 100000,
-//                note = "Note",
-//                orderStatus = 1,
-//                expectDeliveryTime = Instant.now(),
-//                actualDeliveryTime = Instant.now(),
-//                shipperId = "1"
-//            )
-//        )
-//    )
-//}

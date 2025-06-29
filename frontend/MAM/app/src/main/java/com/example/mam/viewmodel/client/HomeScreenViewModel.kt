@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
@@ -14,30 +15,92 @@ import com.example.mam.dto.user.UserResponse
 import com.example.mam.repository.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-    private val accessToken = userPreferencesRepository.accessToken.map { it }
-    private val refreshToken = userPreferencesRepository.refreshToken.map { it }
 
     private val _listCategory = MutableStateFlow<MutableList<CategoryResponse>>(mutableListOf())
-    private val _listProduct = MutableStateFlow<MutableList<ProductResponse>>(mutableListOf())
-    private val _user = MutableStateFlow<UserResponse>(UserResponse())
+
+    private val _recommendedProducts = MutableStateFlow<List<ProductResponse>>(emptyList())
+    val recommendedProducts = _recommendedProducts.asStateFlow()
+
+    private val _cartCount = MutableStateFlow<Int>(0)
+    val cartCount: StateFlow<Int> = _cartCount
+
+    private val _notificationCount = MutableStateFlow<Int>(0)
+    val notificationCount: StateFlow<Int> = _notificationCount
+
+    suspend fun loadCartCount() {
+        try {
+            val response = BaseRepository(userPreferencesRepository).cartRepository.getMyCartCount()
+            Log.d("CartViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                val count = response.body()
+                if (count != null) {
+                    _cartCount.value = count
+                    Log.d("CartViewModel", "Cart count loaded: $count")
+                } else {
+                    Log.d("CartViewModel", "No cart found")
+                }
+            } else {
+                Log.d("CartViewModel", "Failed to load cart count: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CartViewModel", "Failed to load cart count: ${e.message}")
+        }
+    }
+
+    suspend fun loadNotificationCount() {
+        try {
+            val response = BaseRepository(userPreferencesRepository).notificationRepository.countMyUnreadNotifications()
+            Log.d("NotificationViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                val count = response.body()
+                if (count != null) {
+                    _notificationCount.value = count.toInt()
+                    Log.d("NotificationViewModel", "Notification count loaded: $count")
+                } else {
+                    Log.d("NotificationViewModel", "No notifications found")
+                }
+            } else {
+                Log.d("NotificationViewModel", "Failed to load notification count: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("NotificationViewModel", "Failed to load notification count: ${e.message}")
+        }
+    }
+
+    suspend fun loadAdditionalProduct(){
+        try {
+            val response = BaseRepository(userPreferencesRepository).productRepository.getRecommendedProducts()
+            Log.d("CartViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                val products = response.body()
+                if (products != null) {
+                    _recommendedProducts.value = products
+                    Log.d("CartViewModel", "Recommended products loaded: ${_recommendedProducts.value.size} items")
+                } else {
+                    Log.d("CartViewModel", "No recommended products found")
+                }
+            } else {
+                Log.d("CartViewModel", "Failed to load recommended products: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CartViewModel", "Failed to load additional products: ${e.message}")
+        }
+    }
 
     private val _productMap = MutableStateFlow<Map<Long, List<ProductResponse>>>(emptyMap())
     val productMap: StateFlow<Map<Long, List<ProductResponse>>> = _productMap
     fun getListCategory(): List<CategoryResponse> {
         return _listCategory.value.toList()
-    }
-
-    fun getListProduct(categoryId: Long): List<ProductResponse> {
-        val listProduct: MutableList<ProductResponse> = mutableListOf()
-        for(product in _listProduct.value.toList()){
-            if (product.categoryId.equals(categoryId)) listProduct.add(product)
-        }
-        return listProduct
     }
 
     suspend fun loadListCategory(){
@@ -79,10 +142,11 @@ class HomeScreenViewModel(
         }
     }
 
-    fun clearListCategory(){
-        _listCategory.value.clear()
+    fun setAdressAndCoordinates( address: String, longitude: Double, latitude: Double) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveAddress(address, longitude, latitude)
+        }
     }
-
     suspend fun loadListProduct(id: Long): List<ProductResponse>{
         try {
             Log.d("Category", "Bắt đầu lấy Danh mục")
@@ -114,19 +178,7 @@ class HomeScreenViewModel(
         }
         _productMap.value = result
     }
-    fun clearListProduct(){
-        _listProduct.value.clear()
-    }
 
-    suspend fun loadUser() {
-        try {
-            _user.value = BaseRepository(userPreferencesRepository).authPrivateRepository.getUserInfo().body() ?: UserResponse()
-            Log.d("USER", "User loaded: ${_user.value.username}")
-        }
-        catch (e: Exception) {
-            Log.d("USER", "Error loading user: ${e.message}")
-        }
-    }
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

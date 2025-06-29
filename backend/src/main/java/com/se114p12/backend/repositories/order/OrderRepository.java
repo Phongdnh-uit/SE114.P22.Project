@@ -3,6 +3,8 @@ package com.se114p12.backend.repositories.order;
 import com.se114p12.backend.entities.order.Order;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +25,6 @@ public interface OrderRepository
 
   @Query("SELECT o FROM Order o WHERE MONTH(o.createdAt) = :month AND YEAR(o.createdAt) = :year")
   List<Order> findByMonthAndYear(int month, int year);
+
+    Optional<Order> findByTxnRef(String txnRef);
 }

@@ -7,5 +7,7 @@ import retrofit2.http.GET
 interface CartRepository {
     @GET("carts/me")
     suspend fun getMyCart(): Response<CartResponse>
+    @GET("carts/me/count")
+    suspend fun getMyCartCount(): Response<Int>
 
 }

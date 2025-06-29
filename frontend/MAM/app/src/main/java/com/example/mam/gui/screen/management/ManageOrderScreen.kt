@@ -3,7 +3,9 @@ package com.example.mam.gui.screen.management
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,25 +20,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPasteOff
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Reply
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,8 +64,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -63,13 +81,17 @@ import co.yml.charts.common.extensions.isNotNull
 import coil.compose.AsyncImage
 import com.example.mam.R
 import com.example.mam.dto.order.OrderDetailResponse
+import com.example.mam.dto.review.ReviewRequest
+import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.OrderItemContainer
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.gui.screen.client.OrderRating
 import com.example.mam.gui.screen.client.OrderScreen
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.GreyAvaDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.OrangeDefault
@@ -93,7 +115,7 @@ fun ManageOrderScreen(
     val shipper = viewModel.shipper.collectAsStateWithLifecycle().value
     val user = viewModel.user.collectAsStateWithLifecycle().value
     val orderStatus = viewModel.orderStatus.collectAsStateWithLifecycle().value
-
+    val review = viewModel.review.collectAsStateWithLifecycle().value
     val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val isStatusLoading = viewModel.isStatusLoading.collectAsStateWithLifecycle().value
     var isShowDialog by remember { mutableStateOf(false) }
@@ -102,6 +124,7 @@ fun ManageOrderScreen(
     LaunchedEffect(Unit) {
         viewModel.loadOrderStatus()
         viewModel.loadData()
+        viewModel.loadReview()
     }
     Column(
         modifier = Modifier
@@ -163,6 +186,7 @@ fun ManageOrderScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                        else
                         Toast.makeText(
                             context,
                             "Cập nhật trạng thái đơn hàng thành công",
@@ -388,10 +412,36 @@ fun ManageOrderScreen(
                                 .padding(start = 10.dp)
                                 .fillMaxWidth()
                         )
-                        if (order.createdAt.isNotEmpty())
+                        if (order.createdAt.isNotEmpty() && order.createdAt.isNotBlank())
                         Instant.parse(order.createdAt).atZone(ZoneId.systemDefault()).let {
                             Text(
                                 text = "Ngày đặt: " + it.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                                textAlign = TextAlign.Start,
+                                color = OrangeDefault,
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
+                            )
+                        }
+                        if (order.expectedDeliveryTime != null && order.expectedDeliveryTime.isNotEmpty())
+                        Instant.parse(order.expectedDeliveryTime).atZone(ZoneId.systemDefault()).let {
+                            Text(
+                                text = "Thời gian giao hàng dự kiến: " + it.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                                textAlign = TextAlign.Start,
+                                color = OrangeDefault,
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
+                            )
+                        }
+                        if( order.actualDeliveryTime != null && order.actualDeliveryTime.isNotEmpty())
+                        Instant.parse(order.actualDeliveryTime).atZone(ZoneId.systemDefault()).let {
+                            Text(
+                                text = "Thời gian giao hàng thực tế: " + it.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
                                 textAlign = TextAlign.Start,
                                 color = OrangeDefault,
                                 fontSize = 14.sp,
@@ -502,6 +552,46 @@ fun ManageOrderScreen(
                         item = item
                     )
                 }
+
+                if (review != null) {
+                    item {
+                        Text(
+                            text = "Đánh giá của khách hàng",
+                            fontSize = 16.sp,
+                            color = BrownDefault,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .fillMaxWidth()
+                        )
+                    }
+                    item {
+                        OrderReview(
+                            review = review,
+                            onReplyClick = { reply ->
+                                scope.launch {
+                                    if (viewModel.reply(reply) == 0) {
+                                        Toast.makeText(
+                                            context,
+                                            "Phản hồi đánh giá thất bại",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Phản hồi đánh giá thành công",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        viewModel.loadReview() // Reload review after replying
+                                    }
+
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        )
+                    }
+                }
             }
         }
     }
@@ -582,6 +672,164 @@ fun OrderItem(
             }
         }
     }
+@Composable
+fun OrderReview(
+    review: ReviewResponse,
+    onReplyClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+){
+    var isReply by remember { mutableStateOf(false) }
+    val rate by remember { mutableIntStateOf(review.rate) }
+    val comment by remember { mutableStateOf(review.content) }
+    var reply by remember { mutableStateOf(review.reply) }
+    Surface(
+        color = WhiteDefault,
+        shadowElevation = 4.dp, // Elevation applied here instead
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Column(
+            modifier = modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                repeat(5) { index ->
+                    Icon(
+                        imageVector = if (index < rate) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                        tint = OrangeDefault,
+                        modifier = Modifier
+                            .size(32.dp)
+                    )
+                }
+            }
+            comment?.let {
+                OutlinedTextField(
+                    value = it,
+                    onValueChange = {},
+                    readOnly = true,
+                    textStyle = TextStyle(
+                        color = BrownDefault,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BrownDefault,
+                        unfocusedBorderColor = GreyDefault,
+                    ),
+                    label = {
+                        Text(
+                            text = "Nhận xét",
+                            color = BrownDefault,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                        )
+                    },
+                    trailingIcon = {
+                        if (reply == null) {
+                            IconButton(
+                                colors = IconButtonColors(
+                                    containerColor = WhiteDefault,
+                                    contentColor = BrownDefault,
+                                    disabledContentColor = BrownDefault,
+                                    disabledContainerColor = WhiteDefault
+                                ),
+                                onClick = { isReply = true }) {
+                                Icon(Icons.Default.Reply, contentDescription = "Reply Review")
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                )
+            }
+            if (isReply || reply.isNotNull())
+                Row {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_mam_logo),
+                        contentDescription = "MAM Logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(GreyAvaDefault)
+                    )
+                    OutlinedTextField(
+                        value = reply ?: "",
+                        onValueChange = { reply = it },
+                        readOnly = !isReply,
+                        textStyle = TextStyle(
+                            color = BrownDefault,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrownDefault,
+                            unfocusedBorderColor = GreyDefault,
+                        ),
+                        label = {
+                            Text(
+                                text = "Phản hồi từ MAM",
+                                color = BrownDefault,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                            )
+                        },
+                        trailingIcon = {
+                            if (reply.isNotNull() && isReply) {
+                                IconButton(
+                                    colors = IconButtonColors(
+                                        containerColor = WhiteDefault,
+                                        contentColor = BrownDefault,
+                                        disabledContentColor = BrownDefault,
+                                        disabledContainerColor = WhiteDefault
+                                    ),
+                                    onClick = {
+                                        isReply = false
+                                        reply?.let { onReplyClick(it) }
+                                    }) {
+                                    Icon(Icons.Default.Send, contentDescription = "Reply Review")
+                                }
+                            }
+                            if (reply.isNullOrBlank() && isReply) {
+                                IconButton(
+                                    colors = IconButtonColors(
+                                        containerColor = WhiteDefault,
+                                        contentColor = BrownDefault,
+                                        disabledContentColor = BrownDefault,
+                                        disabledContainerColor = WhiteDefault
+                                    ),
+                                    onClick = { isReply = false }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Cancel Reply")
+                                }
+                            }
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
+                    )
+                }
+
+        }
+    }
+}
 fun getStatusUpdateMessage(status: String): String {
     return when (status) {
         "PENDING" -> "Xác nhận đơn hàng"
@@ -593,12 +841,15 @@ fun getStatusUpdateMessage(status: String): String {
     }
 }
 
-//@Preview
-//@Composable
-//fun ManageOrderScreenPreview() {
-//    ManageOrderScreen(
-//        viewModel = ManageOrderViewModel(savedStateHandle = SavedStateHandle(mapOf("orderId" to "orderId"))),
-//        onBackClick = {},
-//        isPreview = true,
-//    )
-//}
+@Preview
+@Composable
+fun OrderReviewPreview() {
+    OrderReview(
+        onReplyClick = {},
+        review = ReviewResponse(
+            orderId = 1,
+            rate = 4,
+            content = "Sản phẩm rất tốt, giao hàng nhanh chóng!"
+        )
+    )
+}

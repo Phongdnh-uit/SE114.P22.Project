@@ -10,6 +10,5 @@ import java.util.Set;
 public class CartItemRequestDTO {
     private Long productId;
     private Long quantity;
-    private BigDecimal price;
     private Set<Long> variationOptionIds;
 }

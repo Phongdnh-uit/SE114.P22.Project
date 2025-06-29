@@ -92,7 +92,7 @@ fun ProductContainer(
         Spacer(modifier = Modifier.height(20.dp))
 
         AsyncImage(
-            model = category.getRealURL(), // Đây là URL từ API
+            model = if(category.name == "Đề xuất") category.imageUrl else category.getRealURL(), // Đây là URL từ API
             contentDescription = null,
             placeholder = painterResource(R.drawable.ic_mam_logo),
             contentScale = ContentScale.Crop,
@@ -380,13 +380,14 @@ fun AdditionalProduct(
                     modifier = Modifier
                         .padding(top = 45.dp, start = 10.dp, end = 10.dp)
                         .fillMaxWidth()
+                        .weight(1f)
                 )
                 OuterShadowFilledButton(
                     text = item.getPriceToString(),
                     fontSize = 14.sp,
                     shadowColor = WhiteDefault,
                     onClick = { onClick(item.id) },
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier.padding(5.dp).height(30.dp)
                 )
 
             }

@@ -1,14 +1,17 @@
 package com.se114p12.backend.services.user;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.se114p12.backend.constants.AppConstant;
+import com.se114p12.backend.dtos.authentication.FirebaseRegisterRequestDTO;
 import com.se114p12.backend.dtos.authentication.GoogleRegisterRequestDTO;
 import com.se114p12.backend.dtos.authentication.RegisterRequestDTO;
 import com.se114p12.backend.dtos.user.UserRequestDTO;
 import com.se114p12.backend.dtos.user.UserResponseDTO;
 import com.se114p12.backend.entities.authentication.Role;
 import com.se114p12.backend.entities.authentication.Verification;
-import com.se114p12.backend.entities.cart.Cart;
 import com.se114p12.backend.entities.user.User;
 import com.se114p12.backend.enums.LoginProvider;
 import com.se114p12.backend.enums.RoleName;
@@ -19,16 +22,16 @@ import com.se114p12.backend.exceptions.ResourceNotFoundException;
 import com.se114p12.backend.mappers.user.UserMapper;
 import com.se114p12.backend.repositories.authentication.RoleRepository;
 import com.se114p12.backend.repositories.authentication.UserRepository;
-import com.se114p12.backend.repositories.cart.CartRepository;
 import com.se114p12.backend.services.authentication.VerificationService;
 import com.se114p12.backend.services.general.MailService;
 import com.se114p12.backend.services.general.SMSService;
 import com.se114p12.backend.services.general.StorageService;
+import com.se114p12.backend.util.ImageLoader;
 import com.se114p12.backend.util.JwtUtil;
+import com.se114p12.backend.util.RandomUtil;
 import com.se114p12.backend.vo.PageVO;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,12 +47,12 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
-  private final CartRepository cartRepository;
   private final JwtUtil jwtUtil;
   private final VerificationService verificationService;
   private final MailService mailService;
   private final SMSService smsService;
   private final StorageService storageService;
+  private final ImageLoader imageLoader;
 
   @Override
   public PageVO<UserResponseDTO> getAllUsers(Specification<User> specification, Pageable pageable) {
@@ -159,7 +162,9 @@ public class UserServiceImpl implements UserService {
     User user = new User();
     user.setEmail(payload.getEmail());
     user.setFullname(payload.get("name").toString());
-    user.setUsername(UUID.randomUUID().toString());
+    do {
+      user.setUsername("user" + RandomUtil.generateRandomString(10));
+    } while (userRepository.existsByUsername(user.getUsername()));
     if (!smsService.lookupPhoneNumber(googleRegisterRequestDTO.getPhone())) {
       throw new BadRequestException("Invalid phone number");
     }
@@ -167,6 +172,54 @@ public class UserServiceImpl implements UserService {
     user.setPassword("");
     user.setLoginProvider(LoginProvider.GOOGLE);
     user.setStatus(UserStatus.ACTIVE);
+    String avatarUrl =
+        imageLoader.saveImageFromUrl(payload.get("picture").toString(), AppConstant.USER_FOLDER);
+    user.setAvatarUrl(avatarUrl);
+    Role userRole =
+        roleRepository
+            .findByName(RoleName.USER.getValue())
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+    user.setRole(userRole);
+    user = userRepository.save(user);
+    return userMapper.entityToResponse(user);
+  }
+
+  // Register or get user from Firebase
+  @Override
+  public UserResponseDTO registerFirebaseUser(
+      FirebaseRegisterRequestDTO firebaseRegisterRequestDTO) {
+    FirebaseToken payload;
+    try {
+      payload = FirebaseAuth.getInstance().verifyIdToken(firebaseRegisterRequestDTO.getIdToken());
+    } catch (FirebaseAuthException e) {
+      throw new BadRequestException("Invalid Firebase ID token");
+    }
+
+    Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
+
+    // If user exists, return the user response
+    if (userOptional.isPresent()) return userMapper.entityToResponse(userOptional.get());
+
+    if (userRepository.existsByPhone(
+        SMSService.formatPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber()))) {
+      throw new DataConflictException("Phone number already exists");
+    }
+
+    User user = new User();
+    user.setEmail(payload.getEmail());
+    user.setFullname(payload.getName());
+    do {
+      user.setUsername("user" + RandomUtil.generateRandomString(10));
+    } while (userRepository.existsByUsername(user.getUsername()));
+    if (!smsService.lookupPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber())) {
+      throw new BadRequestException("Invalid phone number");
+    }
+    user.setPhone(SMSService.formatPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber()));
+    user.setPassword("");
+    user.setLoginProvider(LoginProvider.FIREBASE);
+    user.setStatus(UserStatus.ACTIVE);
+    String avatarUrl = imageLoader.saveImageFromUrl(payload.getPicture(), AppConstant.USER_FOLDER);
+    user.setAvatarUrl(avatarUrl);
     Role userRole =
         roleRepository
             .findByName(RoleName.USER.getValue())

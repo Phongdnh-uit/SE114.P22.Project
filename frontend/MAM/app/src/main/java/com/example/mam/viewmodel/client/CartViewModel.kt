@@ -64,6 +64,19 @@ class CartViewModel(
 
     suspend fun loadAdditionalProduct(){
         try {
+            val response = BaseRepository(userPreferencesRepository).productRepository.getRecommendedProducts()
+            Log.d("CartViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                val products = response.body()
+                if (products != null) {
+                    _recommendedProducts.value = products
+                    Log.d("CartViewModel", "Recommended products loaded: ${_recommendedProducts.value.size} items")
+                } else {
+                    Log.d("CartViewModel", "No recommended products found")
+                }
+            } else {
+                Log.d("CartViewModel", "Failed to load recommended products: ${response.errorBody()?.string()}")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Log.d("CartViewModel", "Failed to load additional products: ${e.message}")
@@ -77,10 +90,11 @@ class CartViewModel(
                 cartItemRequest = CartItemRequest(
                     productId = item.productId,
                     quantity = item.quantity + 1,
-                    price = item.price,
                     variationOptionIds = item.variationOptionIds
                 )
             )
+            Log.d("CartViewModel", "Increasing item quantity for ID: ${item.id}")
+            Log.d("CartViewModel", "Product ID: ${item.productId}, Current Quantity: ${item.quantity}, New Quantity: ${item.quantity + 1}, Variation Options: ${item.variationOptionIds}")
             Log.d("CartViewModel", "Response Code: ${response.code()}")
             if (response.isSuccessful){
                 _cart.value.cartItems.find { it.id == item.id }?.let {
@@ -106,7 +120,6 @@ class CartViewModel(
                 cartItemRequest = CartItemRequest(
                     productId = item.productId,
                     quantity = if (item.quantity > 1) item.quantity - 1 else 1,
-                    price = item.price,
                     variationOptionIds = item.variationOptionIds
                 )
             )

@@ -62,7 +62,7 @@ import java.util.Locale
 @SuppressLint("MissingPermission")
 @Composable
 fun MapScreen(
-    onSelectClicked: (String) -> Unit = {},
+    onSelectClicked: (String, Double, Double) -> Unit ,
     onBackClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ){
@@ -279,7 +279,7 @@ fun MapScreen(
             OuterShadowFilledButton(
                 text = "Áp dụng",
                 fontSize = 18.sp,
-                onClick = { onSelectClicked(address) },
+                onClick = { onSelectClicked(address, currentLocation.latitude(), currentLocation.longitude() ) },
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .padding(bottom = 10.dp)
@@ -297,10 +297,4 @@ fun getAddressFromCoordinates(context: Context, lat: Double, lon: Double): Strin
     } catch (e: Exception) {
         "Không thể lấy địa chỉ"
     }
-}
-
-@Preview
-@Composable
-fun MapScreenPreview(){
-    MapScreen()
 }

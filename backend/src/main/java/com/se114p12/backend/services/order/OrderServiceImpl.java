@@ -1,5 +1,7 @@
 package com.se114p12.backend.services.order;
 
+import com.se114p12.backend.configs.ShopLocationConfig;
+import com.se114p12.backend.dtos.delivery.DeliveryResponseDTO;
 import com.se114p12.backend.dtos.order.OrderRequestDTO;
 import com.se114p12.backend.dtos.order.OrderResponseDTO;
 import com.se114p12.backend.entities.cart.Cart;
@@ -15,6 +17,13 @@ import com.se114p12.backend.enums.PaymentStatus;
 import com.se114p12.backend.exceptions.BadRequestException;
 import com.se114p12.backend.exceptions.ResourceNotFoundException;
 import com.se114p12.backend.mappers.order.OrderMapper;
+import com.se114p12.backend.neo4j.entities.BoughtWithRelationship;
+import com.se114p12.backend.neo4j.entities.CategoryNode;
+import com.se114p12.backend.neo4j.entities.OrderedRelationship;
+import com.se114p12.backend.neo4j.entities.ProductNode;
+import com.se114p12.backend.neo4j.entities.UserNode;
+import com.se114p12.backend.neo4j.repositories.ProductNeo4jRepository;
+import com.se114p12.backend.neo4j.repositories.UserNeo4jRepository;
 import com.se114p12.backend.repositories.authentication.UserRepository;
 import com.se114p12.backend.repositories.cart.CartItemRepository;
 import com.se114p12.backend.repositories.cart.CartRepository;
@@ -22,6 +31,7 @@ import com.se114p12.backend.repositories.order.OrderDetailRepository;
 import com.se114p12.backend.repositories.order.OrderRepository;
 import com.se114p12.backend.repositories.promotion.PromotionRepository;
 import com.se114p12.backend.repositories.shipper.ShipperRepository;
+import com.se114p12.backend.services.delivery.MapService;
 import com.se114p12.backend.services.promotion.UserPromotionService;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.vo.PageVO;
@@ -39,6 +49,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
+  private final ShopLocationConfig shopLocationConfig;
+
   private final OrderRepository orderRepository;
   private final OrderDetailRepository orderDetailRepository;
   private final OrderMapper orderMapper;
@@ -53,6 +65,10 @@ public class OrderServiceImpl implements OrderService {
 
   private final PromotionRepository promotionRepository;
   private final UserPromotionService userPromotionService;
+
+  private final UserNeo4jRepository userNeo4jRepository;
+  private final ProductNeo4jRepository productNeo4jRepository;
+  private final MapService mapService;
 
   @Override
   public PageVO<OrderResponseDTO> getAll(Specification<Order> specification, Pageable pageable) {
@@ -107,6 +123,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     Order order = new Order();
+    order.setDestinationLatitude(orderRequestDTO.getDestinationLatitude());
+    order.setDestinationLongitude(orderRequestDTO.getDestinationLongitude());
     order.setShippingAddress(orderRequestDTO.getShippingAddress());
     order.setNote(orderRequestDTO.getNote());
     order.setUser(
@@ -117,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
     order.setOrderStatus(OrderStatus.PENDING);
     order.setPaymentStatus(PaymentStatus.PENDING);
+    order.setTxnRef(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 
     order.setOrderDetails(new ArrayList<>());
     order.setActualDeliveryTime(null); // sẽ được cập nhật bởi khách
@@ -132,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
       orderDetail.setProductImage(product.getImageUrl());
       orderDetail.setQuantity(cartItem.getQuantity());
       orderDetail.setVariationInfo(extractVariationInfo(cartItem));
-      orderDetail.setPrice(cartItem.getPrice());
+      orderDetail.setPrice(product.getOriginalPrice());
       orderDetail.setCategoryId(product.getCategory().getId());
       orderDetail.setCategoryName(product.getCategory().getName());
       totalPrice =
@@ -165,6 +184,7 @@ public class OrderServiceImpl implements OrderService {
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
 
+    updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
 
@@ -175,9 +195,12 @@ public class OrderServiceImpl implements OrderService {
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-    if (orderRequestDTO.getShippingAddress() != null) {
-      order.setShippingAddress(orderRequestDTO.getShippingAddress());
+    if (orderRequestDTO.getDestinationLatitude() != null
+        && orderRequestDTO.getDestinationLongitude() != null) {
+      order.setDestinationLatitude(orderRequestDTO.getDestinationLatitude());
+      order.setDestinationLongitude(orderRequestDTO.getDestinationLongitude());
     }
+
     if (orderRequestDTO.getNote() != null) {
       order.setNote(orderRequestDTO.getNote());
     }
@@ -246,17 +269,41 @@ public class OrderServiceImpl implements OrderService {
       throw new BadRequestException("Can't update order status to " + status);
     }
     if (status == OrderStatus.SHIPPING) {
-
-      // Chọn shipper để giao hàng
       List<Shipper> availableShippers = shipperRepository.findByIsAvailableTrue();
       if (availableShippers.isEmpty()) {
         throw new BadRequestException("No available shippers to assign for this order");
       }
+
       Shipper selectedShipper =
           availableShippers.get(new Random().nextInt(availableShippers.size()));
       selectedShipper.setIsAvailable(false);
       order.setShipper(selectedShipper);
+
+      // Tọa độ địa chỉ cứng của quán
+      double originLat = shopLocationConfig.getLat();
+      double originLng = shopLocationConfig.getLng();
+
+      // Tọa độ địa chỉ của khách
+      Double destLat = order.getDestinationLatitude();
+      Double destLng = order.getDestinationLongitude();
+
+      if (destLat == null || destLng == null) {
+        throw new BadRequestException("Destination coordinates are missing.");
+      }
+
+      try {
+        DeliveryResponseDTO deliveryInfo =
+            mapService.calculateExpectedDeliveryTime(originLat, originLng, destLat, destLng);
+        Instant now = Instant.now();
+        Instant expectedTime =
+            now.plusSeconds(deliveryInfo.getExpectedDeliveryTimeInSeconds() + 300);
+        order.setExpectedDeliveryTime(expectedTime);
+      } catch (Exception e) {
+        throw new BadRequestException(
+            "Unable to calculate expected delivery time: " + e.getMessage());
+      }
     }
+
     order.setOrderStatus(status);
     orderRepository.save(order);
   }
@@ -283,5 +330,83 @@ public class OrderServiceImpl implements OrderService {
               return variationName + ": " + values;
             })
         .collect(Collectors.joining(", "));
+  }
+
+  // ============================ NEO4J RECOMMEND SYSTEM ============================
+  private void updateRecommend(Order order) {
+    // Neo4j recommendation systemAdd commentMore actions
+
+    Long currentUserId = jwtUtil.getCurrentUserId();
+    // 1. User ordered products
+    UserNode userNode =
+        userNeo4jRepository
+            .findById(currentUserId)
+            .orElseGet(
+                () -> {
+                  UserNode newUser = new UserNode();
+                  newUser.setId(currentUserId);
+                  newUser.setOrderedProducts(new ArrayList<>());
+                  return newUser;
+                });
+
+    Map<Long, OrderedRelationship> orderedMap =
+        userNode.getOrderedProducts().stream()
+            .collect(Collectors.toMap(rel -> rel.getProductNode().getId(), rel -> rel));
+    Map<Long, ProductNode> productNodeMap = new HashMap<>();
+
+    for (OrderDetail detail : order.getOrderDetails()) {
+      Long productId = detail.getProductId();
+      ProductNode productNode =
+          productNeo4jRepository
+              .findById(productId)
+              .orElseGet(
+                  () -> {
+                    ProductNode newProductNode = new ProductNode();
+                    newProductNode.setId(productId);
+                    CategoryNode categoryNode = new CategoryNode();
+                    categoryNode.setId(detail.getCategoryId());
+                    newProductNode.setCategory(categoryNode);
+                    return productNeo4jRepository.save(newProductNode);
+                  });
+      productNodeMap.put(productId, productNode);
+
+      OrderedRelationship rel = orderedMap.get(productId);
+      if (rel != null) {
+        rel.setCount(rel.getCount() + detail.getQuantity());
+      } else {
+        OrderedRelationship newRel = new OrderedRelationship();
+        newRel.setProductNode(productNode);
+        newRel.setCount(detail.getQuantity());
+        userNode.getOrderedProducts().add(newRel);
+      }
+    }
+    userNeo4jRepository.save(userNode);
+
+    // 2.bought with relationship
+    List<ProductNode> productNodes = new ArrayList<>(productNodeMap.values());
+    int n = productNodes.size();
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        ProductNode p1 = productNodes.get(i);
+        ProductNode p2 = productNodes.get(j);
+
+        upsertBoughtWith(p1, p2);
+        upsertBoughtWith(p2, p1);
+      }
+    }
+    productNeo4jRepository.saveAll(productNodes);
+  }
+
+  private void upsertBoughtWith(ProductNode source, ProductNode target) {
+    for (BoughtWithRelationship rel : source.getCoPurchasedProducts()) {
+      if (rel.getProduct().getId().equals(target.getId())) {
+        rel.setCount(rel.getCount() + 1);
+        return;
+      }
+    }
+    BoughtWithRelationship newRel = new BoughtWithRelationship();
+    newRel.setProduct(target);
+    newRel.setCount(1L);
+    source.getCoPurchasedProducts().add(newRel);
   }
 }

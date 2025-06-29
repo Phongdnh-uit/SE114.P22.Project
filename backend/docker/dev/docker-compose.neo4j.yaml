@@ -7,6 +7,7 @@ services:
       - app_network
     ports:
       - "7687:7687"
+      - "7474:7474"
     healthcheck:
       test:
         [

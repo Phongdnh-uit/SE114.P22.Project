@@ -1,0 +1,17 @@
+services:
+  mysql:
+    extends:
+      file: docker-compose.mysql.yaml
+      service: mysql
+  redis:
+    extends:
+      file: docker-compose.redis.yaml
+      service: redis
+  neo4j:
+    extends:
+      file: docker-compose.neo4j.yaml
+      service: neo4j
+
+networks:
+  app_network:
+    driver: bridge

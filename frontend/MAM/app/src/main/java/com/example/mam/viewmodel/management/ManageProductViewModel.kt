@@ -1,6 +1,7 @@
 package com.example.mam.viewmodel.management
 
 import android.content.Context
+import android.icu.util.UniversalTimeScale.toBigDecimal
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import co.yml.charts.common.extensions.isNotNull
 import com.example.mam.MAMApplication
 import com.example.mam.data.Constant
 import com.example.mam.data.UserPreferencesRepository
@@ -59,7 +61,7 @@ class ManageProductViewModel(
     private val _productLongDescription = MutableStateFlow("")
     val productLongDescription = _productLongDescription.asStateFlow()
 
-    private val _productPrice = MutableStateFlow(BigDecimal.ZERO)
+    private val _productPrice = MutableStateFlow("")
     val productPrice = _productPrice.asStateFlow()
 
     private val _productCategory = MutableStateFlow(0L)
@@ -132,7 +134,7 @@ class ManageProductViewModel(
         return "" // Long description is valid
     }
 
-    fun setProductPrice(price: BigDecimal) {
+    fun setProductPrice(price : String) {
         _productPrice.value = price
     }
 
@@ -142,7 +144,7 @@ class ManageProductViewModel(
     }
 
     fun isProductPriceValid(): String {
-        val price = _productPrice.value.toInt()
+        val price = if (_productPrice.value.isNotEmpty()) _productPrice.value.toInt() else 0
         if (price < 1000) {
             return "Giá quá thấp (<1000 VND)" // Price is too low
         }
@@ -246,7 +248,24 @@ class ManageProductViewModel(
 
     suspend fun removeVariant(id: Long): Int {
         try {
-            val response = BaseRepository(userPreferencesRepository).variationRepository.deleteVariation(id)
+            // 1️⃣ Lấy danh sách option thuộc variant cần xóa
+            val optionList = _variants.value[_variants.value.keys.find { it.id == id }] ?: emptyList()
+
+            // 2️⃣ Xóa từng option
+            for (option in optionList) {
+                val optionResponse = BaseRepository(userPreferencesRepository)
+                    .variationOptionRepository.deleteVariationOption(option.id)
+
+                if (!optionResponse.isSuccessful) {
+                    Log.e("ManageProductViewModel", "Failed to remove variant option ${option.id}: ${optionResponse.errorBody()?.string()}")
+                    return 0
+                }
+            }
+
+            // 3️⃣ Sau khi xóa hết option → xóa variant
+            val response = BaseRepository(userPreferencesRepository)
+                .variationRepository.deleteVariation(id)
+
             Log.d("ManageProductViewModel", "Remove variant response: ${response.code()}")
             if (response.isSuccessful) {
                 _variants.value = _variants.value.filterKeys { it.id != id }
@@ -257,7 +276,7 @@ class ManageProductViewModel(
                 return 0
             }
         } catch (e: Exception) {
-            Log.e("ManageProductViewModel", "Error removing variant: ${e.message}")
+            Log.e("ManageProductViewModel", "Error removing variant: ${e.message}", e)
             return 0
         }
 
@@ -339,7 +358,7 @@ class ManageProductViewModel(
                             _productName.value = product.name
                             _productShortDescription.value = product.shortDescription
                             _productLongDescription.value = product.detailDescription
-                            _productPrice.value = product.originalPrice
+                            _productPrice.value = product.originalPrice.toString()
                             _productCategory.value = product.categoryId
                             _productImageUrl.value = product.getRealURL() ?: Constant.BASE_IMAGE
                             _isAvailable.value = product.isAvailable
@@ -381,12 +400,13 @@ class ManageProductViewModel(
             val name = _productName.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val shortDescription = _productShortDescription.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val longDescription = _productLongDescription.value.toRequestBody("text/plain".toMediaTypeOrNull())
-            val price = _productPrice.value.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val price = _productPrice.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val categoryId = _productCategory.value.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
             val imageFile = _imageFile.value
+            if (!imageFile.isNotNull()) return 0
             val requestFile = imageFile!!.asRequestBody("image/*".toMediaType())
-            val imagePart = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+            val imagePart =  MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
 
             val response = BaseRepository(userPreferencesRepository).productRepository.createProduct(
                 name = name,
@@ -406,7 +426,7 @@ class ManageProductViewModel(
                     _productName.value = product.name
                     _productShortDescription.value = product.shortDescription
                     _productLongDescription.value = product.detailDescription
-                    _productPrice.value = product.originalPrice
+                    _productPrice.value = product.originalPrice.toString()
                     _productCategory.value = product.categoryId
                     _productImageUrl.value = product.getRealURL() ?: Constant.BASE_IMAGE
                     _isAvailable.value = product.isAvailable
@@ -420,7 +440,7 @@ class ManageProductViewModel(
                 return 0
             }
         } catch (e: Exception) {
-            Log.e("ManageProductViewModel", "Error adding product: ${e.message}")
+            Log.e("ManageProductViewModel", "Error adding product: ${e}")
             return 0
         } finally {
             _isSetting.value = false
@@ -433,12 +453,12 @@ class ManageProductViewModel(
             val name = _productName.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val shortDescription = _productShortDescription.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val longDescription = _productLongDescription.value.toRequestBody("text/plain".toMediaTypeOrNull())
-            val price = _productPrice.value.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val price = _productPrice.value.toRequestBody("text/plain".toMediaTypeOrNull())
             val categoryId = _productCategory.value.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
             val imageFile = _imageFile.value
-            val requestFile = imageFile!!.asRequestBody("image/*".toMediaType())
-            val imagePart = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+            val requestFile = imageFile?.asRequestBody("image/*".toMediaType())
+            val imagePart = requestFile?.let{ MultipartBody.Part.createFormData("image", imageFile.name, requestFile)}
             val response = BaseRepository(userPreferencesRepository).productRepository.updateProduct(
                 id = _productID.value,
                 name = name,
@@ -458,7 +478,7 @@ class ManageProductViewModel(
                     _productName.value = product.name
                     _productShortDescription.value = product.shortDescription
                     _productLongDescription.value = product.detailDescription
-                    _productPrice.value = product.originalPrice
+                    _productPrice.value = product.originalPrice.toString()
                     _productCategory.value = product.categoryId
                     _productImageUrl.value = product.getRealURL() ?: Constant.BASE_IMAGE
                     _isAvailable.value = product.isAvailable

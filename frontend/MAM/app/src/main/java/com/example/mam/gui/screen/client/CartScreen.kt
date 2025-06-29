@@ -98,6 +98,7 @@ fun CartScreen(
     val scope = rememberCoroutineScope()
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.getCart()
+        viewModel.loadAdditionalProduct()
     }
     Box(
         modifier = modifier
@@ -238,7 +239,6 @@ fun CartScreen(
                                     item = item,
                                     onClick = { onAdditionalProductClicked(item.id)},
                                 )
-
                             }
                         }
                     }

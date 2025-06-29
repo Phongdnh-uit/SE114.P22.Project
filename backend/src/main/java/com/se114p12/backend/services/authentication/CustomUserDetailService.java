@@ -24,7 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
     User user = loginUtil.getUserByCredentialId(credentialId);
     if (!user.getLoginProvider().equals(LoginProvider.LOCAL)) {
       throw new BadRequestException(
-          "Account provider by another provider: " + user.getLoginProvider());
+          "Account provided by another provider: " + user.getLoginProvider());
     }
     String role = "ROLE_ " + user.getRole().getName();
     return new CustomUserDetails()

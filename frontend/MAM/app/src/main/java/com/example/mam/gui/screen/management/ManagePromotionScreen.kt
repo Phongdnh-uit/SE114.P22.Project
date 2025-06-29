@@ -63,6 +63,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.viewmodel.management.ManagePromotionViewModel
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -126,7 +127,9 @@ fun ManagePromotionScreen(
                 shadow = "outer",
                 onClick = {
                     scope.launch {
-                        if (code.isNotEmpty() && description.isNotEmpty() && value > 0 && startDate.isBefore(endDate)
+                        if (code.isNotEmpty() && description.isNotEmpty() && value.isNotEmpty() && value.toInt() > 0
+                            && startDate.isBefore(endDate)
+                            && minValue.isNotEmpty() && minValue.toInt() > 0
                         ) {
                             if (viewModel.createPromotion() == 1){
                                 Toast.makeText(
@@ -319,7 +322,7 @@ fun ManagePromotionScreen(
                 OutlinedTextField(
                     value = value.toString(),
                     onValueChange = {
-                        viewModel.setValue(it.toInt())
+                        viewModel.setValue(it)
                     },
                     textStyle = TextStyle(
                         color = BrownDefault,
@@ -453,7 +456,7 @@ fun ManagePromotionScreen(
                 OutlinedTextField(
                     value = minValue.toString(),
                     onValueChange = {
-                        viewModel.setMinValue(it.toBigDecimal())
+                        viewModel.setMinValue(it)
                     },
                     textStyle = TextStyle(
                         color = BrownDefault,

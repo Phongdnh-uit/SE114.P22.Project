@@ -2,10 +2,12 @@ package com.se114p12.backend.services.general;
 
 import com.se114p12.backend.exceptions.StorageException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -48,6 +50,25 @@ public class StorageService {
     Path fileUri = rootLocation.resolve(folder).resolve(filename);
     try {
       Files.copy(file.getInputStream(), fileUri, StandardCopyOption.REPLACE_EXISTING);
+      return rootLocation.relativize(fileUri).toString();
+    } catch (IOException e) {
+      throw new StorageException("Failed to store file", e);
+    }
+  }
+
+  // Stream must be closed by the caller
+  public String storeByInputStream(InputStream stream, String folder) {
+    if (!Files.exists(rootLocation.resolve(folder))) {
+      try {
+        Files.createDirectories(rootLocation.resolve(folder));
+      } catch (IOException e) {
+        throw new StorageException("Could not create directory", e);
+      }
+    }
+    String filename = UUID.randomUUID().toString();
+    Path fileUri = rootLocation.resolve(folder).resolve(filename);
+    try {
+      Files.copy(stream, fileUri, StandardCopyOption.REPLACE_EXISTING);
       return rootLocation.relativize(fileUri).toString();
     } catch (IOException e) {
       throw new StorageException("Failed to store file", e);

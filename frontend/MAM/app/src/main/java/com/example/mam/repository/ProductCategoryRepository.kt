@@ -29,7 +29,7 @@ interface ProductCategoryRepository {
  @Multipart
  @PUT("product-categories/{id}")
  suspend fun updateCategory(
-     @Part("id") id: Long,
+     @Path("id") id: Long,
      @Part("name") name: RequestBody,
      @Part("description") description: RequestBody?,
      @Part image: MultipartBody.Part?

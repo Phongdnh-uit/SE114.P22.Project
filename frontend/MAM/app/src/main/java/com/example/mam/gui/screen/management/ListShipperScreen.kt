@@ -377,53 +377,6 @@ fun ListShipperScreen(
                         }
                     }
                 }
-                shipperList.let {
-                    items(shipperList) { shipper ->
-                        var isShowDialog by remember { mutableStateOf(false) }
-                        if (isShowDialog) {
-                            CustomDialog(
-                                title = "Xác nhận xóa",
-                                message = "Bạn có chắc muốn xóa Shipper ${shipper.fullname}",
-                                onDismiss = { isShowDialog = false },
-                                onConfirm = {
-                                    scope.launch {
-                                        val result = viewModel.deleteShipper(shipper.id)
-                                        Toast.makeText(
-                                            context,
-                                            when (result) {
-                                                -1 -> "Không thể kết nối Server"
-                                                1 -> "Xóa thành công"
-                                                else -> "Xóa thất bại"
-                                            },
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        isShowDialog = false
-                                    }
-                                }
-
-                            )
-                        }
-                        if (isDeleting)
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
-                            )
-                        else
-                            ShipperItem(
-                                shipper = shipper,
-                                onClick = {
-                                    onShipperClick(shipper.phone)
-                                },
-                                onEditClick = {},
-                                onDeleteClick = {
-                                    isShowDialog = true
-                                    Log.d("Shipper", "${shipper.fullname}, ${shipper.id}, ${shipper.phone}, ${shipper.licensePlate}")
-                                }
-                            )
-                    }
-                }
                 if (isLoading) {
                     item {
                         CircularProgressIndicator(

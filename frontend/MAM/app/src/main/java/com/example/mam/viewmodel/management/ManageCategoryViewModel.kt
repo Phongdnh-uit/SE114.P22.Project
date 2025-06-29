@@ -148,9 +148,6 @@ class ManageCategoryViewModel(
 
             val response = BaseRepository(userPreferencesRepository).productCategoryRepository.updateCategory(_categoryID.value, namePart, descriptionPart, imagePart)
             Log.d("Category", "${_categoryName.value}, ${_categoryDescription.value}, ${_categoryImageFile.value}")
-            if (response == null){
-                return 0
-            }
             Log.d("Category", "Status code: ${response.code()}")
             if (response.isSuccessful) {
                 val category = response.body()

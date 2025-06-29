@@ -68,6 +68,25 @@ public class UserPromotionServiceImpl implements UserPromotionService {
             throw new IllegalArgumentException("Order value does not meet the promotion's minimum requirement");
         }
 
+        // Kiểm tra nếu đã dùng rồi thì không cho áp dụng mã giảm giá đang truyền vào nữa
+        if (!promotion.getIsPublic()) {
+            Optional<UserPromotion> up = userPromotionRepository.findByUserIdAndPromotionId(userId, promotionId);
+            if (up.isEmpty()) {
+                throw new IllegalArgumentException("This private promotion is not assigned to the user.");
+            }
+            if (up.get().isUsed()) {
+                throw new IllegalArgumentException("This promotion has already been used.");
+            }
+        } else {
+            boolean alreadyUsed = userPromotionRepository.findByUserIdAndPromotionId(userId, promotionId)
+                    .map(UserPromotion::isUsed)
+                    .orElse(false);
+            if (alreadyUsed) {
+                throw new IllegalArgumentException("This public promotion has already been used.");
+            }
+        }
+
+        // Cập nhật là đã dùng mã giảm giá
         updatePromotionUsage(userId, promotionId);
 
         return promotion;

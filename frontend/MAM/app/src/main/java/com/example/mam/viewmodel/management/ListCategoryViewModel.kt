@@ -190,7 +190,7 @@ class ListCategoryViewModel(
                     }
                     else break
                 } else {
-                    Log.d("Category", "Lấy Danh mục thất bại: ${response.errorBody()}")
+                    Log.d("Category", "Lấy Danh mục thất bại: ${response.errorBody()?.string()}")
                     break // Stop loop on failure
                 }
             }

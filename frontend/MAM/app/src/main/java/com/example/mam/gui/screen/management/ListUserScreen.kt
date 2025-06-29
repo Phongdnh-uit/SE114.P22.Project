@@ -399,20 +399,20 @@ fun ListUserScreen(
                 }
             }
         }
-        IconButton(
-            onClick = onAddUserClick,
-            modifier = Modifier
-                .padding(16.dp)
-                .size(40.dp)
-                .align(Alignment.BottomEnd)
-                .background(OrangeDefault, RoundedCornerShape(50))
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = WhiteDefault
-            )
-        }
+//        IconButton(
+//            onClick = onAddUserClick,
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .size(40.dp)
+//                .align(Alignment.BottomEnd)
+//                .background(OrangeDefault, RoundedCornerShape(50))
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.Add,
+//                contentDescription = "Add",
+//                tint = WhiteDefault
+//            )
+//        }
     }
 }
 

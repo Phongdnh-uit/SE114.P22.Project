@@ -1,5 +1,11 @@
 package com.example.mam.gui.screen.client
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -52,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.R
@@ -69,8 +76,10 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.viewmodel.client.HomeScreenViewModel
+import com.mapbox.geojson.Point
 import kotlinx.coroutines.launch
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
@@ -86,6 +95,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val categories: List<CategoryResponse> = viewmodel.getListCategory()
+    val cartCount = viewmodel.cartCount.collectAsState().value
+    val notificationCount = viewmodel.notificationCount.collectAsState().value
     val productMap by viewmodel
         .productMap
         .collectAsState()
@@ -100,23 +111,75 @@ fun HomeScreen(
             val lastItemOffset = visibleItems.lastOrNull()?.offset ?: 0
 
             if (visibleItems.any { it.index == lastItemIndex -1}) {
-                lastItemIndex - 2 // Nếu item cuối cùng đang hiển thị, trả về index cuối cùng
+                lastItemIndex - 3 // Nếu item cuối cùng đang hiển thị, trả về index cuối cùng
             } else {
                 firstVisibleItemIndex // Nếu chưa lướt đến cuối, trả về index của item đầu tiên hiển thị
             }
         }
     }
+    val permissionRequest = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if (!permissions.values.all { it }) {
+                //handle permission denied
+            }
+            else {
+
+            }
+        }
+    )
+    LaunchedEffect(Unit) {
+        try {
+            // Use Android's FusedLocationProviderClient for location retrieval
+            val fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context)
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    viewmodel.setAdressAndCoordinates(
+                        address = getAddressFromCoordinates(context, it.latitude, it.longitude),
+                        longitude = it.longitude,
+                        latitude = it.latitude
+                    )
+                } ?: run {
+                    // Handle case where location is null
+                }
+            }.addOnFailureListener {
+                // Handle failure to retrieve location
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is SecurityException -> {
+                    permissionRequest.launch(
+                        arrayOf(
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
+                }
+                else -> {
+                    Toast(context).apply {
+                        setText("Không thể lấy vị trí hiện tại")
+                        show()
+                    }
+                }
+            }
+        }
+    }
+
     LaunchedEffect(key1 = childListState) {
         snapshotFlow { childListState.firstVisibleItemIndex }
             .collect { index ->
                 // Scroll the LazyRow to the corresponding category
-                if (index >= 2 && index < categories.size + 2) { // Adjust for header and image
-                        rowListState.animateScrollToItem(index - 2) // Adjust index for categories
+                if (index >= 3 && index < categories.size + 3) { // Adjust for header and image
+                        rowListState.animateScrollToItem(index - 3) // Adjust index for categories
                 }
             }
     }
+
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewmodel.loadListCategory()
+        viewmodel.loadAdditionalProduct()
+        viewmodel.loadCartCount()
+        viewmodel.loadNotificationCount()
     }
     LaunchedEffect(key1 = categories, key2 = LocalLifecycleOwner.current) {
         if(categories.isNotEmpty() && productMap.isEmpty()){
@@ -148,6 +211,8 @@ fun HomeScreen(
                     foregroundColor = OrangeDefault,
                     icon = Icons.Filled.NotificationsNone,
                     shadow = "outer",
+                    badgesCount = notificationCount,
+                    isBadges = true,
                     onClick = onNotificationClicked,
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -242,15 +307,27 @@ fun HomeScreen(
                                 onClick = {
                                     scope.launch {
                                     val targetIndex = categories.indexOf(category)
-                                    childListState.scrollToItem(targetIndex + 2)}
+                                    childListState.scrollToItem(targetIndex + 3)}
 
                                 },
-                                isEnable = !(categories.indexOf(category) == isRowScrolled.value -2),
+                                isEnable = !(categories.indexOf(category) == isRowScrolled.value -3),
                                 modifier = Modifier
                             )
                             Spacer(Modifier.width(5.dp))
                         }
                     }
+                }
+                item{
+                    ProductContainer(
+                        category = CategoryResponse(
+                            name = "Đề xuất",
+                            description = "Danh sách sản phẩm đề xuất",
+                            imageUrl = "https://em-content.zobj.net/source/apple/81/glowing-star_1f31f.png"
+                        ),
+                        products = viewmodel.recommendedProducts.collectAsState().value,
+                        onClick = { product -> onItemClicked(product) },
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
                 }
                 items(categories) { category ->
                     val products = productMap[category.id] ?: emptyList()
@@ -298,6 +375,8 @@ fun HomeScreen(
                     backgroundColor = OrangeLight,
                     foregroundColor = OrangeDefault,
                     icon = Icons.Outlined.ShoppingCart,
+                    badgesCount = cartCount,
+                    isBadges = true,
                     onClick = onCartClicked,
                     modifier = Modifier
                 )

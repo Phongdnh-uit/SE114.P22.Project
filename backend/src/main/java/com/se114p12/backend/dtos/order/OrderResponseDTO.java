@@ -11,6 +11,8 @@ import lombok.Data;
 
 @Data
 public class OrderResponseDTO extends BaseResponseDTO {
+  private Double destinationLatitude;
+  private Double destinationLongitude;
   private String shippingAddress;
   private BigDecimal totalPrice;
   private String note;

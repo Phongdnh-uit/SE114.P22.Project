@@ -1,5 +1,6 @@
 package com.se114p12.backend.services.user;
 
+import com.se114p12.backend.dtos.authentication.FirebaseRegisterRequestDTO;
 import com.se114p12.backend.dtos.authentication.GoogleRegisterRequestDTO;
 import com.se114p12.backend.dtos.authentication.RegisterRequestDTO;
 import com.se114p12.backend.dtos.user.UserRequestDTO;
@@ -18,6 +19,8 @@ public interface UserService {
   UserResponseDTO findByPhone(String phone);
 
   UserResponseDTO registerGoogleUser(GoogleRegisterRequestDTO googleRegisterRequestDTO);
+
+  UserResponseDTO registerFirebaseUser(FirebaseRegisterRequestDTO firebaseRegisterRequestDTO);
 
   UserResponseDTO register(RegisterRequestDTO userRequestDTO);
 

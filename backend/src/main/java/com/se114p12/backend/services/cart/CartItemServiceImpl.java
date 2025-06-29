@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -62,6 +63,13 @@ public class CartItemServiceImpl implements CartItemService {
 
         CartItem newItem = cartItemMapper.toEntity(dto, productRepository, variationOptionRepository);
         newItem.setCart(cart);
+
+        BigDecimal basePrice = newItem.getProduct().getOriginalPrice();
+        BigDecimal additionalPrice = newItem.getVariationOptions().stream()
+                .map(vo -> BigDecimal.valueOf(vo.getAdditionalPrice() != null ? vo.getAdditionalPrice() : 0.0))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        newItem.setPrice(basePrice.add(additionalPrice));
+
         List<CartItem> existingItems = cartItemRepository.findAllByCartIdAndProductId(
                 cart.getId(), newItem.getProduct().getId());
 
@@ -71,6 +79,7 @@ public class CartItemServiceImpl implements CartItemService {
                 return cartItemMapper.toDTO(cartItemRepository.save(item));
             }
         }
+
         return cartItemMapper.toDTO(cartItemRepository.save(newItem));
     }
 
@@ -82,6 +91,12 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem updated = cartItemMapper.toEntity(dto, productRepository, variationOptionRepository);
         updated.setId(id);
         updated.setCart(existing.getCart());
+
+        BigDecimal basePrice = updated.getProduct().getOriginalPrice();
+        BigDecimal additionalPrice = updated.getVariationOptions().stream()
+                .map(vo -> BigDecimal.valueOf(vo.getAdditionalPrice() != null ? vo.getAdditionalPrice() : 0.0))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        updated.setPrice(basePrice.add(additionalPrice));
 
         return cartItemMapper.toDTO(cartItemRepository.save(updated));
     }

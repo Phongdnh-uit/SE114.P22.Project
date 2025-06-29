@@ -69,6 +69,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -300,13 +301,12 @@ fun DashboardScreen(
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier
-                                    .size(90.dp)
                             ) {
                                 Column(
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
-                                        .fillMaxSize()
+                                        .width(90.dp)
 
                                 ) {
                                     Icon(
@@ -319,7 +319,7 @@ fun DashboardScreen(
                                     )
                                     Text(
                                         text = it.label,
-                                        fontSize = 14.sp,
+                                        fontSize = 12.sp,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .padding(
