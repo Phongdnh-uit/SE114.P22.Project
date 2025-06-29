@@ -1,12 +1,10 @@
 package com.se114p12.backend.controllers.payment;
 
-import com.google.gson.JsonObject;
 import com.se114p12.backend.annotations.ErrorResponse;
 import com.se114p12.backend.constants.AppConstant;
 import com.se114p12.backend.dtos.payment.VnPayRequestDTO;
 import com.se114p12.backend.services.payment.VnPayService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 @Tag(name = "VNPAY Payment Module", description = "Endpoints for integrating VNPAY payment")
@@ -48,10 +46,19 @@ public class VnPayController {
             @ApiResponse(responseCode = "503", description = "Service unavailable"),
     })
     @ErrorResponse
-    @PostMapping("/ipn")
-    public ResponseEntity<Map<String, String>> handleIpn(@RequestBody Map<String, String> params) {
-        Map<String, String> result = vnPayService.handleIpn(params);
-        return ResponseEntity.ok(result);
+    @GetMapping("/ipn")
+    public ResponseEntity<String> handleIpn(HttpServletRequest request) {
+
+        // Lấy đúng Map<String, String> từ query
+        Map<String, String> params = new HashMap<>();
+        request.getParameterMap().forEach((k, vArr) -> {
+            if (vArr != null && vArr.length > 0) params.put(k, vArr[0]);
+        });
+
+        // Xác thực chữ ký & xử lý: trả về "00" / "97" v.v.
+        String rsp = vnPayService.handleIpn(params).toString();
+
+        return ResponseEntity.ok(rsp);
     }
 
     @Operation(summary = "Handle VNPAY return", description = "Handle return callback from VnPay after user completes payment")
@@ -63,16 +70,17 @@ public class VnPayController {
     })
     @ErrorResponse
     @GetMapping("/return")
-    public String handleReturn(
-            @Parameter(description = "All return parameters from VnPay") @RequestParam Map<String, String> params,
-            HttpServletRequest request
-    ) {
-        request.getParameterMap().forEach((key, value) -> {
-            System.out.println("Param: " + key + "=" + Arrays.toString(value));
+    public String handleReturn(HttpServletRequest request) {
+        Map<String, String[]> rawParams = request.getParameterMap();
+
+        Map<String, String> params = new HashMap<>();
+        rawParams.forEach((key, valueArr) -> {
+            if (valueArr != null && valueArr.length > 0) {
+                params.put(key, valueArr[0]); // chỉ lấy phần tử đầu
+            }
         });
 
-        String secureHash = params.get("vnp_SecureHash");
-        boolean isValid = vnPayService.verifyPayment(params, secureHash);
+        boolean isValid = vnPayService.verifyPayment(params, params.get("vnp_SecureHash"));
 
         if (isValid) {
             String responseCode = params.get("vnp_ResponseCode");
