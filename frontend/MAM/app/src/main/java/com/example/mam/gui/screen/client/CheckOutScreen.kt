@@ -485,7 +485,6 @@ fun CheckOutScreen(
                                                 Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
                                             }
                                         }
-                                        onCheckOutClicked()
                                     } else {
                                         Toast.makeText(context, "Đặt hàng thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
                                     }

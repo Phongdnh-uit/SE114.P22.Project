@@ -1,6 +1,7 @@
 package com.example.mam
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -26,7 +27,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             var permissionsGranted by remember { mutableStateOf(false) }
-
             if (permissionsGranted) {
                 App()
             } else {
@@ -63,9 +63,11 @@ fun RequestPermissions(setPermissionsGranted: (Boolean) -> Unit) {
 }
 
 @Composable
-fun App(){
-    Surface() {
-        MainNavHost(modifier = Modifier.padding())
+fun App() {
+    Surface {
+        MainNavHost(
+            modifier = Modifier.padding(),
+        )
     }
 }
 

@@ -1,9 +1,6 @@
 package com.example.mam.viewmodel.client
 
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -244,6 +241,25 @@ class CheckOutViewModel(
             e.printStackTrace()
             Log.d("CheckOutViewModel", "Failed to create payment: ${e.message}")
             return ""
+        }
+    }
+
+    suspend fun handlePaymentResult(): Boolean {
+        try {
+            Log.d("CheckOutViewModel", "Handling payment result")
+            val response = BaseRepository(userPreferencesRepository).paymentRepository.returnPayment()
+            Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("CheckOutViewModel", "Payment result handled successfully")
+                return true // Success
+            } else {
+                Log.d("CheckOutViewModel", "Failed to handle payment result (BE): ${response.errorBody()?.string()}")
+                return false // Failure
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CheckOutViewModel", "Failed to handle payment result: ${e.message}")
+            return false
         }
     }
 
