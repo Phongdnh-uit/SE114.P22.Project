@@ -1,5 +1,6 @@
 package com.se114p12.backend.services.general;
 
+import com.se114p12.backend.constants.AppConstant;
 import com.se114p12.backend.exceptions.BadRequestException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class MailService {
     Map<String, Object> model =
         Map.of(
             "verifyLink",
-            "http://localhost:8080/api/v1/auth/verify-email?code=" + activationCode,
+            AppConstant.BACKEND_URL + "/auth/verify-email?code=" + activationCode,
             "email",
             email);
     sendEmailFromTemplate(email, "Măm - Xác thực email của bạn", "mail/verify-email", model);
