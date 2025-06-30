@@ -24,9 +24,11 @@ public class OpenAPIConfig {
   @Bean
   public OpenAPI myOpenAPI() {
     return new OpenAPI()
-        .info(createInfo())
-        .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-        .components(
-            new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
+            .info(createInfo())
+            .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+            .components(
+                    new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
+            .addServersItem(new io.swagger.v3.oas.models.servers.Server()
+                    .url("https://f5f7-113-161-91-60.ngrok-free.app"));
   }
 }
