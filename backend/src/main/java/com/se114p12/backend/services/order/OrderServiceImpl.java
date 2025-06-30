@@ -335,7 +335,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void markPaymentCompleted(String txnRef) {
+  public Long markPaymentCompleted(String txnRef) {
     Order order = orderRepository.findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
@@ -346,6 +346,8 @@ public class OrderServiceImpl implements OrderService {
       orderRepository.save(order);
       sendOrderStatusNotification(order);
     }
+
+    return order.getId();
   }
 
   // ============================ SUPPORT METHOD ============================

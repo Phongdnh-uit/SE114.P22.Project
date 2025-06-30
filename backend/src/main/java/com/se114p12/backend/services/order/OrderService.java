@@ -28,5 +28,5 @@ public interface OrderService {
 
   void markOrderAsDelivered(Long orderId);
 
-  void markPaymentCompleted(String txnRef);
+  Long markPaymentCompleted(String txnRef);
 }

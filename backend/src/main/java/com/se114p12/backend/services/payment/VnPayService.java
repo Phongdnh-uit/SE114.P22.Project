@@ -183,6 +183,7 @@ public class VnPayService {
     }
 
     // Trả về đường dẫn điều hướng về app
+    // Giá trị mặc định đang để DeepLink của app android nhưng về sau không nên làm
     public String getRedirectUrlFor(String txnRef) {
         return redirectUrlMap.getOrDefault(txnRef, "mam://payment/result?success=false");
     }

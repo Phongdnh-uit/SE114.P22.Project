@@ -65,8 +65,8 @@ public class VnPayController {
         String redirectUrl = vnPayService.getRedirectUrlFor(txnRef);
 
         if (valid && "00".equals(rspCode)) {
-            orderService.markPaymentCompleted(txnRef);
-            redirectUrl += "?success=true&orderId=" + txnRef;
+            Long orderId = orderService.markPaymentCompleted(txnRef);
+            redirectUrl += "?success=true&orderId=" + orderId;
         } else {
             redirectUrl += "?success=false";
         }
