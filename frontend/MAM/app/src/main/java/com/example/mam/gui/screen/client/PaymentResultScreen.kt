@@ -22,6 +22,7 @@ import com.example.mam.gui.component.OuterShadowFilledButton
 
 @Composable
 fun PaymentResultScreen(
+    params: String,
     onBackHome: () -> Unit,
     uri: Uri?,
 ) {
@@ -39,7 +40,7 @@ fun PaymentResultScreen(
     ) {
         Text(
             //if (isSuccess) "Thanh toán thành công!" else "Thanh toán thất bại! $responseCode, $transactionStatus",
-            uri.toString(),
+            params + uri.toString(),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
