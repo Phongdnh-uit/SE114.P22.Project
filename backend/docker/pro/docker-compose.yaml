@@ -16,6 +16,14 @@ services:
       file: docker-compose.neo4j.yaml
       service: neo4j
 
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  neo4j_data:
+    driver: local
+
 networks:
   app_network:
     driver: bridge
