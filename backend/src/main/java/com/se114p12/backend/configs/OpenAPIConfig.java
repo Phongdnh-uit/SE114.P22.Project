@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.se114p12.backend.constants.AppConstant.DOMAIN;
+
 @Configuration
 public class OpenAPIConfig {
   private SecurityScheme createAPIKeyScheme() {
@@ -29,6 +31,6 @@ public class OpenAPIConfig {
             .components(
                     new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
             .addServersItem(new io.swagger.v3.oas.models.servers.Server()
-                    .url("https://f5f7-113-161-91-60.ngrok-free.app"));
+                    .url(DOMAIN));
   }
 }

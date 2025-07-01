@@ -98,6 +98,7 @@ import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.management.ManageProductViewModel
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -137,7 +138,11 @@ fun ManageProductScreen(
             }
         }
     } else null
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(key1 = variants) {
+        viewModel.loadVariants(productId)
+    }
+    LaunchedEffect(key1 = isEditMode) {
         if (isPreview) {
             viewModel.mockData()
         }
@@ -172,7 +177,7 @@ fun ManageProductScreen(
             )
             val isButtonEnable = (isAdd || isEditMode) &&
                 productName.isNotEmpty()
-                        && (productPrice.isNotEmpty() && productPrice.toInt() > 0)
+                        && (productPrice.isNotEmpty() && productPrice.toBigDecimal() > BigDecimal.ZERO)
                         && productShortDescription.isNotEmpty()
                         && productLongDescription.isNotEmpty()
                         && viewModel.isProductNameValid().isEmpty()
@@ -221,6 +226,9 @@ fun ManageProductScreen(
                                 ).show()
                             }
                         }
+                    }
+                    else {
+                        isEditMode = !isEditMode
                     }
 
                 },
@@ -436,17 +444,14 @@ fun ManageProductScreen(
                             var availabelExpanded by remember { mutableStateOf(false) }
                             FilterChip(
                                 selected = availabelExpanded,
-                                onClick = { if (isEditMode || isAdd ) availabelExpanded = !availabelExpanded },
+                                onClick = { },
                                 label = {
                                     Text(
-                                        text = if (isAvailable) "Có sẵn" else "Hết hàng",
+                                        text =  "Có sẵn",
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier
                                     )
-                                },
-                                trailingIcon = {
-                                    if (isEditMode || isAdd ) Icon(if (!availabelExpanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp , contentDescription = "Expand")
                                 },
                                 border = FilterChipDefaults.filterChipBorder(
                                     enabled = true,
@@ -466,28 +471,6 @@ fun ManageProductScreen(
                                 ),
                                 modifier = Modifier
                             )
-                            DropdownMenu(
-                                expanded = availabelExpanded,
-                                onDismissRequest = { availabelExpanded = false },
-                                containerColor = WhiteDefault,
-                                modifier = Modifier
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Có sẵn", color = BrownDefault) },
-                                    onClick = {
-                                        viewModel.setIsAvailable(true)
-                                        availabelExpanded = false
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Hết hàng", color = BrownDefault) },
-                                    onClick = {
-                                        viewModel.setIsAvailable(false)
-                                        availabelExpanded = false
-                                    },
-                                )
-
-                            }
                         }
                     }
                 }

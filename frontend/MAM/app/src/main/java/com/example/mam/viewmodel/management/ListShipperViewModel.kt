@@ -203,6 +203,7 @@ class ListShipperViewModel(
                     break // Stop loop on failure
                 }
             }
+            _asc.value = true // Reset sorting order to ascending
             _shippers.value = allShippers.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {
