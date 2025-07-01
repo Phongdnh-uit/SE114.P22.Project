@@ -304,7 +304,7 @@ fun CartItem(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = WhiteDefault
+                containerColor = if(cartItem.isAvailable) OrangeLighter else GreyLight,
             ),
             modifier = Modifier
                 .animateContentSize()
@@ -355,9 +355,9 @@ fun CartItem(
                             )
                         }
                         Text(
-                            text = cartItem.getPrice(),
+                            text = if(cartItem.isAvailable)cartItem.getPrice() else "Sản phẩm không còn khả dụng",
                             textAlign = TextAlign.End,
-                            color = OrangeDefault,
+                            color = if(cartItem.isAvailable)OrangeDefault else GreyDefault,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.fillMaxWidth()
@@ -370,6 +370,7 @@ fun CartItem(
                             .height(40.dp)
                             .padding(bottom = 8.dp)
                     ){
+                        if(cartItem.isAvailable)
                         QuantitySelectionButton(
                             count = cartItem.quantity.toInt(),
                             onValueDecr = onQuantityDesc,

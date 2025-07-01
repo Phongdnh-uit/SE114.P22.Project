@@ -186,7 +186,7 @@ class ListProductViewModel(
         _isDeleting.value = true
         try {
             val response =
-                BaseRepository(userPreferencesRepository).productCategoryRepository.deleteCategory(id)
+                BaseRepository(userPreferencesRepository).productRepository.deleteProduct(id)
             if (response.isSuccessful) {
                 _product.value = _product.value.filterNot { it.id == id }.toMutableList()
                 Log.d("ListProductViewModel", "Product with id $id deleted successfully")

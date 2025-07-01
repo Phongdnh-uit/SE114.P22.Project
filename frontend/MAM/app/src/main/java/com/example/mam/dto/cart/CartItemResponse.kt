@@ -13,7 +13,8 @@ data class CartItemResponse(
     var quantity: Long = 0L,
     val price: BigDecimal = BigDecimal.ZERO,
     val variationOptionIds: Set<Long> = emptySet(),
-    val variationOptionInfo: String? = ""
+    val variationOptionInfo: String? = "",
+    val isAvailable : Boolean = true,
 ): BaseResponse() {
     fun getPrice(): String {
         val formatter = DecimalFormat("#,###")

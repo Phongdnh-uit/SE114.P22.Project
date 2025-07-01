@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
 import static com.se114p12.backend.constants.AppConstant.DOMAIN;
 
 @Configuration
