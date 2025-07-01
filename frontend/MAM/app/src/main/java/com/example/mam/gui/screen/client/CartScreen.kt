@@ -304,7 +304,7 @@ fun CartItem(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = if(cartItem.isAvailable) OrangeLighter else GreyLight,
+                containerColor = if(cartItem.isAvailable) WhiteDefault else GreyLight,
             ),
             modifier = Modifier
                 .animateContentSize()
@@ -370,13 +370,15 @@ fun CartItem(
                             .height(40.dp)
                             .padding(bottom = 8.dp)
                     ){
-                        if(cartItem.isAvailable)
-                        QuantitySelectionButton(
-                            count = cartItem.quantity.toInt(),
-                            onValueDecr = onQuantityDesc,
-                            onValueIncr = onQuantityIncr,
-                            modifier = Modifier.padding(end = 10.dp, start = 10.dp).height(40.dp)
-                        )
+                        if(cartItem.isAvailable) {
+                            QuantitySelectionButton(
+                                count = cartItem.quantity.toInt(),
+                                onValueDecr = onQuantityDesc,
+                                onValueIncr = onQuantityIncr,
+                                modifier = Modifier.padding(end = 10.dp, start = 10.dp)
+                                    .height(40.dp)
+                            )
+                        }
                         IconButton(
                             onClick = onDeleteClicked,
                             colors = IconButtonColors(
