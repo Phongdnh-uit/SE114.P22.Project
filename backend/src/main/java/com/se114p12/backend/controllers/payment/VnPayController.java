@@ -67,6 +67,8 @@ public class VnPayController {
             orderService.markPaymentCompleted(txnRef);
             return "Thanh toán thành công đơn hàng #" + txnRef;
         }
+
+        orderService.markPaymentFailed(txnRef);
         return "Thanh toán thất bại: Mã lỗi " + rspCode;
     }
 }

@@ -43,7 +43,12 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public PageVO<ProductResponseDTO> getAllProducts(
       Specification<Product> specification, Pageable pageable) {
-    Page<Product> productPage = productRepository.findAll(specification, pageable);
+
+    Specification<Product> specWithNotDeleted = specification.and((root, query, cb) ->
+            cb.isFalse(root.get("deleted"))
+    );
+    Page<Product> productPage = productRepository.findAll(specWithNotDeleted, pageable);
+
     List<ProductResponseDTO> productDTOs =
         productPage.getContent().stream().map(productMapper::entityToResponse).toList();
 
@@ -59,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public PageVO<ProductResponseDTO> getProductsByCategory(Long categoryId, Pageable pageable) {
-    Page<Product> productPage = productRepository.findByCategory_Id(categoryId, pageable);
+    Page<Product> productPage = productRepository.findByCategory_IdAndDeletedFalse(categoryId, pageable);
     List<ProductResponseDTO> productDTOs =
         productPage.map(productMapper::entityToResponse).getContent();
 
@@ -158,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public void delete(Long id) {
     Optional<Product> productOptional = productRepository.findById(id);
-    if (productOptional.isEmpty() || !productOptional.get().getDeleted()) {
+    if (productOptional.isEmpty() || productOptional.get().getDeleted()) {
       throw new ResourceNotFoundException("Product not found");
     }
     Product product = productOptional.get();

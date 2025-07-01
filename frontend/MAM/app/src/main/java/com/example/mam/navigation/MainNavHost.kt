@@ -11,6 +11,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,7 +105,11 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = "Authentication",
+    //deepLinkIntent: Intent? = null
+    uri : Uri? = null
 ) {
+
+
     val unAuthorize by AuthEventManager.unauthorizedEvent.collectAsStateWithLifecycle()
     LaunchedEffect(unAuthorize){
         if (unAuthorize) {
@@ -115,12 +121,38 @@ fun MainNavHost(
             AuthEventManager.resetUnauthorized() // Reset the event
         }
     }
+
     val coroutineScope = CoroutineScope(Job() + Dispatchers.IO)
     AnimatedNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
+        composable(
+            route = "payment-result",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "mam://payment/result"
+                }
+            ),
+            ) { backStackEntry ->
+            val allParams = uri?.queryParameterNames?.joinToString(", ") { "$it=${uri.getQueryParameter(it)}" } ?: "No parameters"
+            val keys = backStackEntry.savedStateHandle.keys()
+            Column {
+                Text(text = "🔑 Keys: ${keys.joinToString(", ")}")
+                Text(text = "🔗 URI: ${uri?.toString() ?: "null"}")
+                Text(text = "📦 Parameters:\n$allParams")
+            }
+            PaymentResultScreen(
+                onBackHome = {
+                    navController.navigate(route = HomeScreen.HomeSreen.name) {
+                        popUpTo("Home") { inclusive = true }
+                    }
+                },
+                uri = uri,
+                params = allParams
+            )
+        }
         navigation(
             startDestination = AuthenticationScreen.Start.name,
             route = "Authentication"
@@ -182,27 +214,7 @@ fun MainNavHost(
                     },
                 )
             }
-            composable(
-                route = "payment-result",
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "mam://payment/result"
-                    }
-                ),
 
-                ) { backStackEntry ->
-                val intent = backStackEntry.savedStateHandle
-                    .get<Intent>("android-support-nav:controller:deepLinkIntent")
-                val uri = intent?.data
-                PaymentResultScreen(
-                    onBackHome = {
-                        navController.navigate(route = HomeScreen.HomeSreen.name) {
-                            popUpTo("Home") { inclusive = true }
-                        }
-                    },
-                    uri = uri,
-                )
-            }
             composable(
                 route = AuthenticationScreen.SignUp.name,
                 enterTransition = defaultTransitions(),
