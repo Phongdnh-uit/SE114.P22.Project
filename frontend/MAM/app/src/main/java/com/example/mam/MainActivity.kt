@@ -1,6 +1,8 @@
 package com.example.mam
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -8,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,11 +27,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val data: Uri? = intent?.data
         setContent {
             var permissionsGranted by remember { mutableStateOf(false) }
-
             if (permissionsGranted) {
-                App()
+                App(uri = data)
             } else {
                 RequestPermissions { granted ->
                     permissionsGranted = granted  // Update state when permissions are granted
@@ -63,9 +66,12 @@ fun RequestPermissions(setPermissionsGranted: (Boolean) -> Unit) {
 }
 
 @Composable
-fun App(){
-    Surface() {
-        MainNavHost(modifier = Modifier.padding())
+fun App(uri : Uri?) {
+    Surface {
+        MainNavHost(
+            modifier = Modifier.padding(),
+            uri = uri,  // Pass the intent to MainNavHost
+        )
     }
 }
 
