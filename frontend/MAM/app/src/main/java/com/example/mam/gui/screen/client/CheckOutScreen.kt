@@ -100,7 +100,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CheckOutScreen(
     onBackClicked: () -> Unit = {},
-    onCheckOutClicked: () -> Unit = {},
+    onHomeClicked: () -> Unit = {},
+    onCheckOutClicked: (Long) -> Unit = {},
     onChangeAddressClicked: () -> Unit = { },
     viewModel: CheckOutViewModel = viewModel(),
     modifier: Modifier = Modifier
@@ -482,13 +483,15 @@ fun CheckOutScreen(
                                             if (!vnpayUrl.isNullOrBlank()) {
                                                 WebView(context).loadUrl(vnpayUrl)
                                             } else {
-                                                Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng đặt lại.", Toast.LENGTH_SHORT).show()
                                             }
                                         }
+                                        onCheckOutClicked(result.toLong())
                                     } else {
                                         Toast.makeText(context, "Đặt hàng thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
+                                        onHomeClicked()
                                     }
-                                    onCheckOutClicked()
+
                                 } },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )

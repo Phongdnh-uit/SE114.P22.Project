@@ -406,7 +406,13 @@ fun OrderScreen(
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(start = 10.dp)
                     )
-
+                    Text(
+                        text = "Tình trạng thanh toán: " + order.paymentStatus,
+                        fontSize = 14.sp,
+                        color = BrownDefault,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
                     Text(
                         text = "Ghi chú: \n" + if (order.note.isNullOrEmpty()) {
                             "Không có ghi chú"

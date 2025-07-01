@@ -37,6 +37,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocalShipping
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -383,7 +385,14 @@ fun HomeScreen(
                 CircleIconButton(
                     backgroundColor = OrangeLight,
                     foregroundColor = OrangeDefault,
-                    icon = Icons.Filled.Person,
+                    icon = Icons.Outlined.ShoppingBag,
+                    onClick = onShippingClicked,
+                    modifier = Modifier
+                )
+                CircleIconButton(
+                    backgroundColor = OrangeLight,
+                    foregroundColor = OrangeDefault,
+                    icon = Icons.Outlined.Person,
                     onClick = onProfileClicked,
                     modifier = Modifier
                 )

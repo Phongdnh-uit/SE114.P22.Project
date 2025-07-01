@@ -309,7 +309,7 @@ fun MainNavHost(
                     },
                     onSearchClicked = {navController.navigate(HomeScreen.Search.name)},
                     onCartClicked = { navController.navigate("Cart") },
-                    onShippingClicked = {navController.navigate("Order")},
+                    onShippingClicked = {navController.navigate("OrderHistory")},
                     onNotificationClicked = {navController.navigate("Notification")},
                     onProfileClicked = {navController.navigate("Profile")},
                     viewmodel = viewmodel
@@ -410,11 +410,14 @@ fun MainNavHost(
                 val viewModel: CheckOutViewModel = viewModel(backStackEntry, factory = CheckOutViewModel.Factory)
                 CheckOutScreen(
                     onBackClicked = {navController.popBackStack()},
-                    onCheckOutClicked = {
+                    onHomeClicked = {
                         //order
                         navController.navigate(route = HomeScreen.HomeSreen.name) {
                             popUpTo("CheckOut") { inclusive = true }
                         } },
+                    onCheckOutClicked = {
+                            orderId ->
+                        navController.navigate("Order/${orderId}") },
                     onChangeAddressClicked = {
                         navController.navigate("Address")
                         // get address for saveStateHandle

@@ -481,6 +481,26 @@ fun ManageOrderScreen(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 ) {
+                                    append("Tình trạng thanh toán: ")
+                                }
+                                append(order.paymentStatus)
+                            },
+                            fontSize = 14.sp,
+                            color = BrownDefault,
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .fillMaxWidth()
+                        )
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = BrownDefault,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                ) {
                                     append("Ghi chú: ")
                                 }
                                 append(order.note ?: "Không có ghi chú")
