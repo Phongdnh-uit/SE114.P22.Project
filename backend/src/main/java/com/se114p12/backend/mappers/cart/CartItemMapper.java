@@ -62,7 +62,7 @@ public interface CartItemMapper {
 
     @Named("mapProduct")
     static Product mapProduct(Long productId, @Context ProductRepository productRepo) {
-        return productRepo.findById(productId)
+        return productRepo.findByIdIncludingDeleted(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại: " + productId));
     }
 
