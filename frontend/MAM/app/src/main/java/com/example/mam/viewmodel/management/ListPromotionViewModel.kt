@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.promotion.PromotionResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -189,7 +189,7 @@ class ListPromotionViewModel(
                     break // Stop loop on failure
                 }
             }
-
+            _asc.value = true // Reset sorting order to ascending
             _promoList.value = allPromotions.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {

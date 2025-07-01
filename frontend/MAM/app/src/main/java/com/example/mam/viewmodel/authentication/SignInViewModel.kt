@@ -12,7 +12,7 @@ import com.example.mam.dto.authentication.FirebaseLoginRequest
 import com.example.mam.dto.authentication.SendVerifyEmailRequest
 import com.example.mam.dto.authentication.SignInRequest
 import com.example.mam.dto.user.UserResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first

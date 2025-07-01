@@ -14,7 +14,7 @@ import com.example.mam.dto.cart.CartItemRequest
 import com.example.mam.dto.product.ProductResponse
 import com.example.mam.dto.variation.VariationOptionResponse
 import com.example.mam.dto.variation.VariationResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.text.DecimalFormat

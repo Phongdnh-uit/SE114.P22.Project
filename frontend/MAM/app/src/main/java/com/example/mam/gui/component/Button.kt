@@ -564,7 +564,7 @@ fun ProductClientListItem(
                     textAlign = TextAlign.Start,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     modifier = Modifier
                         .align(Alignment.Start)
                         .padding(bottom = 5.dp)

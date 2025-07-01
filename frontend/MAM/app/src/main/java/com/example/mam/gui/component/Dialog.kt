@@ -369,18 +369,43 @@ fun OrderRatingDialog(
     )
 }
 
+@Composable
+fun PaymentLoadingAlertDialog() {
+    AlertDialog(
+        onDismissRequest = {},
+        title = null,
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
+            ) {
+                CircularProgressIndicator(
+                    color = OrangeDefault,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Đang xử lý thanh toán...",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        modifier = Modifier
+        ,
+        confirmButton = {},
+        dismissButton = {},
+        properties = DialogProperties(dismissOnClickOutside = false)
+    )
+}
 @Preview
 @Composable
 fun PreviewDialog() {
-    Column {
-        OrderRatingDialog(
-            orderId = 12345L,
-            onSubmit = { reviewRequest ->
-                // Handle review submission
-                println("Review submitted: $reviewRequest")
-            },
-            onDismiss = {}
-        )
+    Column(Modifier.width(500.dp)) {
+        PaymentLoadingAlertDialog()
 //        CustomDialog(
 //            title = "Xác nhận",
 //            message = "Bạn có chắc chắn muốn thực hiện hành động này?",

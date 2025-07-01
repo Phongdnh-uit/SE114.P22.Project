@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.product.ProductResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,6 +99,7 @@ class ListProductViewModel(
         val allProducts = mutableListOf<ProductResponse>()
         val sortOption = when(_selectedSortingOption.value){
             "Tên" -> "name"
+            "Giá" -> "originalPrice"
             else -> "id"
         }
         try {
@@ -158,6 +159,7 @@ class ListProductViewModel(
                     if (page != null){
                         allProducts.addAll(page.content)
                         _product.value = allProducts.toMutableList()
+                         // Reset sorting order to ascending
                         if (page.page >= (page.totalPages - 1)) {
                             break // Stop looping when the last page is reached
                         }
@@ -169,7 +171,7 @@ class ListProductViewModel(
                     break // Stop loop on failure
                 }
             }
-
+            _asc.value = true
             _product.value = allProducts.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {
@@ -185,14 +187,17 @@ class ListProductViewModel(
         _isDeleting.value = true
         try {
             val response =
-                BaseRepository(userPreferencesRepository).productCategoryRepository.deleteCategory(id)
+                BaseRepository(userPreferencesRepository).productRepository.deleteProduct(id)
             if (response.isSuccessful) {
                 _product.value = _product.value.filterNot { it.id == id }.toMutableList()
+                Log.d("ListProductViewModel", "Product with id $id deleted successfully")
                 return 1
             } else {
+                Log.e("ListProductViewModel", "Failed to delete product with id $id: ${response.errorBody()?.string()}")
                 return 0
             }
         } catch (e: Exception) {
+            Log.e("ListProductViewModel", "Error deleting product: ${e.message}")
             return -1
         } finally {
             _isDeleting.value = false

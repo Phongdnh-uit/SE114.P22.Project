@@ -14,7 +14,7 @@ import com.example.mam.dto.review.ReviewRequest
 import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.shipper.ShipperResponse
 import com.example.mam.dto.user.UserResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

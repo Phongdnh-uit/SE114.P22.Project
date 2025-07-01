@@ -12,7 +12,7 @@ import com.example.mam.dto.cart.CartResponse
 import com.example.mam.dto.cart.CartItemRequest
 import com.example.mam.dto.cart.CartItemResponse
 import com.example.mam.dto.product.ProductResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -44,7 +44,7 @@ class CartViewModel(
                     _total.value = _cart.value.getTotalPrice()
                     Log.d("CartViewModel", "Cart details loaded: ${_cart.value.cartItems.size} items")
                     _cart.value.cartItems.forEach { item ->
-                        Log.d("CartViewModel", "Item: ${item.productName}, Quantity: ${item.quantity}, Price: ${item.getPrice()}, Options: ${item.variationOptionInfo}")
+                        Log.d("CartViewModel", "Item: ${item.productName}, Quantity: ${item.quantity}, Price: ${item.getPrice()}, Options: ${item.variationOptionInfo}, Available: ${item.available}")
                     }
 
                 } else {

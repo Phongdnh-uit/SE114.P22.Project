@@ -14,7 +14,7 @@ import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.authentication.ForgetPasswordRequest
 import com.example.mam.dto.authentication.SendOTPRequest
 import com.example.mam.dto.authentication.VerifyOTPRequest
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import com.example.mam.viewmodel.authentication.otp.OtpAction
 import com.example.mam.viewmodel.authentication.otp.OtpState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -133,41 +133,55 @@ class OtpViewModel(
                 enterNumber(action.number, action.index)
             }
             OtpAction.OnKeyboardBack -> {
-                val previousIndex = getPreviousFocusedIndex(state.value.focusedIndex)
-                _state.update { it.copy(
-                    code = it.code.mapIndexed { index, number ->
-                        if(index == previousIndex) {
-                            null
-                        } else {
-                            number
-                        }
-                    },
-                    focusedIndex = previousIndex
-                ) }
+                val currentIndex = state.value.focusedIndex ?: return
+                val currentChar = state.value.code.getOrNull(currentIndex)
+
+                if (currentChar != null) {
+                    // Xóa ký tự tại ô hiện tại
+                    _state.update {
+                        it.copy(
+                            code = it.code.mapIndexed { index, number ->
+                                if (index == currentIndex) null else number
+                            },
+                            focusedIndex = currentIndex
+                        )
+                    }
+                } else {
+                    // Lùi về ô trước
+                    val previousIndex = getPreviousFocusedIndex(currentIndex)
+                    _state.update {
+                        it.copy(
+                            code = it.code.mapIndexed { index, number ->
+                                if (index == previousIndex) null else number
+                            },
+                            focusedIndex = previousIndex
+                        )
+                    }
+                }
             }
         }
     }
-
     private fun enterNumber(number: String?, index: Int) {
-        val newCode = state.value.code.mapIndexed { currentIndex, currentNumber ->
-            if(currentIndex == index) {
-                number
-            } else {
-                currentNumber
-            }
+        val currentCode = state.value.code
+        val newCode = currentCode.mapIndexed { i, c ->
+            if (i == index) number else c
         }
+
         val wasNumberRemoved = number == null
-        _state.update { it.copy(
-            code = newCode,
-            focusedIndex = if(wasNumberRemoved || it.code.getOrNull(index) != null) {
-                it.focusedIndex
-            } else {
-                getNextFocusedTextFieldIndex(
-                    currentCode = it.code,
-                    currentFocusedIndex = it.focusedIndex
-                )
-            }
-        ) }
+
+        val nextIndex = if (wasNumberRemoved) {
+            index
+        } else {
+            // Tìm ô đầu tiên chưa được nhập lại (null) sau index hiện tại
+            (index + 1..5).firstOrNull { newCode[it] == null } ?: index
+        }
+
+        _state.update {
+            it.copy(
+                code = newCode,
+                focusedIndex = nextIndex
+            )
+        }
     }
 
     private fun getPreviousFocusedIndex(currentIndex: Int?): Int? {

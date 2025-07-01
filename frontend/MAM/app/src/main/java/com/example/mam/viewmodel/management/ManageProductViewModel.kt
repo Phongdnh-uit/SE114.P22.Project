@@ -1,7 +1,6 @@
 package com.example.mam.viewmodel.management
 
 import android.content.Context
-import android.icu.util.UniversalTimeScale.toBigDecimal
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -20,7 +19,7 @@ import com.example.mam.dto.variation.VariationOptionRequest
 import com.example.mam.dto.variation.VariationOptionResponse
 import com.example.mam.dto.variation.VariationRequest
 import com.example.mam.dto.variation.VariationResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import com.example.mam.viewmodel.ImageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -144,11 +143,11 @@ class ManageProductViewModel(
     }
 
     fun isProductPriceValid(): String {
-        val price = if (_productPrice.value.isNotEmpty()) _productPrice.value.toInt() else 0
-        if (price < 1000) {
+        val price = if (_productPrice.value.isNotEmpty()) _productPrice.value.toBigDecimal() else BigDecimal.ZERO
+        if (price < 1000.toBigDecimal()) {
             return "Giá quá thấp (<1000 VND)" // Price is too low
         }
-        else if (price > 1000000) {
+        else if (price > 1000000.toBigDecimal()) {
             return "Giá quá cao (>1 triệu VND)" // Price is too high
         }
         return ""
@@ -198,13 +197,7 @@ class ManageProductViewModel(
             )
             Log.d("ManageProductViewModel", "Update variant response: ${response.code()}")
             if (response.isSuccessful) {
-                _variants.value = _variants.value.mapKeys { (key, value) ->
-                    if (key.id == variant.id) {
-                        key.copy(isMultipleChoice = !key.isMultipleChoice)
-                    } else {
-                        key
-                    }
-                }
+                loadVariants(variant.productId)
                 Log.d("ManageProductViewModel", "Variant updated successfully")
                 return 1
             }
@@ -364,23 +357,7 @@ class ManageProductViewModel(
                             _isAvailable.value = product.isAvailable
                             Log.d("ManageProductViewModel", "Product loaded successfully: ${product.name}, ${productCategory.value}")
                             // Load variants if available
-                            val variantResponse = BaseRepository(userPreferencesRepository).variationRepository.getVariationByProduct(product.id, page = 0, size = 100)
-                            if (variantResponse.isSuccessful) {
-                                val variants = variantResponse.body()?.content ?: emptyList()
-                                val variantOptions = mutableMapOf<VariationResponse, List<VariationOptionResponse>>()
-
-                                for (variant in variants) {
-                                    val optionsResponse = BaseRepository(userPreferencesRepository).variationOptionRepository.getVariationOption(variant.id, page = 0, size = 100)
-                                    if (optionsResponse.isSuccessful) {
-                                        variantOptions[variant] = optionsResponse.body()?.content ?: emptyList()
-                                    } else {
-                                        Log.e("ManageProductViewModel", "Failed to load variant options: ${optionsResponse.errorBody()?.string()}")
-                                    }
-                                }
-                                _variants.value = variantOptions
-                            } else {
-                                Log.e("ManageProductViewModel", "Failed to load variants: ${variantResponse.errorBody()?.string()}")
-                            }
+                            loadVariants(product.id)
                         }
                     } else {
                         Log.e("ManageProductViewModel", "Failed to load product: ${response.errorBody()?.string()}")
@@ -394,6 +371,30 @@ class ManageProductViewModel(
 
     }
 
+    suspend fun loadVariants( productId: Long) {
+        try {
+            val variantResponse = BaseRepository(userPreferencesRepository).variationRepository.getVariationByProduct(productId, page = 0, size = 100)
+            if (variantResponse.isSuccessful) {
+                val variants = variantResponse.body()?.content ?: emptyList()
+                Log.d("ManageProductViewModel", "Loaded ${variants.size} variants for product $productId")
+                val variantOptions = mutableMapOf<VariationResponse, List<VariationOptionResponse>>()
+
+                for (variant in variants) {
+                    val optionsResponse = BaseRepository(userPreferencesRepository).variationOptionRepository.getVariationOption(variant.id, page = 0, size = 100)
+                    if (optionsResponse.isSuccessful) {
+                        variantOptions[variant] = optionsResponse.body()?.content ?: emptyList()
+                    } else {
+                        Log.e("ManageProductViewModel", "Failed to load variant options: ${optionsResponse.errorBody()?.string()}")
+                    }
+                }
+                _variants.value = variantOptions
+            } else {
+                Log.e("ManageProductViewModel", "Failed to load variants: ${variantResponse.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            Log.e("ManageProductViewModel", "Error loading variants: ${e.message}")
+        }
+    }
     suspend fun addProduct(): Int {
         try {
             _isSetting.value = true

@@ -403,7 +403,7 @@ fun ManageOrderScreen(
                                 ) {
                                     append("Mã đơn hàng: ")
                                 }
-                                append(order.id.toString())
+                                append(order.txnRef)
                             },
                             fontSize = 14.sp,
                             color = BrownDefault,

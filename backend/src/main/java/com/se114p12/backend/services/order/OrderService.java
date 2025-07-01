@@ -29,4 +29,6 @@ public interface OrderService {
   void markOrderAsDelivered(Long orderId);
 
   void markPaymentCompleted(String txnRef);
+
+  void markPaymentFailed(String txnRef);
 }

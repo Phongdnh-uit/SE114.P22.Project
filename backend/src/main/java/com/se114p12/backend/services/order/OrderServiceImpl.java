@@ -2,6 +2,7 @@ package com.se114p12.backend.services.order;
 
 import com.se114p12.backend.configs.ShopLocationConfig;
 import com.se114p12.backend.dtos.delivery.DeliveryResponseDTO;
+import com.se114p12.backend.dtos.nofitication.NotificationRequestDTO;
 import com.se114p12.backend.dtos.order.OrderRequestDTO;
 import com.se114p12.backend.dtos.order.OrderResponseDTO;
 import com.se114p12.backend.entities.cart.Cart;
@@ -12,7 +13,9 @@ import com.se114p12.backend.entities.product.Product;
 import com.se114p12.backend.entities.promotion.Promotion;
 import com.se114p12.backend.entities.shipper.Shipper;
 import com.se114p12.backend.entities.variation.VariationOption;
+import com.se114p12.backend.enums.NotificationType;
 import com.se114p12.backend.enums.OrderStatus;
+import com.se114p12.backend.enums.PaymentMethod;
 import com.se114p12.backend.enums.PaymentStatus;
 import com.se114p12.backend.exceptions.BadRequestException;
 import com.se114p12.backend.exceptions.ResourceNotFoundException;
@@ -32,6 +35,7 @@ import com.se114p12.backend.repositories.order.OrderRepository;
 import com.se114p12.backend.repositories.promotion.PromotionRepository;
 import com.se114p12.backend.repositories.shipper.ShipperRepository;
 import com.se114p12.backend.services.delivery.MapService;
+import com.se114p12.backend.services.notification.NotificationService;
 import com.se114p12.backend.services.promotion.UserPromotionService;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.util.VnPayUtils;
@@ -69,7 +73,9 @@ public class OrderServiceImpl implements OrderService {
 
   private final UserNeo4jRepository userNeo4jRepository;
   private final ProductNeo4jRepository productNeo4jRepository;
+
   private final MapService mapService;
+  private final NotificationService notificationService;
 
   @Override
   public PageVO<OrderResponseDTO> getAll(Specification<Order> specification, Pageable pageable) {
@@ -134,9 +140,17 @@ public class OrderServiceImpl implements OrderService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found")));
 
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
-    order.setOrderStatus(OrderStatus.PENDING);
+
+    // Gán trạng thái cho đơn hàng tùy vào phương thức thanh toán
+    OrderStatus initialStatus = orderRequestDTO.getPaymentMethod().equals(PaymentMethod.CASH_ON_DELIVERY)
+            ? OrderStatus.PENDING
+            : null;
+
+    order.setOrderStatus(initialStatus);
+
+
+
     order.setPaymentStatus(PaymentStatus.PENDING);
-    order.setTxnRef(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 
     order.setOrderDetails(new ArrayList<>());
     order.setActualDeliveryTime(null); // sẽ được cập nhật bởi khách
@@ -187,7 +201,8 @@ public class OrderServiceImpl implements OrderService {
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
-
+// Gửi thông báo trạng thái
+    sendOrderStatusNotification(order);
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
@@ -208,6 +223,7 @@ public class OrderServiceImpl implements OrderService {
     if (orderRequestDTO.getNote() != null) {
       order.setNote(orderRequestDTO.getNote());
     }
+
     if (orderRequestDTO.getPaymentMethod() != null) {
       order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
     }
@@ -226,6 +242,7 @@ public class OrderServiceImpl implements OrderService {
     }
     order.setOrderStatus(OrderStatus.CANCELED);
     orderRepository.save(order);
+    sendOrderStatusNotification(order);
   }
 
   @Override
@@ -260,6 +277,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     orderRepository.save(order);
+
+    sendOrderStatusNotification(order);
   }
 
   @Override
@@ -310,33 +329,10 @@ public class OrderServiceImpl implements OrderService {
 
     order.setOrderStatus(status);
     orderRepository.save(order);
+
+    sendOrderStatusNotification(order);
   }
 
-  private String extractVariationInfo(CartItem cartItem) {
-    if (cartItem.getVariationOptions() == null || cartItem.getVariationOptions().isEmpty()) {
-      return null;
-    }
-
-    // Đảm bảo thứ tự Variation
-    return cartItem.getVariationOptions().stream()
-        .filter(vo -> vo.getVariation() != null)
-        .collect(Collectors.groupingBy(VariationOption::getVariation))
-        .entrySet()
-        .stream()
-        .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
-        .map(
-            entry -> {
-              String variationName = entry.getKey().getName();
-              String values =
-                  entry.getValue().stream()
-                      .map(VariationOption::getValue)
-                      .collect(Collectors.joining(", "));
-              return variationName + ": " + values;
-            })
-        .collect(Collectors.joining(", "));
-  }
-
-  // OrderServiceImpl.java
   @Override
   @Transactional
   public void markPaymentCompleted(String txnRef) {
@@ -348,7 +344,81 @@ public class OrderServiceImpl implements OrderService {
       order.setPaymentStatus(PaymentStatus.COMPLETED);
       order.setOrderStatus(OrderStatus.PENDING);     // giao hàng chưa bắt đầu
       orderRepository.save(order);
+      sendPaymentStatusNotification(order);
+      sendOrderStatusNotification(order);
     }
+  }
+
+  @Override
+  @Transactional
+  public void markPaymentFailed(String txnRef) {
+    Order order = orderRepository.findByTxnRef(txnRef)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+    order.setPaymentStatus(PaymentStatus.FAILED);
+    orderRepository.save(order);
+
+    sendPaymentStatusNotification(order);
+  }
+
+  // ============================ SUPPORT METHOD ============================
+  private void sendNotificationForOrder(Order order, NotificationType type) {
+    if (type == null) return;
+
+    NotificationRequestDTO notification = new NotificationRequestDTO();
+    notification.setTitle(type.getTitle());
+    notification.setMessage(type.formatMessage(order.getTxnRef()));
+    notification.setType(type);
+    notification.setUserIds(List.of(order.getUser().getId()));
+
+    notificationService.pushNotification(notification);
+  }
+
+  private void sendOrderStatusNotification(Order order) {
+    NotificationType type = switch (order.getOrderStatus()) {
+      case PENDING -> NotificationType.ORDER_PLACED;
+      case CONFIRMED -> NotificationType.ORDER_RECEIVED;
+      case PROCESSING -> NotificationType.ORDER_PREPARING;
+      case SHIPPING -> NotificationType.ORDER_DELIVERING;
+      case COMPLETED -> NotificationType.ORDER_DELIVERED;
+      case CANCELED -> NotificationType.ORDER_CANCELLED;
+    };
+
+    sendNotificationForOrder(order, type);
+  }
+
+  private void sendPaymentStatusNotification(Order order) {
+    NotificationType type = switch (order.getPaymentStatus()) {
+      case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
+      case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
+      default -> null;
+    };
+
+    sendNotificationForOrder(order, type);
+  }
+
+  private String extractVariationInfo(CartItem cartItem) {
+    if (cartItem.getVariationOptions() == null || cartItem.getVariationOptions().isEmpty()) {
+      return null;
+    }
+
+    // Đảm bảo thứ tự Variation
+    return cartItem.getVariationOptions().stream()
+            .filter(vo -> vo.getVariation() != null)
+            .collect(Collectors.groupingBy(VariationOption::getVariation))
+            .entrySet()
+            .stream()
+            .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
+            .map(
+                    entry -> {
+                      String variationName = entry.getKey().getName();
+                      String values =
+                              entry.getValue().stream()
+                                      .map(VariationOption::getValue)
+                                      .collect(Collectors.joining(", "));
+                      return variationName + ": " + values;
+                    })
+            .collect(Collectors.joining(", "));
   }
 
   // ============================ NEO4J RECOMMEND SYSTEM ============================

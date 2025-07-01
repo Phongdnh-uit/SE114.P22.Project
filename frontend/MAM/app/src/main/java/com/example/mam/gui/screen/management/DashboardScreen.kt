@@ -613,7 +613,6 @@ fun SoldCategoryChart(
 ) {
     var year by remember { mutableStateOf<Int>(Instant.now().atZone(ZoneId.systemDefault()).year) }
     var month by remember { mutableStateOf<Int>(Instant.now().atZone(ZoneId.systemDefault()).monthValue) }
-    val quarter by remember { mutableStateOf<Int>(Instant.now().atZone(ZoneId.systemDefault()).monthValue / 3 + 1) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val chartData = viewModel.categorySoldList.collectAsStateWithLifecycle().value
@@ -662,17 +661,6 @@ fun SoldCategoryChart(
                 .padding(16.dp)
                 .size(40.dp)
         )
-    } else if (chartData.isEmpty()) {
-        // Show empty state
-        Text(
-            text = "Không có dữ liệu",
-            color = BrownDefault,
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        )
     } else {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -715,7 +703,7 @@ fun SoldCategoryChart(
                     )
                 }
                 Text(
-                    text = "Tỉ lệ danh mục bán ra\n theo tháng",
+                    text = "Tỉ lệ danh mục bán ra\n theo tháng ($month/$year)",
                     color = BrownDefault,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -747,23 +735,36 @@ fun SoldCategoryChart(
                     )
                 }
             }
-            Legends(
-                legendsConfig = DataUtils.getLegendsConfigFromPieChartData(
-                    pieChartData = data,
-                    3
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .height(150.dp),
-            )
-            DonutPieChart(
-                modifier = Modifier
-                    .size(300.dp),
-                data,
-                pieChartConfig
-            ) { slice ->
-                Toast.makeText(context, slice.label, Toast.LENGTH_SHORT).show()
+            if (chartData.all { it.second == 0f }) {
+                // Show empty state
+                Text(
+                    text = "Không có dữ liệu",
+                    color = BrownDefault,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+            } else {
+                Legends(
+                    legendsConfig = DataUtils.getLegendsConfigFromPieChartData(
+                        pieChartData = data,
+                        3
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .height(150.dp),
+                )
+                DonutPieChart(
+                    modifier = Modifier
+                        .size(300.dp),
+                    data,
+                    pieChartConfig
+                ) { slice ->
+                    Toast.makeText(context, slice.label, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

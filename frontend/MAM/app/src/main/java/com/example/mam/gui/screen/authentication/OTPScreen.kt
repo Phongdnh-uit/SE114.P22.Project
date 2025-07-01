@@ -57,7 +57,11 @@ import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authentication.ForgetPasswordViewModel
 import com.example.mam.viewmodel.authentication.otp.OtpAction
+import com.example.mam.viewmodel.authentication.otp.OtpState
 import com.plcoding.composeotpinput.OtpViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -68,11 +72,38 @@ fun OTPScreen(
     onAction: (OtpAction) -> Unit = viewModel::onAction,
     onVerifyClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
+    resetTrigger: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val uiSate by viewModel.state.collectAsState()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val email = viewModel.email.collectAsStateWithLifecycle().value
 
+    OTPScreenContent(
+        viewModel = viewModel,
+        state = state,
+        email = email,
+        focusRequester = focusRequester,
+        onAction = onAction,
+        onVerifyClicked = onVerifyClicked,
+        onCloseClicked = onCloseClicked,
+        resetTrigger = resetTrigger,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun OTPScreenContent(
+    viewModel: OtpViewModel = viewModel(),
+    state: OtpState,
+    email: String,
+    focusRequester: List<FocusRequester>,
+    onAction: (OtpAction) -> Unit,
+    onVerifyClicked: () -> Unit,
+    onCloseClicked: () -> Unit,
+    resetTrigger: Boolean,
+    modifier: Modifier = Modifier,
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -184,7 +215,6 @@ fun OTPScreen(
                 )
                 Text(
                     text = email,
-                   // text = viewModel.phoneNumber,
                     style = TextStyle(
                         fontSize = Variables.BodySizeMedium,
                         lineHeight = 22.4.sp,
@@ -213,7 +243,10 @@ fun OTPScreen(
 //                        resetTrigger = resetTrigger
 //                    )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            5.dp,
+                            Alignment.CenterHorizontally
+                        ),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(vertical = 16.dp)
@@ -247,8 +280,8 @@ fun OTPScreen(
                 }
                 OtpInputWithCountdown(
                     onResendClick = {
-                        scope.launch{
-                            if (viewModel.reSendOTP() == 1){
+                        scope.launch {
+                            if (viewModel.reSendOTP() == 1) {
                                 Toast.makeText(
                                     context,
                                     "Mã OTP đã được gửi lại đến email của bạn",
@@ -256,8 +289,7 @@ fun OTPScreen(
                                 ).show()
                                 resetTrigger = !resetTrigger
                                 viewModel.setOTP((""))
-                            }
-                            else {
+                            } else {
                                 Toast.makeText(
                                     context,
                                     "Gửi lại mã OTP thất bại, vui lòng thử lại sau",
@@ -271,7 +303,7 @@ fun OTPScreen(
                     text = "Xác nhận",
                     onClick = {
                         viewModel.setOTP(state.code.joinToString(""))
-                        scope.launch{
+                        scope.launch {
                             if (viewModel.verifyOtp() == 1) {
                                 Toast.makeText(
                                     context,
@@ -299,8 +331,133 @@ fun OTPScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewForgetPasswordScreen() {
-    OTPScreen()
+class FakeOtpHandler {
+    private val _state = MutableStateFlow(OtpState())
+    val state: StateFlow<OtpState> = _state
+
+    val email = MutableStateFlow("preview@email.com")
+
+    fun onAction(action: OtpAction) {
+        when(action) {
+            is OtpAction.OnChangeFieldFocused -> {
+                _state.update { it.copy(
+                    focusedIndex = action.index
+                ) }
+            }
+            is OtpAction.OnEnterCharacter -> {
+                enterNumber(action.number, action.index)
+            }
+            OtpAction.OnKeyboardBack -> {
+                val currentIndex = state.value.focusedIndex ?: return
+                val currentChar = state.value.code.getOrNull(currentIndex)
+
+                if (currentChar != null) {
+                    // Xóa ký tự tại ô hiện tại
+                    _state.update {
+                        it.copy(
+                            code = it.code.mapIndexed { index, number ->
+                                if (index == currentIndex) null else number
+                            },
+                            focusedIndex = currentIndex
+                        )
+                    }
+                } else {
+                    // Lùi về ô trước
+                    val previousIndex = getPreviousFocusedIndex(currentIndex)
+                    _state.update {
+                        it.copy(
+                            code = it.code.mapIndexed { index, number ->
+                                if (index == previousIndex) null else number
+                            },
+                            focusedIndex = previousIndex
+                        )
+                    }
+                }
+            }
+        }
+    }
+    private fun enterNumber(number: String?, index: Int) {
+        val currentCode = state.value.code
+        val newCode = currentCode.mapIndexed { i, c ->
+            if (i == index) number else c
+        }
+
+        val wasNumberRemoved = number == null
+
+        val nextIndex = if (wasNumberRemoved) {
+            index
+        } else {
+            // Tìm ô đầu tiên chưa được nhập lại (null) sau index hiện tại
+            (index + 1..5).firstOrNull { newCode[it] == null } ?: index
+        }
+
+        _state.update {
+            it.copy(
+                code = newCode,
+                focusedIndex = nextIndex
+            )
+        }
+    }
+
+    private fun getPreviousFocusedIndex(currentIndex: Int?): Int? {
+        return currentIndex?.minus(1)?.coerceAtLeast(0)
+    }
+
+    private fun getNextFocusedTextFieldIndex(
+        currentCode: List<String?>,
+        currentFocusedIndex: Int?
+    ): Int? {
+        if(currentFocusedIndex == null) {
+            return null
+        }
+
+        if(currentFocusedIndex == 5) {
+            return currentFocusedIndex
+        }
+
+        return getFirstEmptyFieldIndexAfterFocusedIndex(
+            code = currentCode,
+            currentFocusedIndex = currentFocusedIndex
+        )
+    }
+
+    private fun getFirstEmptyFieldIndexAfterFocusedIndex(
+        code: List<String?>,
+        currentFocusedIndex: Int
+    ): Int {
+        for (index in (currentFocusedIndex + 1) until code.size) {
+            if (code[index] == null) {
+                return index
+            }
+        }
+        return currentFocusedIndex
+    }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewOTPScreen() {
+//    val handler = remember { FakeOtpHandler() }
+//
+//    val state by handler.state.collectAsState()
+//    val email by handler.email.collectAsState()
+//
+//    val focusRequesters = remember { List(6) { FocusRequester() } }
+//
+//    OTPScreenContent(
+//        state = state,
+//        email = email,
+//        focusRequester = focusRequesters,
+//        onAction = handler::onAction,
+//        onVerifyClicked = {},
+//        onCloseClicked = {},
+//        resetTrigger = false
+//    )
+//}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewForgetPasswordScreen() {
+//    OTPScreen()
+//}

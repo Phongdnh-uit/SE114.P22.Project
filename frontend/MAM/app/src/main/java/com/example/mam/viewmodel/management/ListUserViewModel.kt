@@ -4,18 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.user.UserResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class ListUserViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
@@ -163,6 +161,7 @@ class ListUserViewModel(
                     break // Stop loop on failure
                 }
             }
+            _asc.value = true // Reset sorting order to ascending
             _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList() // Update UI with all categories
         } catch (e: Exception) {
         } finally {
