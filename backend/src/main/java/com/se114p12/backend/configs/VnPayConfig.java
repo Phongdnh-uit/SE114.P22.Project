@@ -1,5 +1,6 @@
 package com.se114p12.backend.configs;
 
+import com.se114p12.backend.constants.AppConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,7 @@ public class VnPayConfig {
     @Value("${vnpay.payUrl:https://sandbox.vnpay.vn/paymentv2/vpcpay.html}")
     private String vnp_PayUrl;
 
-    @Value("${vnpay.returnUrl:http://localhost:8080/api/v1/payment/return}")
-    private String vnp_ReturnUrl;
+    private String vnp_ReturnUrl = AppConstant.BACKEND_URL + "/api/v1/payment/return";
 
     public String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");

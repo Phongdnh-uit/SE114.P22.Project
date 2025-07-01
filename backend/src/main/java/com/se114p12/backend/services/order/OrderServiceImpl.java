@@ -148,8 +148,7 @@ public class OrderServiceImpl implements OrderService {
 
     order.setOrderStatus(initialStatus);
 
-    // Gửi thông báo trạng thái
-    sendOrderStatusNotification(order);
+
 
     order.setPaymentStatus(PaymentStatus.PENDING);
 
@@ -202,7 +201,8 @@ public class OrderServiceImpl implements OrderService {
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
-
+// Gửi thông báo trạng thái
+    sendOrderStatusNotification(order);
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
@@ -344,32 +344,57 @@ public class OrderServiceImpl implements OrderService {
       order.setPaymentStatus(PaymentStatus.COMPLETED);
       order.setOrderStatus(OrderStatus.PENDING);     // giao hàng chưa bắt đầu
       orderRepository.save(order);
+      sendPaymentStatusNotification(order);
       sendOrderStatusNotification(order);
     }
   }
 
+  @Override
+  @Transactional
+  public void markPaymentFailed(String txnRef) {
+    Order order = orderRepository.findByTxnRef(txnRef)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+    order.setPaymentStatus(PaymentStatus.FAILED);
+    orderRepository.save(order);
+
+    sendPaymentStatusNotification(order);
+  }
+
   // ============================ SUPPORT METHOD ============================
-  private void sendOrderStatusNotification(Order order) {
-    NotificationType type = mapOrderStatusToNotificationType(order.getOrderStatus());
+  private void sendNotificationForOrder(Order order, NotificationType type) {
+    if (type == null) return;
 
     NotificationRequestDTO notification = new NotificationRequestDTO();
-    notification.setTitle("Trạng thái đơn hàng đã thay đổi");
-    notification.setMessage("Đơn hàng #" + order.getId() + " hiện đang ở trạng thái: " + order.getOrderStatus().name());
+    notification.setTitle(type.getTitle());
+    notification.setMessage(type.formatMessage(order.getTxnRef()));
     notification.setType(type);
     notification.setUserIds(List.of(order.getUser().getId()));
 
     notificationService.pushNotification(notification);
   }
 
-  private NotificationType mapOrderStatusToNotificationType(OrderStatus status) {
-    return switch (status) {
+  private void sendOrderStatusNotification(Order order) {
+    NotificationType type = switch (order.getOrderStatus()) {
       case PENDING -> NotificationType.ORDER_PLACED;
       case CONFIRMED -> NotificationType.ORDER_RECEIVED;
       case PROCESSING -> NotificationType.ORDER_PREPARING;
       case SHIPPING -> NotificationType.ORDER_DELIVERING;
       case COMPLETED -> NotificationType.ORDER_DELIVERED;
-      default -> NotificationType.GENERAL;
+      case CANCELED -> NotificationType.ORDER_CANCELLED;
     };
+
+    sendNotificationForOrder(order, type);
+  }
+
+  private void sendPaymentStatusNotification(Order order) {
+    NotificationType type = switch (order.getPaymentStatus()) {
+      case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
+      case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
+      default -> null;
+    };
+
+    sendNotificationForOrder(order, type);
   }
 
   private String extractVariationInfo(CartItem cartItem) {

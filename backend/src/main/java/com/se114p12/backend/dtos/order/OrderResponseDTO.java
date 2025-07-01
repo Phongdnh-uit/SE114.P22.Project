@@ -24,5 +24,6 @@ public class OrderResponseDTO extends BaseResponseDTO {
   private Long shipperId;
   private PaymentMethod paymentMethod;
   private PaymentStatus paymentStatus;
+  private String txnRef;
   private List<OrderDetailResponseDTO> orderDetails;
 }
