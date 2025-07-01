@@ -384,7 +384,7 @@ fun AdditionalProduct(
                 )
                 OuterShadowFilledButton(
                     text = item.getPriceToString(),
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     shadowColor = WhiteDefault,
                     onClick = { onClick(item.id) },
                     modifier = Modifier.padding(5.dp).height(30.dp)

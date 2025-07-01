@@ -136,7 +136,10 @@ public class StatsServiceImpl implements StatsService {
 
   @Override
   public Map<String, BigDecimal> getSoldProductCountByCategory(int month, int year) {
-    List<Order> orders = orderRepository.findByMonthAndYear(month, year);
+    List<Order> orders = orderRepository.findByMonthAndYear(month, year).stream()
+            .filter(order -> order.getOrderStatus() == OrderStatus.COMPLETED &&
+                    order.getPaymentStatus() == PaymentStatus.COMPLETED)
+            .toList();
     Map<Long, BigDecimal> soldByCategory =
         orders.stream()
             .flatMap(order -> order.getOrderDetails().stream())

@@ -99,6 +99,7 @@ class ListProductViewModel(
         val allProducts = mutableListOf<ProductResponse>()
         val sortOption = when(_selectedSortingOption.value){
             "Tên" -> "name"
+            "Giá" -> "originalPrice"
             else -> "id"
         }
         try {
@@ -158,7 +159,7 @@ class ListProductViewModel(
                     if (page != null){
                         allProducts.addAll(page.content)
                         _product.value = allProducts.toMutableList()
-                        _asc.value = true // Reset sorting order to ascending
+                         // Reset sorting order to ascending
                         if (page.page >= (page.totalPages - 1)) {
                             break // Stop looping when the last page is reached
                         }
@@ -170,7 +171,7 @@ class ListProductViewModel(
                     break // Stop loop on failure
                 }
             }
-
+            _asc.value = true
             _product.value = allProducts.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {
