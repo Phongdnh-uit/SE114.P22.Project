@@ -1,5 +1,6 @@
 package com.se114p12.backend.configs;
 
+import com.se114p12.backend.constants.AppConstant;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -25,7 +26,7 @@ public class OpenAPIConfig {
   @Bean
   public OpenAPI myOpenAPI() {
     Server remoteServer = new Server();
-    remoteServer.setUrl("https://api.se114.phongdnh.software");
+    remoteServer.setUrl(AppConstant.DOMAIN);
     Server localServer = new Server();
     localServer.setUrl("http://localhost:8080");
 
