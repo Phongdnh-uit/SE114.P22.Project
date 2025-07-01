@@ -4,6 +4,7 @@ import com.se114p12.backend.dtos.stats.RevenueStatsResponseDTO;
 import com.se114p12.backend.entities.order.Order;
 import com.se114p12.backend.entities.product.ProductCategory;
 import com.se114p12.backend.enums.OrderStatus;
+import com.se114p12.backend.enums.PaymentStatus;
 import com.se114p12.backend.repositories.order.OrderRepository;
 import com.se114p12.backend.repositories.product.ProductCategoryRepository;
 import java.math.BigDecimal;
@@ -91,7 +92,10 @@ public class StatsServiceImpl implements StatsService {
 
   @Override
   public Map<Integer, BigDecimal> getRevenueStatsByYear(int year, String groupBy) {
-    List<Order> orders = orderRepository.findByYear(year);
+    List<Order> orders = orderRepository.findByYear(year).stream()
+            .filter(order -> order.getOrderStatus() == OrderStatus.COMPLETED &&
+                    order.getPaymentStatus() == PaymentStatus.COMPLETED)
+            .toList();
 
     switch (groupBy.toLowerCase()) {
       case "month":
