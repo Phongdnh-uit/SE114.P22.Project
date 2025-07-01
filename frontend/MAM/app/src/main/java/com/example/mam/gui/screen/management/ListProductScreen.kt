@@ -397,12 +397,44 @@ fun ListProductScreen(
                         }
                         else {
                             items(productList) { product ->
-                                ProductItem(
-                                    product = product,
-                                    onProductClick = onProductClick,
-                                    onEditProductClick = onEditProductClick,
-                                    onDeleteProductClick = {  },
-                                )
+                                var isShowDialog by remember { mutableStateOf(false) }
+                                if (isShowDialog){
+                                    CustomDialog(
+                                        title = "Xác nhận xóa",
+                                        message = "Bạn có chắc muốn xóa Sản phẩm ${product.name}",
+                                        onDismiss = {isShowDialog = false},
+                                        onConfirm = {
+                                            scope.launch {
+                                                val result = viewModel.deleteProduct(product.id)
+                                                Toast.makeText(
+                                                    context,
+                                                    when(result){
+                                                        -1 -> "Không thể kết nối Server"
+                                                        1 -> "Xóa thành công"
+                                                        else -> "Xóa thất bại"
+                                                    },
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                isShowDialog = false
+                                            }
+                                        }
+
+                                    )
+                                }
+                                if (isDeleting)
+                                    CircularProgressIndicator(
+                                        color = OrangeDefault,
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .size(40.dp)
+                                    )
+                                else
+                                    ProductItem(
+                                        product = product,
+                                        onProductClick = onProductClick,
+                                        onEditProductClick = onEditProductClick,
+                                        onDeleteProductClick = { isShowDialog = true },
+                                    )
                             }
                             //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
                             item{

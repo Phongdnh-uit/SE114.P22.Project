@@ -187,6 +187,7 @@ class ListNotificationViewModel(
             } catch (e: Exception){
 
         } finally {
+            _desc.value = true // Reset sorting order to ascending
             _isLoading.value = false
         }
     }

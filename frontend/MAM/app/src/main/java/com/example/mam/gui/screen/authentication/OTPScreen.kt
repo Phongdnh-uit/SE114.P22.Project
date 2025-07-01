@@ -41,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.gui.component.CircleIconButton
@@ -81,6 +80,7 @@ fun OTPScreen(
     val email = viewModel.email.collectAsStateWithLifecycle().value
 
     OTPScreenContent(
+        viewModel = viewModel,
         state = state,
         email = email,
         focusRequester = focusRequester,
@@ -94,6 +94,7 @@ fun OTPScreen(
 
 @Composable
 fun OTPScreenContent(
+    viewModel: OtpViewModel = viewModel(),
     state: OtpState,
     email: String,
     focusRequester: List<FocusRequester>,
@@ -279,45 +280,45 @@ fun OTPScreenContent(
                 }
                 OtpInputWithCountdown(
                     onResendClick = {
-//                        scope.launch {
-//                            if (viewModel.reSendOTP() == 1) {
-//                                Toast.makeText(
-//                                    context,
-//                                    "Mã OTP đã được gửi lại đến email của bạn",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                                resetTrigger = !resetTrigger
-//                                viewModel.setOTP((""))
-//                            } else {
-//                                Toast.makeText(
-//                                    context,
-//                                    "Gửi lại mã OTP thất bại, vui lòng thử lại sau",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                            }
-//                        }
+                        scope.launch {
+                            if (viewModel.reSendOTP() == 1) {
+                                Toast.makeText(
+                                    context,
+                                    "Mã OTP đã được gửi lại đến email của bạn",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                resetTrigger = !resetTrigger
+                                viewModel.setOTP((""))
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Gửi lại mã OTP thất bại, vui lòng thử lại sau",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                     }
                 )
                 OuterShadowFilledButton(
                     text = "Xác nhận",
                     onClick = {
-//                        viewModel.setOTP(state.code.joinToString(""))
-//                        scope.launch {
-//                            if (viewModel.verifyOtp() == 1) {
-//                                Toast.makeText(
-//                                    context,
-//                                    "Đổi mật khẩu mới thành công",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                                onVerifyClicked()
-//                            } else {
-//                                Toast.makeText(
-//                                    context,
-//                                    "Xác nhận OTP thất bại, vui lòng thử lại sau",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                            }
-//                        }
+                        viewModel.setOTP(state.code.joinToString(""))
+                        scope.launch {
+                            if (viewModel.verifyOtp() == 1) {
+                                Toast.makeText(
+                                    context,
+                                    "Đổi mật khẩu mới thành công",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                onVerifyClicked()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Xác nhận OTP thất bại, vui lòng thử lại sau",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                     },
                     //isEnable = viewModel.isOTPValid(),
                     modifier = Modifier
@@ -433,26 +434,26 @@ class FakeOtpHandler {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewOTPScreen() {
-    val handler = remember { FakeOtpHandler() }
-
-    val state by handler.state.collectAsState()
-    val email by handler.email.collectAsState()
-
-    val focusRequesters = remember { List(6) { FocusRequester() } }
-
-    OTPScreenContent(
-        state = state,
-        email = email,
-        focusRequester = focusRequesters,
-        onAction = handler::onAction,
-        onVerifyClicked = {},
-        onCloseClicked = {},
-        resetTrigger = false
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewOTPScreen() {
+//    val handler = remember { FakeOtpHandler() }
+//
+//    val state by handler.state.collectAsState()
+//    val email by handler.email.collectAsState()
+//
+//    val focusRequesters = remember { List(6) { FocusRequester() } }
+//
+//    OTPScreenContent(
+//        state = state,
+//        email = email,
+//        focusRequester = focusRequesters,
+//        onAction = handler::onAction,
+//        onVerifyClicked = {},
+//        onCloseClicked = {},
+//        resetTrigger = false
+//    )
+//}
 
 
 //@Preview(showBackground = true)

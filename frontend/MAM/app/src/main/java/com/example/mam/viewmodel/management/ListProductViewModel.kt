@@ -158,6 +158,7 @@ class ListProductViewModel(
                     if (page != null){
                         allProducts.addAll(page.content)
                         _product.value = allProducts.toMutableList()
+                        _asc.value = true // Reset sorting order to ascending
                         if (page.page >= (page.totalPages - 1)) {
                             break // Stop looping when the last page is reached
                         }
@@ -188,11 +189,14 @@ class ListProductViewModel(
                 BaseRepository(userPreferencesRepository).productCategoryRepository.deleteCategory(id)
             if (response.isSuccessful) {
                 _product.value = _product.value.filterNot { it.id == id }.toMutableList()
+                Log.d("ListProductViewModel", "Product with id $id deleted successfully")
                 return 1
             } else {
+                Log.e("ListProductViewModel", "Failed to delete product with id $id: ${response.errorBody()?.string()}")
                 return 0
             }
         } catch (e: Exception) {
+            Log.e("ListProductViewModel", "Error deleting product: ${e.message}")
             return -1
         } finally {
             _isDeleting.value = false

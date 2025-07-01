@@ -189,7 +189,7 @@ class ListPromotionViewModel(
                     break // Stop loop on failure
                 }
             }
-
+            _asc.value = true // Reset sorting order to ascending
             _promoList.value = allPromotions.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {

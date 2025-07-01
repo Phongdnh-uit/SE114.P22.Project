@@ -161,6 +161,7 @@ class ListUserViewModel(
                     break // Stop loop on failure
                 }
             }
+            _asc.value = true // Reset sorting order to ascending
             _user.value = allUsers.filter { it.role.name != "ADMIN" }.toMutableList() // Update UI with all categories
         } catch (e: Exception) {
         } finally {

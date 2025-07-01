@@ -200,6 +200,7 @@ class ListCategoryViewModel(
         } catch (e: Exception) {
             Log.d("Category", "Không thể lấy Danh mục: ${e.message}")
         } finally {
+            _asc.value = true // Reset sorting order to ascending
             _isLoading.value = false
             Log.d("Category", "Kết thúc lấy Danh mục")
         }

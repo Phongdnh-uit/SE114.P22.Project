@@ -240,6 +240,7 @@ class ListOrderViewModel(
                     break // Stop loop on failure
                 }
             }
+            _asc.value = true // Reset sorting order to ascending
             _orders.value = allOrders.toMutableList() // Update UI with all categories
 
         } catch (e: Exception) {

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
+
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -51,7 +53,7 @@ public class MailService {
     Map<String, Object> model =
         Map.of(
             "verifyLink",
-            "http://localhost:8080/api/v1/auth/verify-email?code=" + activationCode,
+            BACKEND_URL + "/auth/verify-email?code=" + activationCode,
             "email",
             email);
     sendEmailFromTemplate(email, "Măm - Xác thực email của bạn", "mail/verify-email", model);
