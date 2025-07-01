@@ -151,7 +151,7 @@ public class VnPayService {
         job.put("data", paymentUrl);
 
         // Lưu địa chỉ điều hướng về app
-        redirectUrlMap.put(order.getTxnRef(), dto.getRedirectUrl());
+        redirectUrlMap.put(order.getTxnRef(), dto.getReturnUrl());
 
         return job;
     }
