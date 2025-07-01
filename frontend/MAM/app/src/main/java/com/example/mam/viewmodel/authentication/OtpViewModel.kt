@@ -14,7 +14,7 @@ import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.authentication.ForgetPasswordRequest
 import com.example.mam.dto.authentication.SendOTPRequest
 import com.example.mam.dto.authentication.VerifyOTPRequest
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import com.example.mam.viewmodel.authentication.otp.OtpAction
 import com.example.mam.viewmodel.authentication.otp.OtpState
 import kotlinx.coroutines.flow.MutableStateFlow

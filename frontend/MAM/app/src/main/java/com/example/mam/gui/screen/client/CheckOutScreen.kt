@@ -1,5 +1,8 @@
 package com.example.mam.gui.screen.client
 
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,6 +82,7 @@ import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.OrderItemContainer
 import com.example.mam.gui.component.OuterShadowFilledButton
+import com.example.mam.gui.component.PaymentLoadingAlertDialog
 import com.example.mam.gui.component.innerShadow
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -116,6 +120,7 @@ fun CheckOutScreen(
     val scope = rememberCoroutineScope()
 
     var paymentExpanded by remember { mutableStateOf(false) }
+    val isPaying = viewModel.isPaying.collectAsStateWithLifecycle().value
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.loadCart()
@@ -123,6 +128,10 @@ fun CheckOutScreen(
         viewModel.loadUser()
         viewModel.loadAddress()
         viewModel.loadDiscounts()
+    }
+
+    if (isPaying) {
+        PaymentLoadingAlertDialog()
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -466,16 +475,21 @@ fun CheckOutScreen(
                             onClick = {
                                 scope.launch {
                                     val result = viewModel.checkOut()
-                                    if (result == 1) {
+                                    if (result != -1) {
                                         Toast.makeText(context, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show()
-                                        onCheckOutClicked()
+                                        if (selectedPaymentOption == "VNPAY"){
+                                            val vnpayUrl = viewModel.createPayment(result)
+                                            if (!vnpayUrl.isNullOrBlank()) {
+                                                WebView(context).loadUrl(vnpayUrl)
+                                            } else {
+                                                Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
                                     } else {
                                         Toast.makeText(context, "Đặt hàng thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
                                     }
                                     onCheckOutClicked()
-                                }
-
-                                      },
+                                } },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )
                     }

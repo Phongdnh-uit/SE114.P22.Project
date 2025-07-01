@@ -12,7 +12,7 @@ import com.example.mam.dto.cart.CartResponse
 import com.example.mam.dto.cart.CartItemRequest
 import com.example.mam.dto.cart.CartItemResponse
 import com.example.mam.dto.product.ProductResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

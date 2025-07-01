@@ -1,5 +1,7 @@
 package com.example.mam.navigation
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -9,6 +11,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,12 +22,14 @@ import androidx.compose.ui.util.fastCbrt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.mam.gui.screen.authentication.ForgetPasswordScreen
 import com.example.mam.gui.screen.authentication.OTPScreen
 import com.example.mam.gui.screen.authentication.SignInScreen
@@ -36,6 +42,7 @@ import com.example.mam.gui.screen.client.ItemScreen
 import com.example.mam.gui.screen.client.MapScreen
 import com.example.mam.gui.screen.client.OrderHistoryScreen
 import com.example.mam.gui.screen.client.OrderScreen
+import com.example.mam.gui.screen.client.PaymentResultScreen
 import com.example.mam.gui.screen.client.ProfileScreen
 import com.example.mam.gui.screen.client.SearchScreen
 import com.example.mam.gui.screen.management.DashboardScreen
@@ -92,13 +99,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = "Authentication",
+    //deepLinkIntent: Intent? = null
+    uri : Uri? = null
 ) {
+
+
     val unAuthorize by AuthEventManager.unauthorizedEvent.collectAsStateWithLifecycle()
     LaunchedEffect(unAuthorize){
         if (unAuthorize) {
@@ -110,12 +121,38 @@ fun MainNavHost(
             AuthEventManager.resetUnauthorized() // Reset the event
         }
     }
+
     val coroutineScope = CoroutineScope(Job() + Dispatchers.IO)
     AnimatedNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
+        composable(
+            route = "payment-result",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "mam://payment/result"
+                }
+            ),
+            ) { backStackEntry ->
+            val allParams = uri?.queryParameterNames?.joinToString(", ") { "$it=${uri.getQueryParameter(it)}" } ?: "No parameters"
+            val keys = backStackEntry.savedStateHandle.keys()
+            Column {
+                Text(text = "🔑 Keys: ${keys.joinToString(", ")}")
+                Text(text = "🔗 URI: ${uri?.toString() ?: "null"}")
+                Text(text = "📦 Parameters:\n$allParams")
+            }
+            PaymentResultScreen(
+                onBackHome = {
+                    navController.navigate(route = HomeScreen.HomeSreen.name) {
+                        popUpTo("Home") { inclusive = true }
+                    }
+                },
+                uri = uri,
+                params = allParams
+            )
+        }
         navigation(
             startDestination = AuthenticationScreen.Start.name,
             route = "Authentication"
@@ -368,7 +405,7 @@ fun MainNavHost(
                 enterTransition = defaultTransitions(),
                 exitTransition = defaultExitTransitions(),
                 popEnterTransition = defaultPopEnterTransitions(),
-                popExitTransition = defaultPopExitTransitions()
+                popExitTransition = defaultPopExitTransitions(),
             ) { backStackEntry ->
                 val viewModel: CheckOutViewModel = viewModel(backStackEntry, factory = CheckOutViewModel.Factory)
                 CheckOutScreen(
@@ -401,6 +438,7 @@ fun MainNavHost(
                     viewModel = viewModel
                 )
             }
+
             composable(
                 route = "Address",
                 enterTransition = defaultTransitions(),

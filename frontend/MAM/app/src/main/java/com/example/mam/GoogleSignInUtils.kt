@@ -62,11 +62,10 @@ class GoogleSignInUtils {
                             }
                         }
                         else ->{
-
                         }
                     }
                 }catch (e: NoCredentialException){
-                    launcher?.launch(getIntent())
+                    //launcher?.launch(getIntent())
                 }catch (e:GetCredentialException){
                     e.printStackTrace()
                 }
@@ -76,46 +75,46 @@ class GoogleSignInUtils {
             }
         }
 
-        suspend fun getGoogleIdToken(
-            context: Context,
-            launcher: ManagedActivityResultLauncher<Intent, ActivityResult>?
-        ): String = suspendCoroutine { continuation ->
-            val credentialManager = CredentialManager.create(context)
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(getCredentialOptions(context))
-                .build()
-
-            CoroutineScope(Dispatchers.Main).launch {
-                try {
-                    val result = credentialManager.getCredential(context, request)
-                    when (val credential = result.credential) {
-                        is CustomCredential -> {
-                            if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                                val googleTokenId = googleIdTokenCredential.idToken
-                                val authCredential = GoogleAuthProvider.getCredential(googleTokenId, null)
-                                val user = Firebase.auth.signInWithCredential(authCredential).await().user
-
-                                val idToken = user?.getIdToken(true)?.await()?.token
-                                continuation.resume(idToken ?: "")
-                            } else {
-                                continuation.resume("")
-                            }
-                        }
-
-                        else -> {
-                            continuation.resume("")
-                        }
-                    }
-                } catch (e: NoCredentialException) {
-                    launcher?.launch(getIntent())
-                    continuation.resume("")
-                } catch (e: GetCredentialException) {
-                    e.printStackTrace()
-                    continuation.resume("")
-                }
-            }
-        }
+//        suspend fun getGoogleIdToken(
+//            context: Context,
+//            launcher: ManagedActivityResultLauncher<Intent, ActivityResult>?
+//        ): String = suspendCoroutine { continuation ->
+//            val credentialManager = CredentialManager.create(context)
+//            val request = GetCredentialRequest.Builder()
+//                .addCredentialOption(getCredentialOptions(context))
+//                .build()
+//
+//            CoroutineScope(Dispatchers.Main).launch {
+//                try {
+//                    val result = credentialManager.getCredential(context, request)
+//                    when (val credential = result.credential) {
+//                        is CustomCredential -> {
+//                            if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+//                                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+//                                val googleTokenId = googleIdTokenCredential.idToken
+//                                val authCredential = GoogleAuthProvider.getCredential(googleTokenId, null)
+//                                val user = Firebase.auth.signInWithCredential(authCredential).await().user
+//
+//                                val idToken = user?.getIdToken(true)?.await()?.token
+//                                continuation.resume(idToken ?: "")
+//                            } else {
+//                                continuation.resume("")
+//                            }
+//                        }
+//
+//                        else -> {
+//                            continuation.resume("")
+//                        }
+//                    }
+//                } catch (e: NoCredentialException) {
+//                    launcher?.launch(getIntent())
+//                    continuation.resume("")
+//                } catch (e: GetCredentialException) {
+//                    e.printStackTrace()
+//                    continuation.resume("")
+//                }
+//            }
+//        }
 
 
         private fun getIntent(): Intent {

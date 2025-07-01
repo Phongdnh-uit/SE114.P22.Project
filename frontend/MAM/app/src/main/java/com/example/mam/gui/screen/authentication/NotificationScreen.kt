@@ -25,8 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Discount
-import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.LocalShipping
@@ -37,30 +35,21 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mam.data.Constant
 import com.example.mam.dto.notification.NotificationResponse
-import com.example.mam.entity.Notification
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -71,7 +60,6 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.authentication.NotificationViewModel
-import com.mapbox.maps.extension.style.expressions.dsl.generated.not
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -228,12 +216,12 @@ fun NotificationItem(notification: NotificationResponse, viewModel: Notification
             ) {
                 Icon(
                     imageVector = when (notification.type) {
-                        Constant.OrderStatus.ORDER_PLACED.name -> Icons.Filled.ShoppingCart
-                        Constant.OrderStatus.ORDER_RECEIVED.name -> Icons.Filled.Inventory
-                        Constant.OrderStatus.ORDER_PREPARING.name -> Icons.Filled.RestaurantMenu
-                        Constant.OrderStatus.ORDER_DELIVERING.name -> Icons.Filled.LocalShipping
-                        Constant.OrderStatus.ORDER_DELIVERED.name -> Icons.Filled.CheckCircle
-                        Constant.OrderStatus.PROMOTION.name -> Icons.Filled.LocalOffer
+                        Constant.notiStatus.ORDER_PLACED.name -> Icons.Filled.ShoppingCart
+                        Constant.notiStatus.ORDER_RECEIVED.name -> Icons.Filled.Inventory
+                        Constant.notiStatus.ORDER_PREPARING.name -> Icons.Filled.RestaurantMenu
+                        Constant.notiStatus.ORDER_DELIVERING.name -> Icons.Filled.LocalShipping
+                        Constant.notiStatus.ORDER_DELIVERED.name -> Icons.Filled.CheckCircle
+                        Constant.notiStatus.PROMOTION.name -> Icons.Filled.LocalOffer
                         else -> Icons.Filled.Notifications
                     },
                     contentDescription = "",

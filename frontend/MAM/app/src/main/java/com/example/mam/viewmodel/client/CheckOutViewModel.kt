@@ -12,10 +12,10 @@ import com.example.mam.data.Constant
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.cart.CartResponse
 import com.example.mam.dto.order.OrderRequest
-import com.example.mam.dto.product.ProductResponse
+import com.example.mam.dto.payment.VnPayRequest
 import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.dto.user.UserResponse
-import com.example.mam.repository.BaseRepository
+import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -63,6 +63,15 @@ class CheckOutViewModel(
 
     val _paymentOption = MutableStateFlow("") // Default payment option
     val paymentOption = _paymentOption.asStateFlow()
+
+    val _isPaying = MutableStateFlow(false)
+    val isPaying = _isPaying.asStateFlow()
+
+    fun setIsPaying(isPaying: Boolean) {
+        _isPaying.value = isPaying
+        Log.d("CheckOutViewModel", "Payment state updated: $isPaying")
+    }
+
     private fun setTotal(){
         val total = _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
             ?: BigDecimal.ZERO)
@@ -202,16 +211,55 @@ class CheckOutViewModel(
             Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
             if (response.isSuccessful) {
                 Log.d("CheckOutViewModel", "Order created successfully")
-                return 1 // Success
+                return response.body()?.id?.toInt() ?: -1 // Success
             } else {
                 Log.d("CheckOutViewModel", "Failed to check out (BE): ${response.errorBody()?.string()}")
-                return 0 // Failure
+                return -1 // Failure
             }
         }
         catch (e: Exception) {
             e.printStackTrace()
             Log.d("CheckOutViewModel", "Failed to check out: ${e.message}")
-            return 0
+            return -1
+        }
+    }
+
+    suspend fun createPayment(orderId: Int ): String {
+        try {
+            val request = VnPayRequest(orderId= orderId.toLong(), returnUrl = "mam://payment/result")
+            Log.d("CheckOutViewModel", "Creating payment for order ID: $orderId")
+            val response = BaseRepository(userPreferencesRepository).paymentRepository.createPayment(request)
+            Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("CheckOutViewModel", "Payment created successfully url: ${response.body()?.get("data")}")
+                return response.body()?.get("data") as? String ?: ""
+            } else {
+                Log.d("CheckOutViewModel", "Failed to create payment (BE): ${response.errorBody()?.string()}")
+                return "" // Failure
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CheckOutViewModel", "Failed to create payment: ${e.message}")
+            return ""
+        }
+    }
+
+    suspend fun handlePaymentResult(): Boolean {
+        try {
+            Log.d("CheckOutViewModel", "Handling payment result")
+            val response = BaseRepository(userPreferencesRepository).paymentRepository.returnPayment()
+            Log.d("CheckOutViewModel", "Response Code: ${response.code()}")
+            if (response.isSuccessful) {
+                Log.d("CheckOutViewModel", "Payment result handled successfully")
+                return true // Success
+            } else {
+                Log.d("CheckOutViewModel", "Failed to handle payment result (BE): ${response.errorBody()?.string()}")
+                return false // Failure
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("CheckOutViewModel", "Failed to handle payment result: ${e.message}")
+            return false
         }
     }
 
