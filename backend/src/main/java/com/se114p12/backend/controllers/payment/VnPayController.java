@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,26 +50,28 @@ public class VnPayController {
     })
     @ErrorResponse
     @GetMapping("/return")
-    public String handleReturn(HttpServletRequest request) {
-
+    public RedirectView handleReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
         request.getParameterMap().forEach((k, v) -> {
             if (v != null && v.length > 0) params.put(k, v[0]);
         });
 
-        boolean valid = vnPayService.verifyPayment(params, params.get("vnp_SecureHash"));
         String txnRef = params.get("vnp_TxnRef");
         String rspCode = params.get("vnp_ResponseCode");
 
-        if (!valid) return "Sai chữ ký! Không xác thực được dữ liệu.";
+        boolean valid = vnPayService.verifyPayment(params, params.get("vnp_SecureHash"));
 
-        if ("00".equals(rspCode)) {
-            // ✅ thanh toán thành công → cập-nhật DB
-            orderService.markPaymentCompleted(txnRef);
-            return "Thanh toán thành công đơn hàng #" + txnRef;
+        // Lấy redirectUrl đã lưu
+        String redirectUrl = vnPayService.getRedirectUrlFor(txnRef);
+
+        if (valid && "00".equals(rspCode)) {
+            Long orderId = orderService.markPaymentCompleted(txnRef);
+            redirectUrl += "?success=true&orderId=" + orderId;
+        } else {
+            redirectUrl += "?success=false";
         }
 
         orderService.markPaymentFailed(txnRef);
-        return "Thanh toán thất bại: Mã lỗi " + rspCode;
+        return new RedirectView(redirectUrl);
     }
 }

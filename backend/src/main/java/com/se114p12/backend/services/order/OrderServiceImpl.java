@@ -142,13 +142,9 @@ public class OrderServiceImpl implements OrderService {
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
 
     // Gán trạng thái cho đơn hàng tùy vào phương thức thanh toán
-    OrderStatus initialStatus = orderRequestDTO.getPaymentMethod().equals(PaymentMethod.CASH_ON_DELIVERY)
-            ? OrderStatus.PENDING
-            : null;
+    OrderStatus initialStatus =  OrderStatus.PENDING;
 
     order.setOrderStatus(initialStatus);
-
-
 
     order.setPaymentStatus(PaymentStatus.PENDING);
 
@@ -194,10 +190,13 @@ public class OrderServiceImpl implements OrderService {
     order.setTotalPrice(
         (totalPrice.compareTo(BigDecimal.ZERO) >= 0) ? totalPrice : BigDecimal.ZERO);
 
-    order = orderRepository.save(order);
-
     order.setTxnRef(VnPayUtils.generateTxnRef("ORD"));
     orderRepository.save(order);
+
+    // Gửi thông báo trạng thái
+    if (initialStatus != null) {
+      sendOrderStatusNotification(order);
+    }
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
@@ -335,7 +334,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void markPaymentCompleted(String txnRef) {
+  public Long markPaymentCompleted(String txnRef) {
     Order order = orderRepository.findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
@@ -347,6 +346,8 @@ public class OrderServiceImpl implements OrderService {
       sendPaymentStatusNotification(order);
       sendOrderStatusNotification(order);
     }
+
+    return order.getId();
   }
 
   @Override

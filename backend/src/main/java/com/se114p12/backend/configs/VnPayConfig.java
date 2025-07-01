@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
+
 @Slf4j
 @Configuration
 @Data
@@ -26,7 +28,7 @@ public class VnPayConfig {
     @Value("${vnpay.payUrl:https://sandbox.vnpay.vn/paymentv2/vpcpay.html}")
     private String vnp_PayUrl;
 
-    private String vnp_ReturnUrl = AppConstant.BACKEND_URL + "/api/v1/payment/return";
+    private String vnp_ReturnUrl = BACKEND_URL + "/payment/return";
 
     public String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
