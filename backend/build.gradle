@@ -10,9 +10,9 @@ bootJar {
 
 // // fix neo4j issue with Java 23
 bootRun {
-  jvmArgs += [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED"
-  ]
+    jvmArgs += [
+            "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    ]
 }
 
 tasks.named("test") {

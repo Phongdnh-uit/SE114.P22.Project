@@ -19,9 +19,9 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "products")
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"category", "variations", "cartItems"})
 @Builder
-@SQLRestriction("deleted = false")
+//@SQLRestriction("deleted = false")
 public class Product extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "category_id", nullable = true)
