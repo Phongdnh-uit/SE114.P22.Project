@@ -282,7 +282,7 @@ fun OrderHistoryItem(order: OrderResponse, onClick: () -> Unit = {}) {
                 )
             }
             Text(
-                text = "Đơn hàng #" + order.id,
+                text = "Đơn hàng #" + order.txnRef,
                 textAlign = TextAlign.Start,
                 color = BrownDefault,
                 fontSize = 16.sp,

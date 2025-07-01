@@ -460,6 +460,16 @@ fun OrderItem(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
+                    text = "#" + order.txnRef,
+                    textAlign = TextAlign.Start,
+                    color = OrangeDefault,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
                     text = owner.fullname,
                     textAlign = TextAlign.Start,
                     color = BrownDefault,
