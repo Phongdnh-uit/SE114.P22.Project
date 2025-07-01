@@ -1,7 +1,11 @@
 package com.example.mam.gui.component
 
 import CustomShape
+import android.annotation.SuppressLint
 import android.util.Log
+import android.webkit.CookieManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,10 +33,13 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +54,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import androidx.core.os.HandlerCompat.postDelayed
 import coil.compose.AsyncImage
 import com.example.mam.R
 import com.example.mam.dto.cart.CartItemResponse
@@ -393,5 +402,46 @@ fun AdditionalProduct(
             }
         }
     }
+}
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyPaymentScreen(paymentUrl: String) {
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Thanh toán") }) }
+    ) {
+        PaymentWebViewScreen(paymentUrl = paymentUrl)
+    }
+}
+@Composable
+fun PaymentWebViewScreen(
+    paymentUrl: String,
+    modifier: Modifier = Modifier,
+) {
+    AndroidView(
+        modifier = modifier.fillMaxSize(),
+        factory = { context ->
+            WebView(context).apply {
+                settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
+                settings.useWideViewPort = true
+                settings.loadWithOverviewMode = true
+                settings.javaScriptCanOpenWindowsAutomatically = true
+
+                webViewClient = WebViewClient()
+
+                // Cookie config
+//                CookieManager.getInstance().apply {
+//                    setAcceptCookie(true)
+//                    setAcceptThirdPartyCookies(this@apply, true)
+//                }
+
+                // Delay 1.5s rồi load URL
+                postDelayed({
+                    loadUrl(paymentUrl)
+                }, 1500)
+            }
+        }
+    )
 }
 

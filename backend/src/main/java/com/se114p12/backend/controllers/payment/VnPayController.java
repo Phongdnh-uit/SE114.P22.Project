@@ -67,6 +67,7 @@ public class VnPayController {
         if (valid && "00".equals(rspCode)) {
             Long orderId = orderService.markPaymentCompleted(txnRef);
             redirectUrl += "?success=true&orderId=" + orderId;
+            return new RedirectView(redirectUrl);
         } else {
             redirectUrl += "?success=false";
         }

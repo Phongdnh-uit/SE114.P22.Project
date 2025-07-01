@@ -1,8 +1,10 @@
 package com.example.mam.gui.screen.client
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -80,9 +82,11 @@ import com.example.mam.R
 import com.example.mam.dto.cart.CartItemResponse
 import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.gui.component.CircleIconButton
+import com.example.mam.gui.component.MyPaymentScreen
 import com.example.mam.gui.component.OrderItemContainer
 import com.example.mam.gui.component.OuterShadowFilledButton
 import com.example.mam.gui.component.PaymentLoadingAlertDialog
+import com.example.mam.gui.component.PaymentWebViewScreen
 import com.example.mam.gui.component.innerShadow
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
@@ -481,7 +485,7 @@ fun CheckOutScreen(
                                         if (selectedPaymentOption == "VNPAY"){
                                             val vnpayUrl = viewModel.createPayment(result)
                                             if (!vnpayUrl.isNullOrBlank()) {
-                                                WebView(context).loadUrl(vnpayUrl)
+                                                openInBrowser(context, vnpayUrl)
                                             } else {
                                                 Toast.makeText(context, "Không thể tạo liên kết thanh toán. Vui lòng đặt lại.", Toast.LENGTH_SHORT).show()
                                             }
@@ -501,7 +505,10 @@ fun CheckOutScreen(
         }
     }
 }
-
+fun openInBrowser(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    context.startActivity(intent)
+}
 @Composable
 fun CheckOutItem(
     cartItem: CartItemResponse,
