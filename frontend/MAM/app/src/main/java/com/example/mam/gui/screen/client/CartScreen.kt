@@ -26,9 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,20 +38,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -280,7 +272,7 @@ fun CartScreen(
                 OuterShadowFilledButton(
                     text = "Thanh toán",
                     icon = Icons.Default.MonetizationOn,
-                    isEnable = cart.cartItems.isNotEmpty(),
+                    isEnable = cart.cartItems.isNotEmpty()&& cart.cartItems.all{ it.available },
                     onClick =  onCheckOutClicked ,
                     modifier = Modifier
                 )
@@ -304,7 +296,7 @@ fun CartItem(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = if(cartItem.isAvailable) WhiteDefault else GreyLight,
+                containerColor = if(cartItem.available) WhiteDefault else GreyLight,
             ),
             modifier = Modifier
                 .animateContentSize()
@@ -355,9 +347,9 @@ fun CartItem(
                             )
                         }
                         Text(
-                            text = if(cartItem.isAvailable)cartItem.getPrice() else "Sản phẩm không còn khả dụng",
+                            text = if(cartItem.available)cartItem.getPrice() else "Sản phẩm không còn khả dụng",
                             textAlign = TextAlign.End,
-                            color = if(cartItem.isAvailable)OrangeDefault else GreyDefault,
+                            color = if(cartItem.available)OrangeDefault else GreyDefault,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.fillMaxWidth()
@@ -370,7 +362,7 @@ fun CartItem(
                             .height(40.dp)
                             .padding(bottom = 8.dp)
                     ){
-                        if(cartItem.isAvailable) {
+                        if(cartItem.available) {
                             QuantitySelectionButton(
                                 count = cartItem.quantity.toInt(),
                                 onValueDecr = onQuantityDesc,

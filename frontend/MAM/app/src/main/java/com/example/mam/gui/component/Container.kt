@@ -395,22 +395,3 @@ fun AdditionalProduct(
     }
 }
 
-@Preview
-@Composable
-fun CartItemContainerPreview() {
-    CartItemContainer(
-        cartItem = CartItemResponse(
-            cartId = 1L,
-            productId = 1L,
-            productName = "Test Product",
-            quantity = 2,
-            price = 100000.toBigDecimal(),
-            variationOptionInfo = "Size: M, Color: Red",
-            imageUrl = "https://example.com/image.jpg"
-        ),
-        onQuantityIncr = {},
-        onQuantityDesc = {},
-        onDeleteClicked = {},
-        modifier = Modifier.width(300.dp)
-    )
-}

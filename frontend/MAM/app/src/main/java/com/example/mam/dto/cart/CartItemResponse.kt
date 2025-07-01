@@ -14,7 +14,7 @@ data class CartItemResponse(
     val price: BigDecimal = BigDecimal.ZERO,
     val variationOptionIds: Set<Long> = emptySet(),
     val variationOptionInfo: String? = "",
-    val isAvailable : Boolean = true,
+    val available : Boolean,
 ): BaseResponse() {
     fun getPrice(): String {
         val formatter = DecimalFormat("#,###")
