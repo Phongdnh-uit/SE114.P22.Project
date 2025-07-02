@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.notification.NotificationRequest
-import com.example.mam.entity.User
+
 import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +40,6 @@ class ManageNotificationViewModel(
     private val _type = MutableStateFlow(typeList.value[0])
     val type = _type.asStateFlow()
 
-    private val _userList = MutableStateFlow(listOf<User>())
-    val userList = _userList.asStateFlow()
 
     private val _receiverList = MutableStateFlow(listOf<String>())
     val receiverList = _receiverList.asStateFlow()

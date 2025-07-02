@@ -81,7 +81,6 @@ fun ManageNotificationScreen(
     val message = viewModel.message.collectAsStateWithLifecycle().value
     val type = viewModel.type.collectAsStateWithLifecycle().value
     val typeList = viewModel.typeList.collectAsStateWithLifecycle().value
-    val userList = viewModel.userList.collectAsStateWithLifecycle().value
     val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     var isShowDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current

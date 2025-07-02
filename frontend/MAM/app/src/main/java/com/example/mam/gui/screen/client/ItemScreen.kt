@@ -51,9 +51,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.mam.R
-import com.example.mam.dto.variation.VariationOptionResponse
-import com.example.mam.entity.Product
-import com.example.mam.entity.VarianceOption
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.MultiChoiceOption
 import com.example.mam.gui.component.OuterShadowFilledButton

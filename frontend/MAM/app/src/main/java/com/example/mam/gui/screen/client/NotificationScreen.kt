@@ -59,7 +59,7 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
-import com.example.mam.viewmodel.authentication.NotificationViewModel
+import com.example.mam.viewmodel.client.NotificationViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId

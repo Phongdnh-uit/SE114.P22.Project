@@ -59,9 +59,12 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.dto.product.ProductResponse
 import com.example.mam.gui.component.ProductClientListItem
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLighter
@@ -76,8 +79,8 @@ fun SearchScreen(
     onItemClicked: (ProductResponse) -> Unit = { ProductResponse -> },
     viewModel: SearchViewModel = viewModel()
 ){
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
-    val listProduct = viewModel.products.collectAsStateWithLifecycle().value
+//    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
+    val listProduct = viewModel.products.collectAsLazyPagingItems()
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle().value
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
@@ -88,7 +91,7 @@ fun SearchScreen(
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
-        viewModel.loadData()
+        //viewModel.loadData()
     }
 
     val focusManager = LocalFocusManager.current
@@ -153,7 +156,7 @@ fun SearchScreen(
                             onClick = {
                                 focusManager.clearFocus()
                                 scope.launch {
-                                    viewModel.searchProduct()
+                                    viewModel.search()
                                     expanded = false // Đóng menu khi tìm kiếm
                                 }
                             }) {
@@ -240,7 +243,7 @@ fun SearchScreen(
                                 onClick = {
                                     scope.launch {
                                         viewModel.setSelectedSortingOption(option)
-                                        viewModel.sortProduct()
+                                        viewModel.sort()
                                         sortExpanded = false
                                     }
                                 }
@@ -258,7 +261,7 @@ fun SearchScreen(
                     onClick = {
                         scope.launch {
                             viewModel.setASC()
-                            viewModel.sortProduct()
+                            viewModel.sort()
                         }
                     },
                     modifier = Modifier.size(30.dp)
@@ -270,27 +273,31 @@ fun SearchScreen(
                 }
             }
         }
-        if (isLoading){
-            item{
-                CircularProgressIndicator(
-                    color = OrangeDefault,
+        items(listProduct.itemSnapshotList) { product ->
+            product?.let {
+                ProductClientListItem(
+                    item = product,
+                    onClick = {
+                        onItemClicked(it)
+                        Log.d("ProductContainer", "Clicked on: ${product.name}")
+                    },
+                    color = WhiteDefault,
                     modifier = Modifier
-                        .padding(16.dp)
-                        .size(40.dp)
+                        .fillMaxWidth(0.9f)
                 )
             }
         }
-        else items(listProduct){product ->
-            ProductClientListItem(
-                item = product,
-                onClick = {
-                    onItemClicked(it)
-                    Log.d("ProductContainer", "Clicked on: ${product.name}")
-                    },
-                color = WhiteDefault,
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-            )
+        listProduct.apply {
+            when {
+                loadState.append is LoadState.Loading -> {
+                    item { CircularProgressIndicator(
+                        color = OrangeDefault,
+                        modifier = Modifier.padding(16.dp)) }
+                }
+                loadState.append is LoadState.Error -> {
+                    item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                }
+            }
         }
         item {
             Spacer(modifier = Modifier.height(20.dp))
