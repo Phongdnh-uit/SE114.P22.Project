@@ -89,4 +89,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    implementation ("androidx.paging:paging-runtime:3.3.0")
+    implementation ("androidx.paging:paging-compose:3.3.0")
 }

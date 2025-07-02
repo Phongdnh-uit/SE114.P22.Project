@@ -11,6 +11,7 @@ import com.example.mam.data.Constant
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.authentication.ChangePasswordRequest
 import com.example.mam.dto.authentication.SendOTPRequest
+import com.example.mam.dto.vo.HandleError
 import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,7 +73,7 @@ class ForgetPasswordViewModel(
     }
 
 
-    suspend fun sendOTP(): Int {
+    suspend fun sendOTP(): String {
         try {
             val metadata = BaseRepository(userPreferencesRepository).authPublicRepository.getMetadata(listOf(
                 Constant.metadata.OTP_ACTION.name
@@ -81,7 +82,7 @@ class ForgetPasswordViewModel(
             val action = metadata.body()?.get(Constant.metadata.OTP_ACTION.name)?.get(0) ?: ""
             if (!metadata.isSuccessful) {
                 Log.d("OtpViewModel", "Error getting metadata: ${metadata.errorBody()?.string()}")
-                return 0
+                return HandleError(metadata.errorBody()?.string())
             }
             Log.d("OtpViewModel", "Metadata: $action")
             val request = SendOTPRequest(
@@ -95,17 +96,17 @@ class ForgetPasswordViewModel(
             Log.d("ForgetPasswordViewModel", "Send OTP response: ${respond.code()}")
             return if (respond.isSuccessful) {
                 Log.d("ForgetPasswordViewModel", "OTP sent successfully")
-                1
+                "SUCCESSFULL"
             } else {
                 Log.d("ForgetPasswordViewModel", "Failed to send OTP: ${respond.errorBody()?.string()}")
-                0
+                HandleError(respond.errorBody()?.string())
             }
         } catch (e: Exception) {
             Log.d("ForgetPasswordViewModel", "Error sending OTP: ${e.message}")
-            return 0
+            return HandleError(e.message)
         }
     }
-    suspend fun changePassword(): Int{
+    suspend fun changePassword(): String{
         try {
             val request = ChangePasswordRequest(
                 _oldPassword.value,
@@ -116,15 +117,15 @@ class ForgetPasswordViewModel(
             Log.d("ForgetPasswordViewModel", "Change password response: ${respond.code()}")
             return if (respond.isSuccessful) {
                 Log.d("ForgetPasswordViewModel", "Password changed successfully")
-                1
+                "SUCCESSFULL"
             } else {
                 Log.d("ForgetPasswordViewModel", "Failed to change password: ${respond.errorBody()?.string()}")
-                0
+                HandleError(respond.errorBody()?.string())
             }
         }
         catch (e: Exception) {
             Log.d("ForgetPasswordViewModel", "Error changing password: ${e.message}")
-            return 0
+            return "FAILED"
         }
     }
 

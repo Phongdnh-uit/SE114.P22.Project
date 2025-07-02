@@ -171,17 +171,24 @@ fun ForgetPasswordScreen(
                         onClick = {
                             if (isForgot) {
                                 scope.launch{
-                                    if( viewModel.sendOTP() == 1) {
+                                    val message = viewModel.sendOTP()
+                                    if( message == "SUCCESS") {
                                         Toast.makeText(
                                             context,
                                             "Gửi mã OTP thành công",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         onChangeClicked(email, password)
-                                    } else {
+                                    } else if (message == "FAILED") {
                                         Toast.makeText(
                                             context,
                                             "Gửi mã OTP thất bại, vui lòng thử lại sau",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            message,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
@@ -189,17 +196,25 @@ fun ForgetPasswordScreen(
 
                             } else {
                                 scope.launch {
-                                    if(viewModel.changePassword() == 1) {
+                                    val message =viewModel.changePassword()
+                                    if( message == "SUCCESS") {
                                         Toast.makeText(
                                             context,
                                             "Đổi mật khẩu thành công",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         onCloseClicked()
-                                    } else {
+                                    } else if (message == "FAILED") {
                                         Toast.makeText(
                                             context,
                                             "Đổi mật khẩu thất bại, vui lòng thử lại sau",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    else {
+                                        Toast.makeText(
+                                            context,
+                                            message,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }

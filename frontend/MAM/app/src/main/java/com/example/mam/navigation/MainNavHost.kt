@@ -1,9 +1,7 @@
 package com.example.mam.navigation
 
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -17,12 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.util.fastCbrt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -61,7 +56,7 @@ import com.example.mam.gui.screen.management.ManagePromotionScreen
 import com.example.mam.gui.screen.management.ManageShipperScreen
 import com.example.mam.gui.screen.management.ManageUserScreen
 import com.example.mam.viewmodel.authentication.ForgetPasswordViewModel
-import com.example.mam.viewmodel.authentication.NotificationViewModel
+import com.example.mam.viewmodel.client.NotificationViewModel
 import com.example.mam.viewmodel.authentication.SignInViewModel
 import com.example.mam.viewmodel.authentication.SignUpViewModel
 import com.example.mam.viewmodel.authentication.StartViewModel
@@ -94,9 +89,6 @@ import com.yourapp.ui.notifications.NotificationScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @Composable

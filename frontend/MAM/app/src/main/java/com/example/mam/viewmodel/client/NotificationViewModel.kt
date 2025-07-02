@@ -1,4 +1,4 @@
-package com.example.mam.viewmodel.authentication
+package com.example.mam.viewmodel.client
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
