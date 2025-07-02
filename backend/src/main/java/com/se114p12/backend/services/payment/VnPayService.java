@@ -15,6 +15,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +23,8 @@ public class VnPayService {
 
     private final VnPayConfig vnPayConfig;
     private final OrderRepository orderRepository;
+
+    private static final Map<String, String> redirectUrlMap = new ConcurrentHashMap<>();
 
     public Map<String, Object> createPaymentUrl(VnPayRequestDTO dto, HttpServletRequest req) {
         Order order = orderRepository.findById(dto.getOrderId()).orElse(null);
@@ -53,8 +56,7 @@ public class VnPayService {
 
         vnp_Params.put("vnp_Locale", dto.getLanguage() != null ? dto.getLanguage() : "vn");
 
-        String returnUrl = !Objects.equals(dto.getReturnUrl(), null) ? dto.getReturnUrl() : vnPayConfig.getVnp_ReturnUrl();
-        vnp_Params.put("vnp_ReturnUrl", returnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnp_ReturnUrl());
 
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
@@ -148,6 +150,9 @@ public class VnPayService {
         job.put("message", "success");
         job.put("data", paymentUrl);
 
+        // Lưu địa chỉ điều hướng về app
+        redirectUrlMap.put(order.getTxnRef(), dto.getReturnUrl());
+
         return job;
     }
 
@@ -175,5 +180,11 @@ public class VnPayService {
         String calcHash = VnPayConfig.hmacSHA512(vnPayConfig.getVnp_HashSecret(), hashData.toString());
 
         return calcHash.equalsIgnoreCase(vnpSecureHash);
+    }
+
+    // Trả về đường dẫn điều hướng về app
+    // Giá trị mặc định đang để DeepLink của app android nhưng về sau không nên làm
+    public String getRedirectUrlFor(String txnRef) {
+        return redirectUrlMap.getOrDefault(txnRef, "mam://payment/result?success=false");
     }
 }
