@@ -358,10 +358,11 @@ public class OrderServiceImpl implements OrderService {
             .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-    order.setPaymentStatus(PaymentStatus.FAILED);
-    orderRepository.save(order);
-
-    sendPaymentStatusNotification(order);
+    if (order.getPaymentStatus() == PaymentStatus.PENDING || order.getPaymentStatus() != PaymentStatus.COMPLETED) {
+      order.setPaymentStatus(PaymentStatus.FAILED);
+      orderRepository.save(order);
+      sendPaymentStatusNotification(order);
+    }
   }
 
   // ============================ SUPPORT METHOD ============================
