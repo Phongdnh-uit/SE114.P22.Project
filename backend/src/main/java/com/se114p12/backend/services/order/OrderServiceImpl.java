@@ -49,6 +49,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -142,13 +143,12 @@ public class OrderServiceImpl implements OrderService {
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
 
     // Gán trạng thái cho đơn hàng tùy vào phương thức thanh toán
-    OrderStatus initialStatus = orderRequestDTO.getPaymentMethod().equals(PaymentMethod.CASH_ON_DELIVERY)
+    OrderStatus initialStatus =
+        orderRequestDTO.getPaymentMethod().equals(PaymentMethod.CASH_ON_DELIVERY)
             ? OrderStatus.PENDING
             : null;
 
     order.setOrderStatus(initialStatus);
-
-
 
     order.setPaymentStatus(PaymentStatus.PENDING);
 
@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
-// Gửi thông báo trạng thái
+    // Gửi thông báo trạng thái
     sendOrderStatusNotification(order);
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
@@ -336,13 +336,15 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void markPaymentCompleted(String txnRef) {
-    Order order = orderRepository.findByTxnRef(txnRef)
+    Order order =
+        orderRepository
+            .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
     // chỉ ghi nếu chưa ghi
     if (order.getPaymentStatus() != PaymentStatus.COMPLETED) {
       order.setPaymentStatus(PaymentStatus.COMPLETED);
-      order.setOrderStatus(OrderStatus.PENDING);     // giao hàng chưa bắt đầu
+      order.setOrderStatus(OrderStatus.PENDING); // giao hàng chưa bắt đầu
       orderRepository.save(order);
       sendPaymentStatusNotification(order);
       sendOrderStatusNotification(order);
@@ -352,7 +354,9 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void markPaymentFailed(String txnRef) {
-    Order order = orderRepository.findByTxnRef(txnRef)
+    Order order =
+        orderRepository
+            .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
     order.setPaymentStatus(PaymentStatus.FAILED);
@@ -374,25 +378,28 @@ public class OrderServiceImpl implements OrderService {
     notificationService.pushNotification(notification);
   }
 
+  @Async
   private void sendOrderStatusNotification(Order order) {
-    NotificationType type = switch (order.getOrderStatus()) {
-      case PENDING -> NotificationType.ORDER_PLACED;
-      case CONFIRMED -> NotificationType.ORDER_RECEIVED;
-      case PROCESSING -> NotificationType.ORDER_PREPARING;
-      case SHIPPING -> NotificationType.ORDER_DELIVERING;
-      case COMPLETED -> NotificationType.ORDER_DELIVERED;
-      case CANCELED -> NotificationType.ORDER_CANCELLED;
-    };
+    NotificationType type =
+        switch (order.getOrderStatus()) {
+          case PENDING -> NotificationType.ORDER_PLACED;
+          case CONFIRMED -> NotificationType.ORDER_RECEIVED;
+          case PROCESSING -> NotificationType.ORDER_PREPARING;
+          case SHIPPING -> NotificationType.ORDER_DELIVERING;
+          case COMPLETED -> NotificationType.ORDER_DELIVERED;
+          case CANCELED -> NotificationType.ORDER_CANCELLED;
+        };
 
     sendNotificationForOrder(order, type);
   }
 
   private void sendPaymentStatusNotification(Order order) {
-    NotificationType type = switch (order.getPaymentStatus()) {
-      case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
-      case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
-      default -> null;
-    };
+    NotificationType type =
+        switch (order.getPaymentStatus()) {
+          case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
+          case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
+          default -> null;
+        };
 
     sendNotificationForOrder(order, type);
   }
@@ -404,24 +411,25 @@ public class OrderServiceImpl implements OrderService {
 
     // Đảm bảo thứ tự Variation
     return cartItem.getVariationOptions().stream()
-            .filter(vo -> vo.getVariation() != null)
-            .collect(Collectors.groupingBy(VariationOption::getVariation))
-            .entrySet()
-            .stream()
-            .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
-            .map(
-                    entry -> {
-                      String variationName = entry.getKey().getName();
-                      String values =
-                              entry.getValue().stream()
-                                      .map(VariationOption::getValue)
-                                      .collect(Collectors.joining(", "));
-                      return variationName + ": " + values;
-                    })
-            .collect(Collectors.joining(", "));
+        .filter(vo -> vo.getVariation() != null)
+        .collect(Collectors.groupingBy(VariationOption::getVariation))
+        .entrySet()
+        .stream()
+        .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
+        .map(
+            entry -> {
+              String variationName = entry.getKey().getName();
+              String values =
+                  entry.getValue().stream()
+                      .map(VariationOption::getValue)
+                      .collect(Collectors.joining(", "));
+              return variationName + ": " + values;
+            })
+        .collect(Collectors.joining(", "));
   }
 
   // ============================ NEO4J RECOMMEND SYSTEM ============================
+  @Async
   private void updateRecommend(Order order) {
     // Neo4j recommendation systemAdd commentMore actions
 
