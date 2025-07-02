@@ -48,11 +48,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.data.Constant
 import com.example.mam.dto.notification.NotificationResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.gui.screen.management.NotificationItem
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
@@ -71,13 +75,12 @@ fun NotificationScreen(
     onBackClicked: () -> Unit = {},
     ) {
 
-    val notifications =  viewModel.notifications.collectAsStateWithLifecycle().value
+    val notifications =  viewModel.notifications.collectAsLazyPagingItems()
     val scope = rememberCoroutineScope()
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadNotifications()
+        notifications.refresh()
     }
 
         Column(
@@ -162,19 +165,25 @@ fun NotificationScreen(
                         )
                     }
                 }
-                if (isLoading){
-                    item{
-                        CircularProgressIndicator(
-                            color = OrangeDefault,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(40.dp)
-                        )
+                items(
+                    notifications.itemCount
+                ) { index ->
+                    val notification = notifications[index]
+                    notification?.let {
+                        NotificationItem(notification, viewModel)
                     }
                 }
-                else
-                items(notifications) { notification ->
-                    NotificationItem(notification,viewModel)
+                notifications.apply {
+                    when{
+                        loadState.append is LoadState.Loading -> {
+                            item { CircularProgressIndicator(
+                                color = OrangeDefault,
+                                modifier = Modifier.padding(16.dp)) }
+                        }
+                        loadState.append is LoadState.Error -> {
+                            item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                        }
+                    }
                 }
             }
         }

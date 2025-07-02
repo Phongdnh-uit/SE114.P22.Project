@@ -56,6 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.OrangeDefault
@@ -129,7 +130,7 @@ fun ManagePromotionScreen(
                     scope.launch {
                         if (code.isNotEmpty() && description.isNotEmpty() && value.isNotEmpty() && value.toInt() > 0
                             && startDate.isBefore(endDate)
-                            && minValue.isNotEmpty() && minValue.toInt() > 0
+                            && minValue.isNotEmpty() && minValue.toInt() >= 0
                         ) {
                             if (viewModel.createPromotion() == 1){
                                 Toast.makeText(
@@ -476,6 +477,17 @@ fun ManagePromotionScreen(
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
                         )
+                    },
+                    supportingText = {
+                        if (!viewModel.isMinValueValid()) {
+                            Text(
+                                text = "Giá trị đơn hàng tối thiểu phải lớn hơn giá trị khuyến mãi",
+                                color = ErrorColor,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier
+                            )
+                        }
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,

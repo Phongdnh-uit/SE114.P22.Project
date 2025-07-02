@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +41,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.core.os.HandlerCompat.postDelayed
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.example.mam.R
 import com.example.mam.dto.cart.CartItemResponse
@@ -65,18 +75,17 @@ import com.example.mam.ui.theme.GreyLight
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.WhiteDefault
+import com.example.mam.viewmodel.client.HomeScreenViewModel
 
 
 @Composable
 fun ProductContainer(
    category: CategoryResponse,
-   products: List<ProductResponse>,
    onClick: (ProductResponse) -> Unit = {ProductResponse -> },
+   products: List<ProductResponse> = emptyList(),
    modifier: Modifier = Modifier
 ){
     Column(
-        //gradient from white on top to orangelight on bottom
-
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .widthIn(min = 300.dp)
@@ -106,20 +115,28 @@ fun ProductContainer(
             modifier = Modifier
         )
         Spacer(Modifier.height(10.dp))
+        if(products.isEmpty()) {
+            CircularProgressIndicator(
+                color = OrangeDefault,
+                modifier = Modifier.padding(16.dp))
+        } else
         products.forEach { product ->
-            ProductClientListItem(
-                item = product,
-                onClick = {
-                    Log.d("ProductContainer", "Clicked on: ${product.name}")
-                    onClick(product)},
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-            )
-            Spacer(Modifier.height(10.dp))
+                product?.let {
+                    ProductClientListItem(
+                        item = product,
+                        onClick = {
+                            onClick(product)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
+            }
         }
         Spacer(Modifier.height(10.dp))
-    }
 }
+
 
 @Composable
 fun CartItemContainer(

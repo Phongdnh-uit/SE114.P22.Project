@@ -137,7 +137,6 @@ class ListNotificationViewModel(
         }
     }
 
-
     fun setSelectedSortingOption(option: String) {
         _selectedSortingOption.value = option
     }
@@ -191,6 +190,7 @@ class ListNotificationViewModel(
             _isLoading.value = false
         }
     }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

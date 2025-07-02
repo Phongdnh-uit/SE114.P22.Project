@@ -79,7 +79,6 @@ fun SearchScreen(
     onItemClicked: (ProductResponse) -> Unit = { ProductResponse -> },
     viewModel: SearchViewModel = viewModel()
 ){
-//    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val listProduct = viewModel.products.collectAsLazyPagingItems()
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle().value
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
@@ -91,7 +90,7 @@ fun SearchScreen(
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
-        //viewModel.loadData()
+        listProduct.refresh()
     }
 
     val focusManager = LocalFocusManager.current
@@ -273,7 +272,8 @@ fun SearchScreen(
                 }
             }
         }
-        items(listProduct.itemSnapshotList) { product ->
+        items(listProduct.itemCount) { index ->
+            val product = listProduct[index]
             product?.let {
                 ProductClientListItem(
                     item = product,

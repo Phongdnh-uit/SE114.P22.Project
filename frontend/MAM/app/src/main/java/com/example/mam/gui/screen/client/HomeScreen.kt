@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +59,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.R
 import com.example.mam.dto.product.CategoryResponse
 import com.example.mam.dto.product.ProductResponse
@@ -65,6 +68,7 @@ import com.example.mam.gui.component.BasicOutlinedButton
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.ProductContainer
 import com.example.mam.gui.component.outerShadow
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
@@ -88,12 +92,11 @@ fun HomeScreen(
 ){
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val categories: List<CategoryResponse> = viewmodel.getListCategory()
+    val categories = viewmodel.listCategory.collectAsLazyPagingItems()
     val cartCount = viewmodel.cartCount.collectAsState().value
     val notificationCount = viewmodel.notificationCount.collectAsState().value
-    val productMap by viewmodel
-        .productMap
-        .collectAsState()
+    val rcmProducts = viewmodel.recommendedProducts.collectAsState().value
+    val productByCategory = viewmodel.productsByCategory
 
     val childListState = rememberLazyListState()
     val rowListState = rememberLazyListState()
@@ -163,22 +166,17 @@ fun HomeScreen(
         snapshotFlow { childListState.firstVisibleItemIndex }
             .collect { index ->
                 // Scroll the LazyRow to the corresponding category
-                if (index >= 3 && index < categories.size + 3) { // Adjust for header and image
+                if (index >= 3 && index < categories.itemCount + 3) { // Adjust for header and image
                         rowListState.animateScrollToItem(index - 3) // Adjust index for categories
                 }
             }
     }
 
-    LaunchedEffect(LocalLifecycleOwner.current) {
-        viewmodel.loadListCategory()
+    LaunchedEffect(key1 = categories) {
+        categories.refresh()
         viewmodel.loadAdditionalProduct()
         viewmodel.loadCartCount()
         viewmodel.loadNotificationCount()
-    }
-    LaunchedEffect(key1 = categories, key2 = LocalLifecycleOwner.current) {
-        if(categories.isNotEmpty() && productMap.isEmpty()){
-            viewmodel.loadAllProductsFromCategories(categories)
-        }
     }
     Box(
         modifier = modifier
@@ -293,21 +291,40 @@ fun HomeScreen(
                             .background(OrangeLighter)
                     ) {
 
-                        items(categories) { category ->
-                            Spacer(Modifier.width(5.dp))
-                            BasicOutlinedButton(
-                                text = category.name,
-                                url = category.getRealURL(),
-                                onClick = {
-                                    scope.launch {
-                                    val targetIndex = categories.indexOf(category)
-                                    childListState.scrollToItem(targetIndex + 3)}
-
-                                },
-                                isEnable = !(categories.indexOf(category) == isRowScrolled.value -3),
-                                modifier = Modifier
-                            )
-                            Spacer(Modifier.width(5.dp))
+                        items(categories.itemCount) { index ->
+                            val category = categories[index]
+                            category?.let {
+                                scope.launch {
+                                    viewmodel.getProductsByCategory(category.id)
+                                }
+                                Spacer(Modifier.width(5.dp))
+                                BasicOutlinedButton(
+                                    text = category.name,
+                                    url = category.getRealURL(),
+                                    onClick = {
+                                        scope.launch {
+                                            val targetIndex =
+                                                categories.itemSnapshotList.indexOf(category)
+                                            childListState.scrollToItem(targetIndex + 3)
+                                        }
+                                    },
+                                    isEnable = categories.itemSnapshotList.indexOf(category) != isRowScrolled.value - 3,
+                                    modifier = Modifier
+                                )
+                                Spacer(Modifier.width(5.dp))
+                            }
+                        }
+                        categories.apply {
+                            when{
+                                loadState.append is LoadState.Loading -> {
+                                    item { CircularProgressIndicator(
+                                        color = OrangeDefault,
+                                        modifier = Modifier.padding(16.dp)) }
+                                }
+                                loadState.append is LoadState.Error -> {
+                                    item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                                }
+                            }
                         }
                     }
                 }
@@ -318,20 +335,22 @@ fun HomeScreen(
                             description = "Danh sách sản phẩm đề xuất",
                             imageUrl = "https://em-content.zobj.net/source/apple/81/glowing-star_1f31f.png"
                         ),
-                        products = viewmodel.recommendedProducts.collectAsState().value,
                         onClick = { product -> onItemClicked(product) },
+                        products = rcmProducts,
                         modifier = Modifier.fillMaxWidth(0.9f)
                     )
                 }
-                items(categories) { category ->
-                    val products = productMap[category.id] ?: emptyList()
-                    Spacer(Modifier.height(70.dp))
-                    ProductContainer(
-                        category = category,
-                        products = products,
-                        onClick = { product -> onItemClicked(product) },
-                        modifier = Modifier.fillMaxWidth(0.9f)
-                    )
+                items(categories.itemCount) { index ->
+                    val category = categories[index]
+                    category?.let {
+                        Spacer(Modifier.height(70.dp))
+                        ProductContainer(
+                            category = category,
+                            onClick = { product -> onItemClicked(product) },
+                            products = productByCategory[category.id] ?: emptyList(),
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        )
+                    }
 
                 }
                 item{Spacer(Modifier.height(60.dp))}
@@ -359,8 +378,7 @@ fun HomeScreen(
                     onClick = {
                         scope.launch {
                             childListState.scrollToItem(0)
-                            viewmodel.loadListCategory()
-                            viewmodel.loadAllProductsFromCategories(categories)
+                            categories.refresh()
                         }
                     },
                     modifier = Modifier

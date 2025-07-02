@@ -80,6 +80,10 @@ class ManagePromotionViewModel(
         _minValue.value = minValue
     }
 
+    fun isMinValueValid(): Boolean {
+        return _minValue.value.isNotEmpty() && _minValue.value.toBigDecimalOrNull() != null && _minValue.value.toBigDecimal() > _value.value.toBigDecimalOrNull()
+    }
+
     suspend fun createPromotion(): Int{
         _isLoading.value = true
         try {

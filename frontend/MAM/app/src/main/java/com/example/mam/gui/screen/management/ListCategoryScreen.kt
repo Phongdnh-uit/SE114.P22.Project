@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.example.mam.dto.product.CategoryResponse
 import com.example.mam.gui.component.CircleIconButton
@@ -112,8 +113,7 @@ fun ListCategoryScreen(
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val categoryList = viewModel.categories.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
+    val categoryList = viewModel.categories.collectAsLazyPagingItems()
     val isDeleting = viewModel.isDeleting.collectAsStateWithLifecycle().value
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
 
@@ -121,7 +121,7 @@ fun ListCategoryScreen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = isDeleting) {
-        viewModel.loadData()
+        categoryList.refresh()
     }
 
 
@@ -258,7 +258,7 @@ fun ListCategoryScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchCategory() }
+                                            scope.launch { viewModel.search() }
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -342,7 +342,7 @@ fun ListCategoryScreen(
                                             sortExpanded = false
                                             scope.launch {
                                                 viewModel.setSelectedSortingOption(option)
-                                                viewModel.sortCategory()
+                                                viewModel.sort()
                                             }
                                         }
                                     )
@@ -359,7 +359,7 @@ fun ListCategoryScreen(
                             onClick = {
                                 scope.launch {
                                     viewModel.setASC()
-                                    viewModel.sortCategory()
+                                    viewModel.sort()
                                 }
                             },
                             modifier = Modifier.size(30.dp)
@@ -369,60 +369,56 @@ fun ListCategoryScreen(
                     }
                 }
                 categoryList.let {
-                    items(categoryList) { category ->
-                        var isShowDialog by remember { mutableStateOf(false) }
-                        if (isShowDialog){
-                            CustomDialog(
-                                title = "Xác nhận xóa",
-                                message = "Bạn có chắc muốn xóa Danh mục ${category.name}",
-                                onDismiss = {isShowDialog = false},
-                                onConfirm = {
-                                    scope.launch {
-                                        val result = viewModel.deleteCategory(category.id)
-                                        Toast.makeText(
-                                            context,
-                                            when(result){
-                                                -1 -> "Không thể kết nối Server"
-                                                1 -> "Xóa thành công"
-                                                else -> "Xóa thất bại"
-                                            },
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        isShowDialog = false
+                    items(categoryList.itemCount) { index ->
+                        val category = categoryList[index]
+                        category?.let {
+                            var isShowDialog by remember { mutableStateOf(false) }
+                            if (isShowDialog) {
+                                CustomDialog(
+                                    title = "Xác nhận xóa",
+                                    message = "Bạn có chắc muốn xóa Danh mục ${category.name}",
+                                    onDismiss = { isShowDialog = false },
+                                    onConfirm = {
+                                        scope.launch {
+                                            val result = viewModel.deleteCategory(category.id)
+                                            Toast.makeText(
+                                                context,
+                                                when (result) {
+                                                    -1 -> "Không thể kết nối Server"
+                                                    1 -> "Xóa thành công"
+                                                    else -> "Xóa thất bại"
+                                                },
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            isShowDialog = false
+                                        }
                                     }
-                                }
 
-                            )
-                        }
-                        if (isDeleting)
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
-                            )
-                        else
-                        CategoryItem(
-                            category = category,
-                            onEditClick = onEditCategoryClick,
-                            onDeleteClick = {
-                                isShowDialog = true
-                                Log.d("Category", "${category.id}, ${category.createdAt}, ${category.updatedAt}, ${category.imageUrl}")
+                                )
                             }
-                        )
+                            if (isDeleting)
+                                CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .size(40.dp)
+                                )
+                            else
+                                CategoryItem(
+                                    category = category,
+                                    onEditClick = onEditCategoryClick,
+                                    onDeleteClick = {
+                                        isShowDialog = true
+                                        Log.d(
+                                            "Category",
+                                            "${category.id}, ${category.createdAt}, ${category.updatedAt}, ${category.imageUrl}"
+                                        )
+                                    }
+                                )
+                        }
                     }
                 }
-                if (isLoading) {
-                    item {
-                        CircularProgressIndicator(
-                            color = OrangeDefault,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(40.dp)
-                        )
-                    }
-                }
-                else if (categoryList.isEmpty()) {
+                if (categoryList.itemCount == 0) {
                     item {
                         Text(
                             text = "Không có danh mục nào",
@@ -585,39 +581,3 @@ fun CategoryItem(
     }
 }
 
-//@Preview
-//@Composable
-//fun CategoryItemPreview() {
-//    MaterialTheme {
-//        CategoryItem(
-//            category = ,
-//            onEditClick = {},
-//            onDeleteClick = {}
-//        )
-//    }
-//}
-//
-//@Preview
-//@Composable
-//fun CategoryScreenPreview() {
-//    ListCategoryScreen(
-//        viewModel = viewModel(factory = ListCategoryViewModel.Factory),
-//        onBackClick = {},
-//        onAddCategoryClick = {},
-//        onEditCategoryClick = {},
-//        mockData = listOf(
-//            ProductCategory(
-//                id = "1",
-//                name = "Hamburger",
-//            ),
-//            ProductCategory(
-//                id = "2",
-//                filtename = "Pizza",
-//            ),
-//            ProductCategory(
-//                id = "3",
-//                name = "Chicken",
-//            )
-//        )
-//    )
-//}

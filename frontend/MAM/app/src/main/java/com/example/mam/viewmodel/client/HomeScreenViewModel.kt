@@ -1,17 +1,22 @@
 package com.example.mam.viewmodel.client
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.product.CategoryResponse
 import com.example.mam.dto.product.ProductResponse
+import com.example.mam.repository.paging.createPagingFlow
 import com.example.mam.repository.retrofit.BaseRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +26,16 @@ class HomeScreenViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
-    private val _listCategory = MutableStateFlow<MutableList<CategoryResponse>>(mutableListOf())
+    val listCategory = createPagingFlow { page, size, sort, filter ->
+        BaseRepository(userPreferencesRepository).productCategoryRepository.getCategories(
+            page = page,
+            size = size,
+            filter = ""
+        ).body()?.content ?: emptyList()
+    }.cachedIn(viewModelScope)
+
+    private val _productsByCategory = mutableStateMapOf<Long, List<ProductResponse>>()
+    val productsByCategory: Map<Long, List<ProductResponse>> get() = _productsByCategory
 
     private val _recommendedProducts = MutableStateFlow<List<ProductResponse>>(emptyList())
     val recommendedProducts = _recommendedProducts.asStateFlow()
@@ -95,86 +109,22 @@ class HomeScreenViewModel(
         }
     }
 
-    private val _productMap = MutableStateFlow<Map<Long, List<ProductResponse>>>(emptyMap())
-    val productMap: StateFlow<Map<Long, List<ProductResponse>>> = _productMap
-    fun getListCategory(): List<CategoryResponse> {
-        return _listCategory.value.toList()
-    }
-
-    suspend fun loadListCategory(){
-        var currentPage = 0
-        val allCategories = mutableListOf<CategoryResponse>()
-        try {
-            Log.d("Category", "Bắt đầu lấy Danh mục")
-
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .productCategoryRepository
-                    .getCategories(filter = "", page = currentPage)
-
-                Log.d("Category", "Status code: ${response.code()}")
-
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        allCategories.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        Log.d("Category", "Lấy trang ${page.page}")
-                        _listCategory.value = allCategories.toMutableList()
-
-                    }
-                    else break
-                } else {
-                    Log.d("Category", "Lấy Danh mục thất bại: ${response.errorBody()}")
-                    break // Stop loop on failure
-                }
-            }
-
-            _listCategory.value = allCategories.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-            Log.d("Category", "Không thể lấy Danh mục: ${e.message}")
-        }
-    }
-
     fun setAdressAndCoordinates( address: String, longitude: Double, latitude: Double) {
         viewModelScope.launch {
             userPreferencesRepository.saveAddress(address, longitude, latitude)
         }
     }
-    suspend fun loadListProduct(id: Long): List<ProductResponse>{
-        try {
-            Log.d("Category", "Bắt đầu lấy Danh mục")
-                val response = BaseRepository(userPreferencesRepository)
-                    .productRepository
-                    .getProductsByCategory(id,filter= "", page = 0)
-                Log.d("Category", "Status code: ${response.code()}")
 
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        return page.content
-                    }
-                    else return listOf()
-                } else {
-                    Log.d("Category", "Lấy Danh mục thất bại: ${response.errorBody()}")
-                    return listOf()
-                }
-        } catch (e: Exception) {
-            Log.d("Product", "Không thể lấy Sản phẩm: ${e.message}")
-            return listOf()
+    suspend fun getProductsByCategory(categoryId: Long) {
+        _productsByCategory[categoryId] ?: run {
+            val result = BaseRepository(userPreferencesRepository).productRepository.getProductsByCategory(
+                categoryId,
+                page = 0,
+                size = 100,
+                filter = ""
+            ).body()?.content ?: emptyList()
+            _productsByCategory[categoryId] = result
         }
-    }
-    suspend fun loadAllProductsFromCategories(categories: List<CategoryResponse>){
-        val result = mutableMapOf<Long, List<ProductResponse>>()
-        for(category in categories){
-            val products = loadListProduct(category.id)
-            result[category.id] = products
-        }
-        _productMap.value = result
     }
 
     companion object {
