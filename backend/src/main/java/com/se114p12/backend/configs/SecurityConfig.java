@@ -28,7 +28,10 @@ public class SecurityConfig implements WebMvcConfigurer {
 
   @Bean
   public SecurityFilterChain filterChain(
-      HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+      HttpSecurity http,
+      CustomAuthenticationEntryPoint authenticationEntryPoint,
+      JwtAuthenticationConverter jwtAuthenticationConverter)
+      throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
@@ -52,13 +55,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/api/v1/payment/**"
-                    )
+                        "/api/v1/payment/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
         .oauth2ResourceServer(
-            oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            oauth2 ->
+                oauth2
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                    .authenticationEntryPoint(authenticationEntryPoint))
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
