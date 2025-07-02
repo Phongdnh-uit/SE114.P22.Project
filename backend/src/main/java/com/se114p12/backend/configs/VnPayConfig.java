@@ -16,13 +16,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Data
 public class VnPayConfig {
-  @Value("${vnpay.tmnCode:DUMMY_CODE}")
+  @Value("${vnpay.tmnCode}")
   private String vnp_TmnCode;
 
-  @Value("${vnpay.hashSecret:DUMMY_SECRET}")
+  @Value("${vnpay.hashSecret}")
   private String vnp_HashSecret;
 
-  @Value("${vnpay.payUrl:https://sandbox.vnpay.vn/paymentv2/vpcpay.html}")
+  @Value("${vnpay.payUrl}")
   private String vnp_PayUrl;
 
   private String vnp_ReturnUrl = AppConstant.BACKEND_URL + "/payment/return";
