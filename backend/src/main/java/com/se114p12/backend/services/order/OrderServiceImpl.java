@@ -172,8 +172,9 @@ public class OrderServiceImpl implements OrderService {
       order.getOrderDetails().add(orderDetail);
 
       cartItem.getVariationOptions().clear();
-      cartItemRepository.delete(cartItem);
     }
+
+    cartItemRepository.deleteAll(cart.getCartItems());
 
     // Trừ giá trị Order theo Promotion
     if (orderRequestDTO.getPromotionId() != null) {
