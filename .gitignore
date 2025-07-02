@@ -41,4 +41,4 @@ out/
 application-dev.properties
 
 /frontend/MAM/app/src/main/res/values/mapbox-access-token.xml
-/frontend/MAM/app/release
+/frontend/MAM/app/release/
