@@ -39,6 +39,6 @@ out/
 
 ### .env ###
 application-dev.properties
-
+*.apk
 /frontend/MAM/app/src/main/res/values/mapbox-access-token.xml
 /frontend/MAM/app/release/
