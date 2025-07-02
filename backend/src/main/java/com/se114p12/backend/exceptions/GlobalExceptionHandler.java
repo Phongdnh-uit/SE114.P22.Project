@@ -15,11 +15,15 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(DataConflictException.class)
   public ResponseEntity<?> handleDataConflictException(DataConflictException e) {
+    Map<String, Object> errorDetails = new HashMap<>();
+    for (var entry : e.getErrors().entrySet()) {
+      errorDetails.put(entry.getKey(), entry.getValue());
+    }
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(
             ErrorVO.builder()
                 .type(ErrorType.RESOURCE_CONFLICT_ERROR)
-                .details(Map.of("message", e.getMessage()))
+                .details(errorDetails)
                 .build());
   }
 
@@ -45,7 +49,7 @@ public class GlobalExceptionHandler {
         .body(ErrorVO.builder().type(ErrorType.VALIDATION_ERROR).details(errorMap).build());
   }
 
-  @ExceptionHandler(Exception.class)
+  @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<?> handle(Exception e) {
     e.printStackTrace(); // log ra console
     return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));

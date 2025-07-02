@@ -30,7 +30,9 @@ import com.se114p12.backend.util.ImageLoader;
 import com.se114p12.backend.util.JwtUtil;
 import com.se114p12.backend.util.RandomUtil;
 import com.se114p12.backend.vo.PageVO;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -85,23 +87,27 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+    Map<String, String> errors = new HashMap<>();
     if (userRepository.existsByUsername(registerRequestDTO.getUsername())) {
-      throw new DataConflictException("Username already exists");
+      errors.put("username", "Username already exists");
     }
     if (userRepository.existsByEmail(registerRequestDTO.getEmail())) {
-      throw new DataConflictException("Email already exists");
+      errors.put("email", "Email already exists");
     }
     if (userRepository.existsByPhone(registerRequestDTO.getPhone())) {
-      throw new DataConflictException("Phone already exists");
+      errors.put("phone", "Phone number already exists");
+    }
+    if (!smsService.lookupPhoneNumber(registerRequestDTO.getPhone())) {
+      errors.put("phone", "Invalid phone number");
+    }
+    if (!errors.isEmpty()) {
+      throw new DataConflictException(errors);
     }
     User user = new User();
     user.setFullname(registerRequestDTO.getFullname());
     user.setUsername(registerRequestDTO.getUsername());
     user.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
     user.setEmail(registerRequestDTO.getEmail());
-    if (!smsService.lookupPhoneNumber(registerRequestDTO.getPhone())) {
-      throw new BadRequestException("Invalid phone number");
-    }
     user.setPhone(SMSService.formatPhoneNumber(registerRequestDTO.getPhone()));
     user.setStatus(UserStatus.PENDING);
     user.setLoginProvider(LoginProvider.LOCAL);
@@ -151,12 +157,17 @@ public class UserServiceImpl implements UserService {
 
     Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
 
+    Map<String, String> errors = new HashMap<>();
     // If user exists, return the user response
-    if (userOptional.isPresent()) return userMapper.entityToResponse(userOptional.get());
-
+    if (userOptional.isPresent()) {
+      errors.put("email", "Email already exists");
+    }
     if (userRepository.existsByPhone(
         SMSService.formatPhoneNumber(googleRegisterRequestDTO.getPhone()))) {
-      throw new DataConflictException("Phone number already exists");
+      errors.put("phone", "Phone number already exists");
+    }
+    if (!smsService.lookupPhoneNumber(googleRegisterRequestDTO.getPhone())) {
+      errors.put("phone", "Invalid phone number");
     }
 
     User user = new User();
@@ -165,9 +176,6 @@ public class UserServiceImpl implements UserService {
     do {
       user.setUsername("user" + RandomUtil.generateRandomString(10));
     } while (userRepository.existsByUsername(user.getUsername()));
-    if (!smsService.lookupPhoneNumber(googleRegisterRequestDTO.getPhone())) {
-      throw new BadRequestException("Invalid phone number");
-    }
     user.setPhone(SMSService.formatPhoneNumber(googleRegisterRequestDTO.getPhone()));
     user.setPassword("");
     user.setLoginProvider(LoginProvider.GOOGLE);
@@ -197,12 +205,21 @@ public class UserServiceImpl implements UserService {
 
     Optional<User> userOptional = userRepository.findByEmail(payload.getEmail());
 
+    Map<String, String> errors = new HashMap<>();
     // If user exists, return the user response
-    if (userOptional.isPresent()) return userMapper.entityToResponse(userOptional.get());
+    if (userOptional.isPresent()) {
+      errors.put("email", "Email already exists");
+    }
 
     if (userRepository.existsByPhone(
         SMSService.formatPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber()))) {
-      throw new DataConflictException("Phone number already exists");
+      errors.put("phone", "Phone number already exists");
+    }
+    if (!smsService.lookupPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber())) {
+      errors.put("phone", "Invalid phone number");
+    }
+    if (!errors.isEmpty()) {
+      throw new DataConflictException(errors);
     }
 
     User user = new User();
@@ -211,9 +228,6 @@ public class UserServiceImpl implements UserService {
     do {
       user.setUsername("user" + RandomUtil.generateRandomString(10));
     } while (userRepository.existsByUsername(user.getUsername()));
-    if (!smsService.lookupPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber())) {
-      throw new BadRequestException("Invalid phone number");
-    }
     user.setPhone(SMSService.formatPhoneNumber(firebaseRegisterRequestDTO.getPhoneNumber()));
     user.setPassword("");
     user.setLoginProvider(LoginProvider.FIREBASE);
@@ -258,19 +272,20 @@ public class UserServiceImpl implements UserService {
   }
 
   private void validateUserUniqueness(UserRequestDTO userRequestDTO, User existingUser) {
+    Map<String, String> errors = new HashMap<>();
     if ((existingUser == null || !userRequestDTO.getUsername().equals(existingUser.getUsername()))
         && userRepository.existsByUsername(userRequestDTO.getUsername())) {
-      throw new DataConflictException("Username already exists");
+      errors.put("username", "Username already exists");
     }
 
     if ((existingUser == null || !userRequestDTO.getEmail().equals(existingUser.getEmail()))
         && userRepository.existsByEmail(userRequestDTO.getEmail())) {
-      throw new DataConflictException("Email already exists");
+      errors.put("email", "Email already exists");
     }
 
     if ((existingUser == null || !userRequestDTO.getPhone().equals(existingUser.getPhone()))
         && userRepository.existsByPhone(userRequestDTO.getPhone())) {
-      throw new DataConflictException("Phone already exists");
+      errors.put("phone", "Phone number already exists");
     }
   }
 
