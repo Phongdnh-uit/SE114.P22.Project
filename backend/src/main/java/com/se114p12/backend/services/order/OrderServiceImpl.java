@@ -202,8 +202,7 @@ public class OrderServiceImpl implements OrderService {
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
-    // Gửi thông báo trạng thái
-    sendOrderStatusNotification(order);
+
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
@@ -346,7 +345,6 @@ public class OrderServiceImpl implements OrderService {
       order.setOrderStatus(OrderStatus.PENDING); // giao hàng chưa bắt đầu
       orderRepository.save(order);
       sendPaymentStatusNotification(order);
-      sendOrderStatusNotification(order);
     }
 
     return order.getId();
