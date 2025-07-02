@@ -386,7 +386,7 @@ fun PaymentLoadingAlertDialog() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Đang xử lý thanh toán...",
+                    text = "Đang xử lý đơn hàng...",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,

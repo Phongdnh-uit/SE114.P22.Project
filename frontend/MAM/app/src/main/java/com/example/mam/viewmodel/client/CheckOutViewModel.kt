@@ -198,6 +198,7 @@ class CheckOutViewModel(
 
     suspend fun checkOut(): Int{
         try{
+            _isPaying.value = true
             val request = OrderRequest(
                 _latitude.value,
                 _longitude.value,
@@ -221,6 +222,10 @@ class CheckOutViewModel(
             e.printStackTrace()
             Log.d("CheckOutViewModel", "Failed to check out: ${e.message}")
             return -1
+        }
+        finally {
+            _isPaying.value = false
+            Log.d("CheckOutViewModel", "Payment state reset to false after checkout")
         }
     }
 
