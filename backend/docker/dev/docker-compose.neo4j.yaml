@@ -1,0 +1,29 @@
+services:
+  neo4j:
+    image: "neo4j:latest"
+    environment:
+      NEO4J_AUTH: neo4j/notverysecret
+    networks:
+      - app_network
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "cypher-shell",
+          "-u",
+          "neo4j",
+          "-p",
+          "notverysecret",
+          "RETURN 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  app_network:
+    driver: bridge

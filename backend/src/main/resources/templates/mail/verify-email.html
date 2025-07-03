@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xác Thực Email</title>
+  <style>
+    body {
+      background-color: #f3f4f6;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background-color: #ffffff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 28px;
+      color: #1f2937;
+      margin: 0;
+    }
+    .content {
+      text-align: center;
+      color: #4b5563;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .content strong {
+      color: #111827;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #f97316;
+      color: #ffffff !important;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #ea580c;
+    }
+    .note {
+      color: #f97316;
+      font-weight: bold;
+      margin-top: 30px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .content {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Xác Thực Email</h1>
+    </header>
+    <main class="content">
+      <p class="mb-4">Chào <strong th:text="${email}"></strong>,</p>
+      <p>
+        Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký, vui lòng xác thực email của bạn bằng cách nhấn vào nút dưới đây:
+      </p>
+      <div>
+        <a th:href="${verifyLink}" class="btn" href="#">
+          Xác Thực Email
+        </a>
+      </div>
+      <p class="note">
+        Lưu ý: Đường link xác thực này sẽ hết hạn sau 1 giờ kể từ khi bạn nhận được email này.
+      </p>
+      <p style="margin-top: 20px;">
+        Nếu bạn không yêu cầu đăng ký tài khoản, vui lòng bỏ qua email này.
+      </p>
+    </main>
+    <footer class="footer">
+      <p>© 2025 MĂM. Mọi quyền lợi được bảo lưu.</p>
+    </footer>
+  </div>
+</body>
+</html>

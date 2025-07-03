@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: "redis:latest"
+    networks:
+      - app_network
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

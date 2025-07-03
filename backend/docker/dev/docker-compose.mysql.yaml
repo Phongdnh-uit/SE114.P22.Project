@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: "mysql:latest"
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: verysecret
+      MYSQL_USER: myuser
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app_network:
+    driver: bridge

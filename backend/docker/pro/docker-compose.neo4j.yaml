@@ -1,0 +1,18 @@
+services:
+  neo4j:
+    image: "neo4j:latest"
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+    networks:
+      - app_network
+    volumes:
+      - neo4j_data:/data
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

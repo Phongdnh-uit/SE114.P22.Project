@@ -1,0 +1,671 @@
+[
+  {
+    "name": "Pizza",
+    "description": "Đây là mô tả mẫu cho Pizza",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/pizza_1f355.png",
+    "products": [
+      {
+        "name": "Pizza Margherita",
+        "shortDescription": "Pizza truyền thống Ý với sốt cà chua, phô mai mozzarella và húng quế.",
+        "detailDescription": "Một món kinh điển vượt thời gian, pizza Margherita thể hiện sự đơn giản tinh tế của ẩm thực Ý. Đế bánh mỏng và giòn được phủ lớp sốt cà chua tươi, phô mai mozzarella mềm mại và lá húng quế thơm lừng. Mỗi miếng bánh là một sự hòa quyện tuyệt vời của hương vị Ý.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Margherita%20Flatbread.jpg?alt=media&token=d79daa6d-a9e2-4ba8-900d-271eca183705",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 275000.0
+      },
+      {
+        "name": "Pizza Pepperoni",
+        "shortDescription": "Pizza phủ đầy pepperoni đậm đà, phô mai tan chảy và sốt cà chua đậm vị.",
+        "detailDescription": "Đắm chìm trong hương vị đậm đà của Pepperoni – giấc mơ của người yêu thịt. Lớp vỏ bánh được phủ đầy lát pepperoni cay nồng, hòa quyện hoàn hảo cùng phô mai mozzarella tan chảy và sốt cà chua đậm đà. Mỗi miếng là một bản giao hưởng của vị mặn và cay, lý tưởng cho ai thích vị mạnh.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Pepperoni%20Lovers.jpg?alt=media&token=d9d172ff-eb4b-4149-bcc5-5690994a0f1f",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 325000.0
+      },
+      {
+        "name": "Pizza Veggie",
+        "shortDescription": "Pizza rau củ đầy màu sắc với ớt chuông, hành, nấm và oliu.",
+        "detailDescription": "Pizza Veggie là tuyệt tác đầy màu sắc dành cho người ăn chay. Được phủ đầy ớt chuông, hành tây, oliu và nấm tươi, món pizza này mang đến sự hòa quyện của nhiều kết cấu và hương vị. Lớp vỏ vàng giòn cùng rau củ tươi tạo nên trải nghiệm ẩm thực nhẹ nhàng và trọn vẹn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Veggie%20Supreme.jpg?alt=media&token=cfddce97-575a-49af-b330-9299d0d9f776",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 300000.0
+      },
+      {
+        "name": "Pizza Gà Nướng BBQ",
+        "shortDescription": "Pizza với gà nướng sốt BBQ, hành tím và ớt chuông thơm ngon.",
+        "detailDescription": "Trải nghiệm hương vị khói lôi cuốn từ pizza Gà Nướng BBQ. Những miếng gà thấm đẫm sốt BBQ kết hợp với vị ngọt nhẹ của hành tím và độ giòn của ớt chuông. Tất cả được bao phủ bởi hỗn hợp phô mai béo ngậy, tạo nên một hành trình hương vị đậm đà trong từng lát bánh.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/BBQ%20Chicken%20Delight.jpg?alt=media&token=5f42cf73-af4e-4e11-bb02-80a3ff2d136d",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 350000.0
+      },
+      {
+        "name": "Pizza Hawaii",
+        "shortDescription": "Pizza vị ngọt mặn kết hợp giữa dứa tươi và thịt nguội.",
+        "detailDescription": "Đưa vị giác bạn đến thiên đường nhiệt đới với pizza Hawaii. Sự kết hợp hài hòa giữa thịt nguội mặn mà, miếng dứa mọng nước và sốt BBQ ngọt nhẹ tạo nên từng miếng bánh vừa ngọt vừa mặn, gói trọn tinh thần của một chuyến phiêu lưu Hawaii.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Hawaiian%20Paradise.jpg?alt=media&token=ea25596d-f1ec-4219-9f03-4a8f3448b113",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 300000.0
+      },
+      {
+        "name": "Pizza Meat Feast",
+        "shortDescription": "Pizza với nhiều loại thịt như xúc xích, thịt xông khói và pepperoni.",
+        "detailDescription": "Pizza Meat Feast là bữa tiệc dành cho người yêu thịt, với sự kết hợp hấp dẫn giữa xúc xích đậm đà, thịt xông khói giòn rụm và pepperoni cay nồng. Một hành trình hương vị đầy năng lượng, hoàn hảo cho những ai yêu thích món ăn đậm đà, giàu protein.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Meat%20Feast%20pizza.jpg?alt=media&token=0bf024d4-4f26-4237-8479-1a346dc5c537",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 375000.0
+      },
+      {
+        "name": "Pizza Địa Trung Hải",
+        "shortDescription": "Pizza kiểu Địa Trung Hải với oliu, feta, cà chua và lá oregano.",
+        "detailDescription": "Khám phá hành trình ẩm thực đến Địa Trung Hải với Pizza Địa Trung Hải. Phủ đầy oliu đậm vị, phô mai feta béo nhẹ, cà chua chín mọng và rắc thêm lá oregano, món pizza này tái hiện hương vị mạnh mẽ và tinh tế đặc trưng của vùng biển xanh tươi mát.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Mediterranean%20Joy.jpg?alt=media&token=2855007a-925e-4d0d-9167-5a41dcb96065",
+        "variations": [
+          {
+            "name": "Kích cỡ",
+            "isMultipleChoice": false,
+            "variationOptions": [
+              {
+                "value": "20cm",
+                "additionalPrice": 0
+              },
+              {
+                "value": "25cm",
+                "additionalPrice": 25000.0
+              },
+              {
+                "value": "30cm",
+                "additionalPrice": 50000.0
+              }
+            ]
+          },
+          {
+            "name": "Tùy chỉnh",
+            "isMultipleChoice": true,
+            "variationOptions": [
+              {
+                "value": "Thêm phô mai",
+                "additionalPrice": 12000.0
+              }
+            ]
+          }
+        ],
+        "originalPrice": 325000.0
+      }
+    ]
+  },
+  {
+    "name": "Hamburger",
+    "description": "Đây là mô tả mẫu cho Burger",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/hamburger_1f354.png",
+    "products": [
+      {
+        "name": "Burger Bò",
+        "shortDescription": "Burger bò cổ điển với bánh mì mè, rau tươi và sốt đặc biệt.",
+        "detailDescription": "Tận hưởng sự đơn giản của burger bò cổ điển với miếng bò mọng nước nằm giữa bánh mì mè nướng vàng. Được phủ lên lớp rau xà lách giòn, cà chua chín mọng và sốt đặc biệt, món burger này là biểu tượng vượt thời gian của ẩm thực Mỹ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Classic%20Beef%20Burger.jpg?alt=media&token=97db8d6d-8c0d-4d22-b13d-31714244eab3",
+        "originalPrice": 75000.0
+      },
+      {
+        "name": "Burger Jalapeño",
+        "shortDescription": "Burger cay nồng với jalapeño, phô mai pepper jack và sốt chipotle.",
+        "detailDescription": "Thêm chút cay nồng với burger Jalapeño. Miếng thịt nướng thơm phức được trộn với ớt jalapeño, phủ phô mai pepper jack và sốt chipotle đậm đà – mang đến trải nghiệm burger bùng nổ hương vị cho tín đồ yêu món cay.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Spicy%20Jalape%C3%B1o%20Burger.jpg?alt=media&token=b6df636e-d2de-4ef5-8286-b0cb5ef2e3db",
+        "originalPrice": 100000.0
+      },
+      {
+        "name": "Burger Nấm",
+        "shortDescription": "Burger với nấm xào, sốt truffle aioli và phô mai Thụy Sĩ.",
+        "detailDescription": "Thưởng thức hương vị đậm đà của burger nấm và phô mai Thụy Sĩ. Miếng thịt mọng nước kết hợp với nấm xào thơm lừng và sốt truffle aioli béo ngậy, tạo nên món burger tinh tế dành cho những khẩu vị sành ăn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Mushroom%20Swiss%20Delight.jpg?alt=media&token=548e3ab0-02ba-4e72-b708-e5bf7811857b",
+        "originalPrice": 112000.0
+      },
+      {
+        "name": "Burger Gà Bơ",
+        "shortDescription": "Burger gà nướng với bơ tươi, rau sống và sốt ranch kem.",
+        "detailDescription": "Lựa chọn lành mạnh với burger gà bơ tươi. Ức gà nướng được kết hợp cùng bơ chín mềm, xà lách tươi và sốt ranch kem, tất cả nằm trong bánh mì nguyên cám giàu dinh dưỡng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Chicken%20Avocado%20Bliss.jpg?alt=media&token=e444197e-b9af-4b2c-8790-9c7ab7089148",
+        "originalPrice": 112000.0
+      },
+      {
+        "name": "Burger Cheese Bacon",
+        "shortDescription": "Burger với thịt bò, bacon giòn, phô mai cheddar và sốt BBQ.",
+        "detailDescription": "Dành cho tín đồ Bacon – burger Bacon Cheese  là lựa chọn không thể bỏ qua. Miếng thịt bò được phủ lên bacon giòn rụm, phô mai cheddar béo ngậy và sốt BBQ đậm đà, tạo nên hương vị khói mặn thơm ngon khó cưỡng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Bacon%20and%20Cheese%20Heaven.jpg?alt=media&token=0a213036-6086-4b29-ad8d-b20ca3216717",
+        "originalPrice": 150000.0
+      },
+      {
+        "name": "Burger Veggie",
+        "shortDescription": "Burger chay với patty rau củ, rau nướng, sốt hummus và tzatziki.",
+        "detailDescription": "Trải nghiệm bữa tiệc hương vị với burger rau củ. Miếng patty từ thực vật được bổ sung rau củ nướng, sốt hummus và tzatziki, phù hợp với những ai yêu thích lựa chọn chay lành mạnh mà vẫn đậm đà.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Veggie%20Extravaganza.jpg?alt=media&token=cffbe6fd-0c0b-4b9a-8ea4-996e0fc019f0",
+        "originalPrice": 125000.0
+      },
+      {
+        "name": "Burger Teriyaki Dứa",
+        "shortDescription": "Burger gà hoặc đậu phụ sốt teriyaki, thơm nướng và hành lá.",
+        "detailDescription": "Đưa vị giác bạn đến vùng nhiệt đới với burger Teriyaki Dứa. Gà nướng (hoặc đậu phụ) phủ sốt teriyaki, kết hợp với thơm nướng và hành lá – tạo nên món burger hòa quyện giữa vị ngọt và mặn độc đáo.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Teriyaki%20Pineapple%20Pleasure.jpg?alt=media&token=56cec393-7d88-431f-8258-7403d16fa24a",
+        "originalPrice": 137000.0
+      },
+      {
+        "name": "Burger BBQ Ranch",
+        "shortDescription": "Burger bò với bacon, phô mai cheddar, sốt BBQ ranch và hành giòn.",
+        "detailDescription": "Bùng nổ vị giác cùng burger BBQ Ranch. Miếng thịt bò thơm ngậy kết hợp với bacon giòn, phô mai cheddar, sốt BBQ ranch đậm đà và hành phi giòn tan trong bánh ciabatta – tất cả tạo nên bản hòa âm hương vị mạnh mẽ, đầy quyến rũ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/BBQ%20Ranch%20Delight.jpg?alt=media&token=11e77c82-36f1-432e-9093-5b71bc43c317",
+        "originalPrice": 162000.0
+      }
+    ]
+  },
+  {
+    "name": "Gà",
+    "description": "Đây là mô tả mẫu cho Chicken",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/poultry-leg_1f357.png",
+    "products": [
+      {
+        "name": "Gà Giòn Truyền Thống",
+        "shortDescription": "Gà chiên giòn vàng, đậm đà và giòn rụm trong từng miếng cắn.",
+        "detailDescription": "Thưởng thức món gà giòn truyền thống được tẩm ướp đậm vị và chiên vàng ruộm, mang đến độ giòn hoàn hảo trong mỗi miếng ăn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Original%20Crispy%20Chicken.jpg?alt=media&token=b311a54c-684a-4f7c-8983-336d984fa9e7",
+        "originalPrice": 50000.0
+      },
+      {
+        "name": "Cánh Gà Sốt Cay",
+        "shortDescription": "Cánh gà mềm thơm phủ sốt buffalo cay nồng kích thích vị giác.",
+        "detailDescription": "Trải nghiệm hương vị bùng nổ với cánh gà sốt cay Buffalo. Cánh gà mềm mại được áo một lớp sốt buffalo cay nồng, mang lại dư vị nóng bỏng khó quên.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Spicy%20Buffalo%20Wings.jpg?alt=media&token=1146da75-ae9e-42e8-9be8-931e3a558f7f",
+        "originalPrice": 35000.0
+      },
+      {
+        "name": "Gà Tẩm Mật Ong Mustard",
+        "shortDescription": "Gà mềm tẩm sốt mật ong mù tạt ngọt dịu và đậm đà.",
+        "detailDescription": "Thưởng thức sự hòa quyện giữa vị ngọt và mặn trong món gà tẩm sốt mật ong mù tạt, với từng miếng gà mềm thấm đều lớp sốt thơm ngon.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Honey%20Mustard%20Glazed%20Tenders.jpg?alt=media&token=73f17e69-33ff-4aa0-8a81-76500000f1c4",
+        "originalPrice": 52000.0
+      },
+      {
+        "name": "Gà Chanh Tiêu",
+        "shortDescription": "Gà giòn rắc chanh và tiêu đen, tạo vị tươi mới và đậm đà.",
+        "detailDescription": "Đánh thức vị giác với món gà chanh tiêu giòn rụm, được nêm nếm với chanh tươi và tiêu đen thơm nồng, mang đến cảm giác sảng khoái và lôi cuốn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Lemon%20Pepper%20Chicken.jpg?alt=media&token=13eb02eb-93a8-40da-9dc6-105c2346a1aa",
+        "originalPrice": 37000.0
+      },
+      {
+        "name": "Gà Chiên Hàn Quốc",
+        "shortDescription": "Gà chiên giòn phủ lớp sốt Hàn Quốc ngọt cay đặc trưng.",
+        "detailDescription": "Khám phá hương vị Hàn Quốc với món gà chiên giòn bên ngoài, phủ sốt ngọt cay hấp dẫn mang lại cảm giác thỏa mãn trong từng miếng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Korean%20Fried%20Chicken.jpg?alt=media&token=0c524509-5697-4db6-aeb2-c986fc996467",
+        "originalPrice": 50000.0
+      },
+      {
+        "name": "Cánh Gà Kiểu Nam Mỹ",
+        "shortDescription": "Gà giòn kẹp bánh biscuit mềm thơm kiểu miền Nam nước Mỹ.",
+        "detailDescription": "Trải nghiệm sự thoải mái trong từng miếng ăn với món gà kiểu Nam Mỹ – miếng gà chiên giòn kẹp trong bánh biscuit mềm mịn, đậm đà hương vị truyền thống miền Nam.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Southern-Style%20Chicken%20Biscuit.jpg?alt=media&token=a63bfb8e-36ad-4371-b194-befb1521bce3",
+        "originalPrice": 55000.0
+      },
+      {
+        "name": "Cánh Gà Teriyaki",
+        "shortDescription": "Cánh gà phủ sốt teriyaki ngọt mặn hài hòa, chuẩn vị Nhật.",
+        "detailDescription": "Thưởng thức sự kết hợp hoàn hảo của cánh gà phủ sốt teriyaki – lớp sốt đậm đà vị ngọt mặn đặc trưng, mang đến trải nghiệm ẩm thực tinh tế và cân bằng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Teriyaki%20Chicken%20Wings.jpg?alt=media&token=6934d5cf-5a2e-4383-bb96-0eae2598c804",
+        "originalPrice": 55000.0
+      },
+      {
+        "name": "Gà Phô Mai Tỏi",
+        "shortDescription": "Gà giòn áo lớp phô mai Parmesan và tỏi thơm lừng hấp dẫn.",
+        "detailDescription": "Thưởng thức vị đậm đà béo ngậy của Gà Phô Mai Tỏi. Từng miếng gà giòn rụm được phủ lớp phô mai Parmesan và tỏi thơm phức, làm say mê mọi tín đồ ẩm thực.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Garlic%20Parmesan%20Chicken.jpg?alt=media&token=9f143ea1-9c21-4a1f-b406-a29c610d8ca1",
+        "originalPrice": 50000.0
+      }
+    ]
+  },
+  {
+    "name": "Sushi",
+    "description": "Đây là mô tả mẫu cho Sushi",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/sushi_1f363.png",
+    "products": [
+      {
+        "name": "California Roll",
+        "shortDescription": "Cuộn rong biển nhân thanh cua, bơ và dưa leo, hài hòa vị mát và ngọt.",
+        "detailDescription": "Thưởng thức món California Roll cổ điển với thanh cua, bơ và dưa leo được cuộn trong lớp rong biển nori.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/California%20Roll.jpg?alt=media&token=66aa4c55-f599-43ea-a9d6-e478776f89b0",
+        "originalPrice": 50000.0
+      },
+      {
+        "name": "Spicy Tuna Roll",
+        "shortDescription": "Cá ngừ cay, dưa leo và sốt mayo đậm đà cho tín đồ vị nồng.",
+        "detailDescription": "Tăng độ nóng với Spicy Tuna Roll – sự kết hợp hấp dẫn của cá ngừ cay, dưa leo và sốt mayo cay nồng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Spicy%20Tuna%20Roll.jpg?alt=media&token=16f31ca9-616c-4654-bb60-04beeea53839",
+        "originalPrice": 62000.0
+      },
+      {
+        "name": "Nigiri Cá Hồi",
+        "shortDescription": "Cá hồi tươi đặt trên cơm sushi – đơn giản mà tinh tế.",
+        "detailDescription": "Thưởng thức sự đơn giản với món Nigiri Cá Hồi, gồm lát cá hồi tươi ngon đặt trên cơm sushi được nêm vị.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Salmon%20Nigiri.jpg?alt=media&token=357ed6a9-741f-4d0e-8e94-c94583be002e",
+        "originalPrice": 700000.0
+      },
+      {
+        "name": "Dragon Roll",
+        "shortDescription": "Cuộn lươn, bơ và dưa leo, trang trí đẹp mắt với lát bơ tươi.",
+        "detailDescription": "Thưởng thức món Dragon Roll đầy tính nghệ thuật với lươn, bơ và dưa leo bên trong, phía trên là lớp bơ tươi thái lát.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Dragon%20Roll.jpg?alt=media&token=253901d1-571b-4002-9c30-7b70a5b9f475",
+        "originalPrice": 125000.0
+      },
+      {
+        "name": "Rainbow Roll",
+        "shortDescription": "Cuộn maki với rau củ và bơ đầy màu sắc và hương vị tươi mới.",
+        "detailDescription": "Tận hưởng sự bùng nổ sắc màu và hương vị với Rainbow Roll – lớp topping đa dạng rau củ tươi và bơ phủ lên cuộn maki.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Rainbow%20Roll.jpg?alt=media&token=7c1a1e5e-8403-48bb-95b6-dbfce1999054",
+        "originalPrice": 70000.0
+      },
+      {
+        "name": "Tempura Shrimp Roll",
+        "shortDescription": "Tôm chiên giòn, bơ và dưa leo gói trong rong biển, giòn tan và ngon miệng.",
+        "detailDescription": "Thưởng thức vị giòn rụm của Tempura Shrimp Roll, gồm tôm tempura, bơ và dưa leo được cuộn trong rong biển.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Tempura%20Shrimp%20Roll.jpg?alt=media&token=71151d53-b4b3-45fc-a092-8f4be2ab372c",
+        "originalPrice": 70000.0
+      },
+      {
+        "name": "Veggie Roll",
+        "shortDescription": "Cuộn chay tươi mát với rau củ giòn ngọt hấp dẫn.",
+        "detailDescription": "Thưởng thức độ tươi mát của Veggie Roll với sự kết hợp của nhiều loại rau củ giòn ngọt – lựa chọn hoàn hảo cho người ăn chay.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Veggie%20Roll.jpg?alt=media&token=e9e4fd61-2f3c-45a3-b648-33d3ff89bac0",
+        "originalPrice": 70000.0
+      },
+      {
+        "name": "Sashimi Platter",
+        "shortDescription": "Khám phá hương vị nguyên bản từ các loại cá sống tươi ngon.",
+        "detailDescription": "Thưởng thức sự tinh khiết trong hương vị của Sashimi Platter – tuyển chọn các loại cá sống tươi ngon được thái lát mỏng đầy nghệ thuật.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Sashimi%20Platter.jpg?alt=media&token=9af63e84-19ed-4c1b-ab07-b1332b0cfaaa",
+        "originalPrice": 325000.0
+      }
+    ]
+  },
+  {
+    "name": "Thịt",
+    "description": "Đây là mô tả mẫu cho Meat",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/meat-on-bone_1f356.png",
+    "products": [
+      {
+        "name": "Sườn Nướng",
+        "shortDescription": "Thịt bò mềm, nướng thơm lừng cùng thảo mộc đậm vị.",
+        "detailDescription": "Thưởng thức vị ngon đậm đà của món Sườn Nướng – phần thịt mềm, có vân mỡ hấp dẫn được nướng chín tới cùng các loại thảo mộc và gia vị, mang đến trải nghiệm tan chảy trong miệng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Grilled%20Ribeye%20Steak.jpg?alt=media&token=e04200a4-e8f3-4c40-8f18-001139d4fc34",
+        "originalPrice": 375000.0
+      },
+      {
+        "name": "Sườn Cừu Moroccan Cay",
+        "shortDescription": "Sườn cừu ướp gia vị Ma Rốc cay nồng, nướng thơm quyến rũ.",
+        "detailDescription": "Khám phá hương vị ẩm thực Ma Rốc với món Sườn Cừu Moroccan Cay – sườn cừu mềm được ướp cùng gia vị đặc trưng và nướng chín hoàn hảo, mang đến lựa chọn đậm đà cho người yêu thịt cừu.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Spicy%20Moroccan%20Lamb%20Chops.jpg?alt=media&token=2970ec34-c9c3-484e-bd67-84ae2f843318",
+        "originalPrice": 450000.0
+      },
+      {
+        "name": "Bò BBQ Hun Khói",
+        "shortDescription": "Thịt bò hầm chậm, hun khói thơm lừng vị BBQ.",
+        "detailDescription": "Thưởng thức món Bò BBQ Hun Khói – thịt bò được nấu chậm mềm mại, tẩm ướp sốt BBQ đặc trưng và hun khói cho hương vị đậm đà chuẩn kiểu Mỹ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Smoked%20BBQ%20Brisket.jpg?alt=media&token=2f426ea4-0bad-41b3-887c-16b55239f111",
+        "originalPrice": 425000.0
+      },
+      {
+        "name": "Bò Bơ Tỏi Áp Chảo",
+        "shortDescription": "Thăn bò áp chảo sốt bơ tỏi, mềm thơm ngập vị.",
+        "detailDescription": "Thưởng thức sự tinh tế của món Bò Bơ Tỏi Áp Chảo – thăn bò áp chảo chín tới, phủ sốt bơ tỏi thơm ngậy, tạo nên bản hòa âm hương vị cho tín đồ steak.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Pan-Seared%20Garlic%20Butter%20Sirloin.jpg?alt=media&token=5c278f44-54d7-4d9f-acc7-aefbe83abf3b",
+        "originalPrice": 275000.0
+      },
+      {
+        "name": "Thăn Bò Cuộn Bacon",
+        "shortDescription": "Thịt thăn bò mềm mịn cuộn thịt xông khói hấp dẫn.",
+        "detailDescription": "Nâng tầm bữa ăn với món Thăn Bò Cuộn Bacon – phần thăn bò cao cấp được cuộn cùng thịt xông khói mặn mà, nướng chín theo ý thích để mang đến sự sang trọng và đầy cuốn hút cho người sành ăn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Bacon-Wrapped%20Filet%20Mignon.jpg?alt=media&token=0dbe5ca9-e0ec-469b-aa7a-cfa081208f68",
+        "originalPrice": 525000.0
+      },
+      {
+        "name": "Sườn Bò BBQ Hàn Quốc",
+        "shortDescription": "Sườn bò ướp sốt BBQ Hàn, nướng thơm ngậy vị ngọt mặn.",
+        "detailDescription": "Đắm chìm trong hương vị đậm đà của món Sườn Bò BBQ Hàn Quốc – sườn được ướp sốt đặc trưng và nướng chín tới, mang đến sự kết hợp tuyệt vời giữa vị ngọt dịu và mặn mà.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Korean%20BBQ%20Short%20Ribs.jpg?alt=media&token=d3a06162-0b6e-4d2f-a7bb-fc27598a1ee5",
+        "originalPrice": 275000.0
+      }
+    ]
+  },
+  {
+    "name": "Hot Dog",
+    "description": "Đây là mô tả mẫu cho Hotdog",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/hot-dog_1f32d.png",
+    "products": [
+      {
+        "name": "Hot Dog Bò",
+        "shortDescription": "Xúc xích bò truyền thống với mù tạt và hành cắt nhỏ.",
+        "detailDescription": "Thưởng thức hương vị truyền thống với món Hot Dog Bò cổ điển, gồm xúc xích bò mọng nước phủ mù tạt và hành cắt nhỏ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Classic%20Beef%20Hot%20Dog.jpg?alt=media&token=833e0dd3-d88f-493e-b442-58d2e8c17d9a",
+        "originalPrice": 70000.0
+      },
+      {
+        "name": "Hot Dog Phô Mai Cay",
+        "shortDescription": "Xúc xích bò với sốt chili, phô mai cheddar tan chảy và hành.",
+        "detailDescription": "Tận hưởng món ăn đậm đà với Hot Dog Phô Mai Cay – xúc xích bò được phủ sốt chili đậm vị, phô mai cheddar tan chảy và hành cắt nhỏ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Chili%20Cheese%20Dog.jpg?alt=media&token=f446830c-8d87-45c3-9f7f-9e48df8e241b",
+        "originalPrice": 72000.0
+      },
+      {
+        "name": "Hot Dog Rau Củ",
+        "shortDescription": "Xúc xích chay với dưa cải, mù tạt trong bánh mềm.",
+        "detailDescription": "Thưởng thức lựa chọn chay với Hot Dog Rau Củ, gồm dưa cải chua, mù tạt và xúc xích thực vật đậm đà trong bánh mì mềm.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Veggie%20Dog%20with%20Sauerkraut.jpg?alt=media&token=b2f663df-6706-4937-bc2e-942437b16006",
+        "originalPrice": 72000.0
+      },
+      {
+        "name": "Hot Dog Kiểu Chicago",
+        "shortDescription": "Xúc xích bò với mù tạt, hành, dưa chua, cà chua và dưa leo.",
+        "detailDescription": "Khám phá hương vị Chicago với món Hot Dog kiểu Chicago – xúc xích bò đi kèm mù tạt, hành, dưa ngọt, cà chua và dưa leo nguyên quả.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Chicago%20Style%20Hot%20Dog.jpg?alt=media&token=fbc6cd42-46fc-460e-ab2d-064cab9e4a85",
+        "originalPrice": 77000.0
+      },
+      {
+        "name": "Pretzel Bun Hot Dog",
+        "shortDescription": "Xúc xích bò trong bánh mì pretzel mềm thơm.",
+        "detailDescription": "Nâng tầm món hot dog với Pretzel Bun Hot Dog – xúc xích bò được đặt trong bánh mì pretzel mềm và đậm vị.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Pretzel%20Bun%20Dog.jpg?alt=media&token=06f07486-d6cb-45c6-85f1-cc85be179672",
+        "originalPrice": 75000.0
+      },
+      {
+        "name": "Hawaiian BBQ Dog",
+        "shortDescription": "Xúc xích bò với dứa và sốt BBQ mang phong cách Hawaii.",
+        "detailDescription": "Khám phá vị nhiệt đới với Hawaiian BBQ Dog – xúc xích bò kết hợp hương vị Hawaii với dứa và sốt BBQ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Hawaiian%20BBQ%20Dog.jpg?alt=media&token=008f10c7-0b88-4c60-9667-3f915139bbd9",
+        "originalPrice": 80000.0
+      },
+      {
+        "name": "Hot Dog Kimchi",
+        "shortDescription": "Xúc xích bò kết hợp cùng kimchi cay.",
+        "detailDescription": "Tăng độ cay với món Hot Dog Kimchi – sự kết hợp độc đáo giữa xúc xích bò và kimchi cay nồng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Kimchi%20Hot%20Dog.jpg?alt=media&token=53a34d9e-be28-4a81-9b31-7c98dccbca7a",
+        "originalPrice": 80000.0
+      },
+      {
+        "name": "Hot Dog Kiểu Reuben",
+        "shortDescription": "Xúc xích bò kèm thịt bò muối, dưa cải, phô mai Thụy Sĩ và sốt Thousand Island.",
+        "detailDescription": "Thưởng thức phiên bản mới lạ với Hot Dog Kiểu Reuben – xúc xích bò đi kèm thịt bò muối, dưa cải chua, phô mai Thụy Sĩ và sốt Thousand Island.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Reuben%20Style%20Hot%20Dog.jpg?alt=media&token=6afc13f3-1388-4290-a84b-e4b66914899a",
+        "originalPrice": 85000.0
+      }
+    ]
+  },
+  {
+    "name": "Đồ Uống",
+    "description": "Đây là mô tả mẫu cho Drink",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/cup-with-straw_1f964.png",
+    "products": [
+      {
+        "name": "Nước Cam Tươi",
+        "shortDescription": "Nước cam tươi mát từ những quả cam ngon nhất.",
+        "detailDescription": "Giải khát với Nước Cam Tươi – thức uống tươi mát và sảng khoái được ép từ những quả cam ngon nhất.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Fresh%20Orange%20Juice.jpg?alt=media&token=cf8baceb-ba9e-479e-8759-2eb7aed05876",
+        "originalPrice": 20000.0
+      },
+      {
+        "name": "Sinh Tố Dâu",
+        "shortDescription": "Sinh tố dâu mát lạnh với sữa chua và trái cây mọng nước.",
+        "detailDescription": "Thưởng thức Sinh Tố Dâu – sự kết hợp mát lạnh của các loại quả mọng và sữa chua cho một món uống bổ dưỡng, trái cây và sảng khoái.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Berry%20Blast%20Smoothie.jpg?alt=media&token=e5b843ad-dfda-434a-bc5f-5dc1f3ebfc19",
+        "originalPrice": 22000.0
+      },
+      {
+        "name": "Macchiato Caramel",
+        "shortDescription": "Cà phê espresso lạnh pha caramel và sữa thơm ngọt.",
+        "detailDescription": "Thưởng thức Caramel Macchiato Đá – món cà phê ngọt ngào và đầy năng lượng với espresso, siro caramel, sữa và đá.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Iced%20Caramel%20Macchiato.jpg?alt=media&token=ce379ec0-24bf-4786-8475-9305b8750f27",
+        "originalPrice": 25000.0
+      },
+      {
+        "name": "Nước Chanh Bạc Hà",
+        "shortDescription": "Nước chanh mát lạnh kết hợp bạc hà sảng khoái.",
+        "detailDescription": "Giải nhiệt với Nước Chanh Bạc Hà – thức uống mát lạnh và chua dịu, hoàn hảo cho những ngày nắng nóng.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Mint%20Lemonade.jpg?alt=media&token=02335c99-49eb-421a-978a-586eb4f1aead",
+        "originalPrice": 20000.0
+      },
+      {
+        "name": "Đá Xay Xoài",
+        "shortDescription": "Đá xay xoài mát lạnh thơm ngon đậm vị nhiệt đới.",
+        "detailDescription": "Đánh tan cái nóng với Đá Xay Xoài – món uống đậm vị xoài nhiệt đới được xay mịn sảng khoái.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Mango%20Tango%20Slush.jpg?alt=media&token=b1384665-539c-46ad-b3ca-9b6640b5e02f",
+        "originalPrice": 25000.0
+      },
+      {
+        "name": "Matcha Latte",
+        "shortDescription": "Matcha latte dịu nhẹ kết hợp cùng sữa hấp thơm mịn.",
+        "detailDescription": "Thưởng thức Matcha Latte – sự kết hợp dịu nhẹ giữa bột trà xanh và sữa hấp mang đến cảm giác thư giãn tinh tế.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Green%20Tea%20Latte.jpg?alt=media&token=d688a418-4cd2-4feb-a977-74f43657cc17",
+        "originalPrice": 22000.0
+      },
+      {
+        "name": "Nước Dừa",
+        "shortDescription": "Nước dừa tươi mát, giàu điện giải từ tự nhiên.",
+        "detailDescription": "Bổ sung nước tự nhiên với Nước Dừa – thức uống tươi mát giàu điện giải được lấy trực tiếp từ quả dừa.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Coconut%20Water.jpg?alt=media&token=49cccb7a-a991-4639-b8cd-110d177bcd63",
+        "originalPrice": 25000.0
+      },
+      {
+        "name": "Espresso Martini",
+        "shortDescription": "Cocktail cà phê sang trọng kết hợp espresso và vodka.",
+        "detailDescription": "Thưởng thức Espresso Martini – món cocktail sang trọng kết hợp espresso, vodka và rượu cà phê đậm đà.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Espresso%20Martini.jpg?alt=media&token=5b772672-e789-4141-a09e-509ea2847410",
+        "originalPrice": 20000.0
+      }
+    ]
+  },
+  {
+    "name": "Món Khác",
+    "description": "Đây là mô tả mẫu cho More",
+    "imageUrl": "https://em-content.zobj.net/source/apple/419/french-fries_1f35f.png",
+    "products": [
+      {
+        "name": "Pasta Carbonara",
+        "shortDescription": "Mì Ý Carbonara với nước sốt kem, thịt xông khói và phô mai Parmesan.",
+        "detailDescription": "Thưởng thức món Pasta Carbonara truyền thống của Ý với mì spaghetti al dente trộn cùng sốt kem béo ngậy, pancetta, phô mai Parmesan và tiêu đen.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Pasta%20Carbonara.jpg?alt=media&token=e7732efa-64a4-4f95-ba81-1a33a49becb6",
+        "originalPrice": 75000.0
+      },
+      {
+        "name": "Cà Ri Thái",
+        "shortDescription": "Cà ri đỏ Thái cay nồng với thịt gà hoặc đậu phụ và rau củ.",
+        "detailDescription": "Trải nghiệm hương vị đậm đà và thơm lừng của món Cà Ri Đỏ Thái với thịt gà hoặc đậu phụ, rau củ và nước sốt cà ri đỏ béo ngậy.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Thai%20Red%20Curry.jpg?alt=media&token=252a7b48-e636-4f8f-878b-7fd7c02cb9df",
+        "originalPrice": 77000.0
+      },
+      {
+        "name": "Pad Thái",
+        "shortDescription": "Pad Thái chay với đậu phụ, giá đỗ, đậu phộng và chanh.",
+        "detailDescription": "Thưởng thức món Pad Thái Chay đậm đà với mì xào, đậu phụ, giá đỗ, đậu phộng và lát chanh, mang đến sự cân bằng hoàn hảo giữa vị ngọt, chua và mặn.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Vegetarian%20Pad%20Thai.jpg?alt=media&token=af91cdb8-e6dd-4fbd-b7ed-804033f5c145",
+        "originalPrice": 77000.0
+      },
+      {
+        "name": "Margherita Nướng",
+        "shortDescription": "Bánh mì nướng giòn với cà chua tươi, phô mai mozzarella và húng quế.",
+        "detailDescription": "Trải nghiệm sự đơn giản tinh tế với món Margherita Flatbread – đế bánh mỏng giòn phủ cà chua tươi, phô mai mozzarella và húng quế mang hương vị chuẩn Ý.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Margherita%20Flatbread.jpg?alt=media&token=d79daa6d-a9e2-4ba8-900d-271eca183705",
+        "originalPrice": 75000.0
+      },
+      {
+        "name": "Quinoa Salad",
+        "shortDescription": "Salad quinoa với rau xanh, rau củ và nước xốt vinaigrette.",
+        "detailDescription": "Lựa chọn bổ dưỡng và đầy năng lượng với Salad Quinoa – sự kết hợp của quinoa, rau xanh, rau củ sắc màu và nước xốt vinaigrette chua nhẹ.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Quinoa%20Salad%20Bowl.jpg?alt=media&token=7a5f0160-c75d-4114-890f-0a4f43e4888c",
+        "originalPrice": 50000.0
+      },
+      {
+        "name": "Shrimp Scampi",
+        "shortDescription": "Tôm xào bơ tỏi trắng và rượu vang, ăn kèm mì Ý.",
+        "detailDescription": "Thưởng thức hương vị hấp dẫn của món Tôm Scampi với tôm tươi xào trong bơ tỏi và sốt rượu vang trắng, ăn kèm với mì Ý mềm mại.",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/project162-foodapp.appspot.com/o/Shrimp%20Scampi.jpg?alt=media&token=ca069ef6-70b4-4072-ba5a-864ccf14097c",
+        "originalPrice": 45000.0
+      }
+    ]
+  }
+]
