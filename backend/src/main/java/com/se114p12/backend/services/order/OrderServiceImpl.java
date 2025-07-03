@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
             .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
     if (cart.getCartItems().isEmpty()) {
-      throw new IllegalArgumentException("Cart is empty");
+      throw new BadRequestException("Cart is empty");
     }
 
     Order order = new Order();
@@ -185,8 +185,6 @@ public class OrderServiceImpl implements OrderService {
       // Trừ giảm giá nếu có
       BigDecimal discount = appliedPromotion.getDiscountValue();
       totalPrice = totalPrice.subtract(discount);
-      userPromotionService.markPromotionAsUsed(
-          jwtUtil.getCurrentUserId(), appliedPromotion.getId());
     }
 
     order.setTotalPrice(
@@ -200,7 +198,6 @@ public class OrderServiceImpl implements OrderService {
       sendOrderStatusNotification(order);
     }
 
-    cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
 
     updateRecommend(order);
