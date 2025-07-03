@@ -80,6 +80,7 @@ import com.example.mam.component.CircleIconButton
 import com.example.mam.component.OrderRatingDialog
 import com.example.mam.component.OuterShadowFilledButton
 import com.example.mam.component.outerShadow
+import com.example.mam.data.Constant.DELAY_TIME
 import com.example.mam.screen.management.OrderItem
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyAvaDefault
@@ -92,6 +93,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.client.OrderViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -113,15 +115,12 @@ fun OrderScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(isReviewing) {
-        viewModel.loadReview()
-    }
-    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        while(true){
             viewModel.loadOrder()
+            viewModel.loadReview()
+            delay(DELAY_TIME)
         }
-
     }
     if (isReviewing.value) {
         OrderRatingDialog(
@@ -564,6 +563,9 @@ fun OrderScreen(
                         modifier = Modifier.fillMaxWidth(0.9f)
                     )
                 }
+            }
+            item {
+                Spacer(Modifier.height(100.dp))
             }
         }
     }

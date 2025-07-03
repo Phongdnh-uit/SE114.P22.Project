@@ -384,6 +384,7 @@ fun ListPromotionScreen(
                                                     },
                                                     Toast.LENGTH_SHORT
                                                 ).show()
+                                                promoList.refresh()
                                                 isShowDialog = false
                                             }
                                         }

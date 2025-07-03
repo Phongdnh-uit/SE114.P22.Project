@@ -120,7 +120,6 @@ class SignUpViewModel(
                 return "SUCCESS"
             }
             else{
-                Log.e("SignUp", "Đăng ky thất bại với mã lỗi: ${response.errorBody()?.string()}")
                 return HandleError(response.errorBody()?.string())
             }
         } catch (e: Exception) {

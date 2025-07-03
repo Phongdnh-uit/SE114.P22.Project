@@ -81,7 +81,6 @@ class ForgetPasswordViewModel(
             Log.d("OtpViewModel", "Get metadata: ${metadata.code()}")
             val action = metadata.body()?.get(Constant.metadata.OTP_ACTION.name)?.get(0) ?: ""
             if (!metadata.isSuccessful) {
-                Log.d("OtpViewModel", "Error getting metadata: ${metadata.errorBody()?.string()}")
                 return HandleError(metadata.errorBody()?.string())
             }
             Log.d("OtpViewModel", "Metadata: $action")
@@ -96,9 +95,8 @@ class ForgetPasswordViewModel(
             Log.d("ForgetPasswordViewModel", "Send OTP response: ${respond.code()}")
             return if (respond.isSuccessful) {
                 Log.d("ForgetPasswordViewModel", "OTP sent successfully")
-                "SUCCESSFULL"
+                "SUCCESS"
             } else {
-                Log.d("ForgetPasswordViewModel", "Failed to send OTP: ${respond.errorBody()?.string()}")
                 HandleError(respond.errorBody()?.string())
             }
         } catch (e: Exception) {
@@ -117,7 +115,7 @@ class ForgetPasswordViewModel(
             Log.d("ForgetPasswordViewModel", "Change password response: ${respond.code()}")
             return if (respond.isSuccessful) {
                 Log.d("ForgetPasswordViewModel", "Password changed successfully")
-                "SUCCESSFULL"
+                "SUCCESS"
             } else {
                 Log.d("ForgetPasswordViewModel", "Failed to change password: ${respond.errorBody()?.string()}")
                 HandleError(respond.errorBody()?.string())

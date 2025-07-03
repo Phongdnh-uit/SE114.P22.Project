@@ -39,7 +39,7 @@ class ListNotificationViewModel(
     private val _selectedSortingOption = MutableStateFlow<String>(_sortingOptions.value[0])
     val selectedSortingOption = _selectedSortingOption.asStateFlow()
 
-    private val _asc = MutableStateFlow(true)
+    private val _asc = MutableStateFlow(false)
     val asc = _asc.asStateFlow()
 
     private val _searchQuery = MutableStateFlow<String>("")
@@ -57,7 +57,7 @@ class ListNotificationViewModel(
 
     fun sort(){
         val sortOption = when(_selectedSortingOption.value){
-            "Ngày" -> "created_at"
+            "Ngày" -> "createdAt"
             else -> "id"
         }
         sort.value = if (_asc.value) listOf("$sortOption,asc") else listOf("$sortOption,desc")

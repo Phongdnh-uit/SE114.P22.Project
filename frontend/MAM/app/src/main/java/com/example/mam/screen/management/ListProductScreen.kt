@@ -383,6 +383,7 @@ fun ListProductScreen(
                                                 },
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                            productList.refresh()
                                             isShowDialog = false
                                         }
                                     }

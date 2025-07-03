@@ -347,10 +347,8 @@ fun ListShipperScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-
-                                                viewModel.setSelectedSortingOption(option)
-                                                viewModel.sort()
-
+                                            viewModel.setSelectedSortingOption(option)
+                                            viewModel.sort()
                                         }
                                     )
                                 }
@@ -399,6 +397,7 @@ fun ListShipperScreen(
                                                 },
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                            shipperList.refresh()
                                             isShowDialog = false
                                         }
                                     }

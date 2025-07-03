@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 class ListOrderViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-
     private val _isProcessing = MutableStateFlow<Boolean>(false)
     private val _isPreProcessing = MutableStateFlow<Boolean>(false)
     private val _sortingOptions = MutableStateFlow<MutableList<String>>(mutableListOf(
@@ -40,7 +39,7 @@ class ListOrderViewModel(
     ))
     val sortingOptions: StateFlow<List<String>> = _sortingOptions
 
-    private val _asc = MutableStateFlow<Boolean>(true)
+    private val _asc = MutableStateFlow<Boolean>(false)
     val asc = _asc.asStateFlow()
 
     private val _orderState = MutableStateFlow(OrderRequest())
@@ -63,7 +62,7 @@ class ListOrderViewModel(
 
     fun sort(){
         val sortOption = when(_selectedSortingOption.value){
-            "Ngày đặt hàng" -> "created_at"
+            "Ngày đặt hàng" -> "createdAt"
             "Giá tiền" -> "totalPrice"
             else -> "id"
         }
@@ -92,6 +91,7 @@ class ListOrderViewModel(
     fun setOrderState(isProcessing: Boolean = false, isPreProcessing: Boolean = false) {
         _isProcessing.value = isProcessing
         _isPreProcessing.value = isPreProcessing
+        Log.d("orderlist", "${_isProcessing.value}, ${_isPreProcessing.value}")
     }
     @OptIn(ExperimentalCoroutinesApi::class)
     val orders: Flow<PagingData<OrderResponse>> = combine(
@@ -104,28 +104,20 @@ class ListOrderViewModel(
             filter = filter,
             sort = sort
         ) { page, size, s, f ->
+            val baseFilter = listOf(
+                "orderStatus", "actualDeliveryTime", "shippingAddress", "note",
+                "expectedDeliveryTime", "paymentStatus", "totalPrice", "txnRef",
+                "user.id", "user.fullname", "user.email", "user.phone",
+                "review.rate", "shipper.fullname", "shipper.phone",
+                "shipper.licensePlate", "id", "createdAt", "updatedAt"
+            ).joinToString(" or ") { "$it ~~ '*$f*'" }
+            val filter = when {
+                _isProcessing.value -> "orderStatus in ['CONFIRMED','PROCESSING'] and ($baseFilter)"
+                _isPreProcessing.value -> "orderStatus ~~ 'PENDING' and ($baseFilter)"
+                else -> "($baseFilter)"
+            }
             BaseRepository(userPreferencesRepository).orderRepository.getAllOrders(
-                filter = "actualDeliveryTime ~~ '*${f}*' " +
-                        "or shippingAddress ~~ '*${f}*' " +
-                        "or note ~~ '*${f}*' " +
-                        "or expectedDeliveryTime ~~ '*${f}*' "  +
-                        "or paymentStatus ~~ '*${f}*' " +
-                        "or totalPrice ~~ '*${f}*' " +
-                        "or txnRef ~~ '*${f}*' " +
-                        "or user.id ~~ '*${f}*' " +
-                        "or user.fullname ~~ '*${f}*' " +
-                        "or user.email ~~ '*${f}*' " +
-                        "or user.phone ~~ '*${f}*' " +
-                        "or review.rate ~~ '*${f}*' " +
-                        "or shipper.fullname ~~ '*${f}*' " +
-                        "or shipper.phone ~~ '*${f}*' " +
-                        "or shipper.licensePlate ~~ '*${f}*' " +
-                        "or id ~~ '*${f}*' " +
-                        "or createdAt ~~ '*${f}*' " +
-                        "or updatedAt ~~ '*${f}*' " +
-                        if(_isProcessing.value) "and orderStatus in ['CONFIRMED','PROCESSING'] "
-                        else if(_isPreProcessing.value) "and orderStatus : 'PENDING' "
-                        else "or orderStatus ~~ '*${f}*' ",
+                filter = filter,
                 sort = s,
                 page = page,
                 size = size

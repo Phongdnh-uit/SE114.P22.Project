@@ -39,7 +39,7 @@ class ListPromotionViewModel(
     private val _selectedSortingOption = MutableStateFlow<String>(_sortingOptions.value[0])
     val selectedSortingOption = _selectedSortingOption.asStateFlow()
 
-    private val _asc = MutableStateFlow(true)
+    private val _asc = MutableStateFlow(false)
     val asc = _asc.asStateFlow()
 
     private val _searchQuery = MutableStateFlow<String>("")

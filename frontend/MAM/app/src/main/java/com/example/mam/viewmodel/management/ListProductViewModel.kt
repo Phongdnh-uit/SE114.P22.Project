@@ -49,7 +49,7 @@ class ListProductViewModel(
     val searchHistory: StateFlow<List<String>> get() = _searchHistory
 
     private val search = MutableStateFlow<String>("")
-    private val sort = MutableStateFlow<List<String>>(listOf("id,desc"))
+    private val sort = MutableStateFlow<List<String>>(listOf("id,asc"))
     fun search(){
         search.value = _searchQuery.value
         setSearchHistory(_searchQuery.value)

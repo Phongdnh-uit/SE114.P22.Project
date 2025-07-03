@@ -393,6 +393,7 @@ fun ListCategoryScreen(
                                                 },
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                            categoryList.refresh()
                                             isShowDialog = false
                                         }
                                     }

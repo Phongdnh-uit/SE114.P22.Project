@@ -65,6 +65,7 @@ import com.example.mam.component.BasicOutlinedButton
 import com.example.mam.component.CircleIconButton
 import com.example.mam.component.ProductContainer
 import com.example.mam.component.outerShadow
+import com.example.mam.data.Constant.DELAY_TIME
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.OrangeDefault
@@ -72,6 +73,7 @@ import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.viewmodel.client.HomeScreenViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
@@ -173,7 +175,11 @@ fun HomeScreen(
         categories.refresh()
         viewmodel.loadAdditionalProduct()
         viewmodel.loadCartCount()
-        viewmodel.loadNotificationCount()
+        while (true) {
+            viewmodel.loadNotificationCount()
+            delay(DELAY_TIME) // 10s = 10,000 milliseconds
+        }
+
     }
     Box(
         modifier = modifier

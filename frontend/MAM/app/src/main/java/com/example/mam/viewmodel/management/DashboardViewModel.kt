@@ -44,18 +44,7 @@ class DashboardViewModel(
     private val _isLoadingCategory = MutableStateFlow(false)
     val isLoadingCategory: StateFlow<Boolean> = _isLoadingCategory
 
-    fun loadData() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                // Simulate network call
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
+
 
     suspend fun loadRevenueMonthlyList(year: Int, isMonthly: Boolean) {
         try {
@@ -67,7 +56,7 @@ class DashboardViewModel(
             )
             if (response.isSuccessful){
                 _revenueList.value = response.body()?.map {
-                    Point(it.key.toFloat(), it.value.toFloat())
+                    Point(it.key.toFloat(), it.value.toFloat()/1000)
                 } ?: emptyList()
             }
 

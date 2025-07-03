@@ -49,7 +49,7 @@ class OrderHistoryViewModel(
         createPagingFlow{ page, size, s, f ->
             BaseRepository(userPreferencesRepository).orderRepository.getMyOrders(
                 filter = "orderStatus ~~ '${_selectedOrderStatus.value}'",
-                sort = s,
+                sort = listOf("createdAt,desc"),
                 page = page,
                 size = size
             ).body()?.content ?: emptyList()

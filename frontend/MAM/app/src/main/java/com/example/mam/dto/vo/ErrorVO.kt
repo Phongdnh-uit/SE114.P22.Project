@@ -1,5 +1,6 @@
 package com.example.mam.dto.vo
 import com.google.gson.Gson
+import org.json.JSONObject
 
 enum class ErrorType(var message: String) {
     VALIDATION_ERROR("Validation error occurred"),
@@ -61,6 +62,6 @@ fun HandleError(errorBody: String?): String{
         }
         return "Lỗi không xác định"
     } catch (e: Exception) {
-        return "Lỗi không xác định"
+        return "Lỗi không xác định (không thể chuyển thành JSON)"
     }
 }

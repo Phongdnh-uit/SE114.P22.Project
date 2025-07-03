@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +54,7 @@ import com.example.mam.data.Constant
 import com.example.mam.dto.notification.NotificationResponse
 import com.example.mam.component.CircleIconButton
 import com.example.mam.component.outerShadow
+import com.example.mam.data.Constant.DELAY_TIME
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
@@ -64,6 +66,7 @@ import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.client.NotificationViewModel
 import com.mapbox.maps.extension.style.expressions.dsl.generated.not
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -80,7 +83,11 @@ fun NotificationScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        notifications.refresh()
+        while (true) {
+            notifications.refresh()
+            delay(DELAY_TIME) // 10s = 10,000 milliseconds
+        }
+
     }
 
         Column(
@@ -140,6 +147,12 @@ fun NotificationScreen(
                             bottomEnd = 0.dp
                         )
                     )
+                    .clip(shape = RoundedCornerShape(
+                        topStart = 50.dp,
+                        topEnd = 50.dp,
+                        bottomStart = 0.dp,
+                        bottomEnd = 0.dp
+                    ))
                     .height(300.dp)
                     .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -176,6 +189,7 @@ fun NotificationScreen(
                 notifications.apply {
                     when(val refresh = notifications.loadState.refresh) {
                         is LoadState.Loading -> {
+                            if(notifications.itemCount == 0)
                             item { CircularProgressIndicator(
                                 color = OrangeDefault,
                                 modifier = Modifier.padding(16.dp)) }

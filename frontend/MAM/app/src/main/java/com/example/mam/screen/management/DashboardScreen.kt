@@ -87,6 +87,7 @@ import co.yml.charts.ui.piechart.models.PieChartData
 import co.yml.charts.ui.piechart.utils.proportion
 import com.example.mam.component.CircleIconButton
 import com.example.mam.component.outerShadow
+import com.example.mam.data.Constant.DELAY_TIME
 import com.example.mam.ui.theme.BrownDark
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.GreyDark
@@ -96,6 +97,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Typography
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.management.DashboardViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -110,21 +112,16 @@ fun DashboardScreen(
     onPreProcessOrderClick: () -> Unit = {},
     onProcessingOrderClick: () -> Unit = {}
 ) {
-    // Your UI code here
-    // You can use viewModel to access the data and state
-    // For example:
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val isLoading = viewModel.isLoading.collectAsState()
-    val processingOrderNum = viewModel.processingOrderNum.collectAsState().value
-    val notProcessingOrderNum = viewModel.notProcessingOrderNum.collectAsState().value
     var processingCount by remember { mutableStateOf(0L) }
     var preProcessCount by remember { mutableStateOf(0L) }
     LaunchedEffect(key1 = Unit) {
-        viewModel.loadData()
-        val countStatus = viewModel.countOrderByStatus()
-        processingCount = countStatus["CONFIRMED"]?.let { countStatus["PROCESSING"]?.plus(it) } ?: 0L
-        preProcessCount = countStatus["PENDING"]?:0L
+        while (true) {
+            val countStatus = viewModel.countOrderByStatus()
+            processingCount = countStatus["CONFIRMED"]?.let { countStatus["PROCESSING"]?.plus(it) } ?: 0L
+            preProcessCount = countStatus["PENDING"]?:0L
+            delay(DELAY_TIME) // 10s = 10,000 milliseconds
+        }
+
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -471,7 +468,7 @@ fun MonthRevenueChart(
                         "theo tháng"
                     } else {
                         "theo quý"
-                    } + " (Đơn vị: triệu đồng)",
+                    } + " (Đơn vị: nghìn đồng)",
                     color = BrownDefault,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
