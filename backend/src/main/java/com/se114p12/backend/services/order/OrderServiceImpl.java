@@ -15,6 +15,7 @@ import com.se114p12.backend.entities.shipper.Shipper;
 import com.se114p12.backend.entities.variation.VariationOption;
 import com.se114p12.backend.enums.NotificationType;
 import com.se114p12.backend.enums.OrderStatus;
+import com.se114p12.backend.enums.PaymentMethod;
 import com.se114p12.backend.enums.PaymentStatus;
 import com.se114p12.backend.exceptions.BadRequestException;
 import com.se114p12.backend.exceptions.ResourceNotFoundException;
@@ -267,6 +268,10 @@ public class OrderServiceImpl implements OrderService {
 
     order.setOrderStatus(OrderStatus.COMPLETED);
     order.setActualDeliveryTime(Instant.now());
+
+    if (order.getPaymentMethod() == PaymentMethod.CASH_ON_DELIVERY) {
+      order.setPaymentStatus(PaymentStatus.COMPLETED);
+    }
 
     // Cập nhật shipper: đánh dấu là available
     if (order.getShipper() != null) {
