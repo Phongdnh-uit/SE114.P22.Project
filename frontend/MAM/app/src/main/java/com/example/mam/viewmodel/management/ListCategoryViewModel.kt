@@ -76,8 +76,8 @@ class ListCategoryViewModel(
                 filter = "name ~~ '*${f}*' " +
                         "or description ~~ '*${f}*'" +
                         "or id ~~ '*${f}*'" +
-                        "or create_at ~~ '*${f}*'" +
-                        "or update_at ~~ '*${f}*'"
+                        "or createdAt ~~ '*${f}*'" +
+                        "or updatedAt ~~ '*${f}*'"
                 ,
                 sort = s,
                 page = page,

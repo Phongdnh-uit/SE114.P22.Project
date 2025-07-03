@@ -77,8 +77,8 @@ class ListNotificationViewModel(
                 filter = "type ~~ '*${f}*' " +
                         "or title ~~ '*${f}*' " +
                         "or message ~~ '*${f}*'" +
-                        "or created_at ~~ '*${f}*'"+
-                        "or updated_at ~~ '*${f}*'"+
+                        "or createdAt ~~ '*${f}*'"+
+                        "or updatedAt ~~ '*${f}*'"+
                         "or id ~~ '*${f}*'",
                 sort = s,
                 page = page,

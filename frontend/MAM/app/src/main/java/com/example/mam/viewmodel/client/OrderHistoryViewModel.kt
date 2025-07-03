@@ -47,8 +47,8 @@ class OrderHistoryViewModel(
         _selectedOrderStatus
     ){}.flatMapLatest {
         createPagingFlow{ page, size, s, f ->
-            BaseRepository(userPreferencesRepository).orderRepository.getAllOrders(
-                filter = "orderStatus : '${_selectedOrderStatus.value}'",
+            BaseRepository(userPreferencesRepository).orderRepository.getMyOrders(
+                filter = "orderStatus ~~ '${_selectedOrderStatus.value}'",
                 sort = s,
                 page = page,
                 size = size

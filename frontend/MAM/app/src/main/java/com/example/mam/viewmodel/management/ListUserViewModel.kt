@@ -83,8 +83,8 @@ class ListUserViewModel(
                         "or phone ~~ '*${f}*'"+
                         "or email ~~ '*${f}*'"+
                         "or username ~~ '*${f}*'"+
-                        "or created_at ~~ '*${f}*'"+
-                        "or updated_at ~~ '*${f}*'"+
+                        "or createdAt ~~ '*${f}*'"+
+                        "or updatedAt ~~ '*${f}*'"+
                         "or id ~~ '*${f}*'" +
                         "and role.name : 'USER'",
                 sort = s,

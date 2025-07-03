@@ -83,8 +83,8 @@ class ListShipperViewModel(
                 filter = "fullname ~~ '*${f}*' " +
                         "or phone ~~ '*${f}*'"+
                         "or licensePlate ~~ '*${f}*'"+
-                        "or created_at ~~ '*${f}*'"+
-                        "or updated_at ~~ '*${f}*'"+
+                        "or createdAt ~~ '*${f}*'"+
+                        "or updatedAt ~~ '*${f}*'"+
                         "or id ~~ '*${f}*'",
                 sort = s,
                 page = page,

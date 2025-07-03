@@ -84,8 +84,8 @@ class ListPromotionViewModel(
                         "or startDate ~~ '*${f}*' " +
                         "or endDate ~~ '*${f}*' " +
                         "or description ~~ '*${f}*'" +
-                        "or created_at ~~ '*${f}*'"+
-                        "or updated_at ~~ '*${f}*'"+
+                        "or createdAt ~~ '*${f}*'"+
+                        "or updatedAt ~~ '*${f}*'"+
                         "or id ~~ '*${f}*'",
                 sort = s,
                 page = page,
