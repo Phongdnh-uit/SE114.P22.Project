@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -361,18 +362,7 @@ fun ListPromotionScreen(
                     }
                 }
 
-                    if (promoList.itemCount == 0) {
-                        item {
-                            Text(
-                                text = "Không có khuyến mãi nào",
-                                color = GreyDefault,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    }
-                    else {
+
                         items(promoList.itemCount) { index ->
                             val promo = promoList[index]
                             promo?.let {
@@ -407,18 +397,36 @@ fun ListPromotionScreen(
                             }
                         }
                         promoList.apply {
-                            when {
-                                loadState.append is LoadState.Loading -> {
+                            when(val refresh = promoList.loadState.refresh) {
+                                is LoadState.Loading -> {
                                     item { CircularProgressIndicator(
                                         color = OrangeDefault,
                                         modifier = Modifier.padding(16.dp)) }
                                 }
-                                loadState.append is LoadState.Error -> {
+                                is LoadState.Error -> {
                                     item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                                }
+                                is LoadState.NotLoading -> {
+                                    if (promoList.itemCount == 0) {
+                                        item {
+                                            Text(
+                                                text = "Không có mã giảm giá nào",
+                                                style = TextStyle(
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = GreyDefault
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(16.dp),
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
+
                     //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
                     item{
                         Spacer(Modifier.height(100.dp))

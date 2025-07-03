@@ -60,6 +60,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -360,18 +361,7 @@ fun ListNotificationScreen(
                         }
                     }
                 }
-                if (notiList.itemCount == 0) {
-                    item {
-                        Text(
-                            text = "Không có thông báo nào",
-                            color = GreyDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-                else {
+
                     items(notiList.itemCount) {index ->
                         val noti = notiList[index]
                         noti?.let { noti ->
@@ -384,18 +374,36 @@ fun ListNotificationScreen(
                         Spacer(Modifier.height(100.dp))
                     }
                     notiList.apply {
-                        when {
-                            loadState.append is LoadState.Loading -> {
+                        when(val refresh = notiList.loadState.refresh) {
+                            is LoadState.Loading -> {
                                 item { CircularProgressIndicator(
                                     color = OrangeDefault,
                                     modifier = Modifier.padding(16.dp)) }
                             }
-                            loadState.append is LoadState.Error -> {
+                            is LoadState.Error -> {
                                 item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                            is LoadState.NotLoading -> {
+                                if (notiList.itemCount == 0) {
+                                    item {
+                                        Text(
+                                            text = "Không có thông báo nào",
+                                            style = TextStyle(
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = GreyDefault
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-                }
+
 
             }
         }

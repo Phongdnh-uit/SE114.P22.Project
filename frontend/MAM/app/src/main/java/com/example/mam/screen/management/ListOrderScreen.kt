@@ -60,6 +60,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -362,17 +363,7 @@ fun ListOrderScreen(
                         }
                     }
                 }
-                if (orderList.itemCount == 0) {
-                    item {
-                        Text(
-                            text = "Không có đơn hàng " + if(isProcessing) "đang xử lý nào" else if(isPreProcessing) "chưa xử lý nào" else   "nào",
-                            color = GreyDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                } else {
+
                     items(orderList.itemCount) { index ->
                         val order= orderList[index]
                         order?.let {
@@ -387,14 +378,32 @@ fun ListOrderScreen(
                         Spacer(Modifier.height(100.dp))
                     }
                     orderList.apply {
-                        when {
-                            loadState.append is LoadState.Loading -> {
+                        when(val refresh = orderList.loadState.refresh) {
+                            is LoadState.Loading -> {
                                 item { CircularProgressIndicator(
                                     color = OrangeDefault,
                                     modifier = Modifier.padding(16.dp)) }
                             }
-                            loadState.append is LoadState.Error -> {
+                            is LoadState.Error -> {
                                 item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                            is LoadState.NotLoading -> {
+                                if (orderList.itemCount == 0) {
+                                    item {
+                                        Text(
+                                            text = "Không có đơn hàng " + if(isProcessing) "đang xử lý" else if(isPreProcessing) "chưa tiếp nhận" else "" +" nào",
+                                            style = TextStyle(
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = GreyDefault
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -402,7 +411,6 @@ fun ListOrderScreen(
             }
         }
     }
-}
 
 @Composable
 fun OrderItem(

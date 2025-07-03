@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -61,6 +62,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.R
 import com.example.mam.component.CircleIconButton
@@ -87,6 +90,7 @@ import com.example.mam.viewmodel.management.ListProductViewModel
 import coil.compose.AsyncImage
 import com.example.mam.dto.product.ProductResponse
 import com.example.mam.component.CustomDialog
+import com.example.mam.ui.theme.ErrorColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -357,33 +361,22 @@ fun ListProductScreen(
                     }
                 }
 
-                if (productList.itemCount == 0) {
-                    item {
-                        Text(
-                            text = "Không có sản phẩm nào",
-                            color = GreyDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-                else {
+
                     items(productList.itemCount) { index ->
                         val product = productList[index]
                         product?.let {
                             var isShowDialog by remember { mutableStateOf(false) }
-                            if (isShowDialog){
+                            if (isShowDialog) {
                                 CustomDialog(
                                     title = "Xác nhận xóa",
                                     message = "Bạn có chắc muốn xóa Sản phẩm ${product.name}",
-                                    onDismiss = {isShowDialog = false},
+                                    onDismiss = { isShowDialog = false },
                                     onConfirm = {
                                         scope.launch {
                                             val result = viewModel.deleteProduct(product.id)
                                             Toast.makeText(
                                                 context,
-                                                when(result){
+                                                when (result) {
                                                     -1 -> "Không thể kết nối Server"
                                                     1 -> "Xóa thành công"
                                                     else -> "Xóa thất bại"
@@ -404,13 +397,42 @@ fun ListProductScreen(
                             )
                         }
                     }
+                productList.apply {
+                    when(val refresh = productList.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            item { CircularProgressIndicator(
+                                color = OrangeDefault,
+                                modifier = Modifier.padding(16.dp)) }
+                        }
+                        is LoadState.Error -> {
+                            item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                        }
+                        is LoadState.NotLoading -> {
+                            if (productList.itemCount == 0) {
+                                item {
+                                    Text(
+                                        text = "Không có sản phẩm nào",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = GreyDefault
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                     //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
                     item{
                         Spacer(Modifier.height(100.dp))
                     }
                 }
             }
-        }
         IconButton(
             onClick = onAddProductClick,
             modifier = Modifier

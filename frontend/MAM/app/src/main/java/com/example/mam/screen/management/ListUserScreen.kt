@@ -59,6 +59,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -351,17 +352,7 @@ fun ListUserScreen(
                         }
                     }
                 }
-                if (userList.itemCount == 0) {
-                    item {
-                        Text(
-                            text = "Không có người dùng nào",
-                            color = GreyDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                } else {
+
                     items(userList.itemCount) { index ->
                         val user = userList[index]
                         user?.let {
@@ -373,18 +364,36 @@ fun ListUserScreen(
                         }
                     }
                     userList.apply {
-                        when {
-                            loadState.append is LoadState.Loading -> {
+                        when(val refresh = userList.loadState.refresh) {
+                            is LoadState.Loading -> {
                                 item { CircularProgressIndicator(
                                     color = OrangeDefault,
                                     modifier = Modifier.padding(16.dp)) }
                             }
-                            loadState.append is LoadState.Error -> {
+                            is LoadState.Error -> {
                                 item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                            is LoadState.NotLoading -> {
+                                if (userList.itemCount == 0) {
+                                    item {
+                                        Text(
+                                            text = "Không có tài khoản nào",
+                                            style = TextStyle(
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = GreyDefault
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-                }
+
             }
         }
 //        IconButton(

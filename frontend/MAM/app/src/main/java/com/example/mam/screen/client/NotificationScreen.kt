@@ -44,6 +44,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
@@ -55,12 +56,14 @@ import com.example.mam.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
+import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.OrangeDefault
 import com.example.mam.ui.theme.OrangeLight
 import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.client.NotificationViewModel
+import com.mapbox.maps.extension.style.expressions.dsl.generated.not
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -171,21 +174,39 @@ fun NotificationScreen(
                     }
                 }
                 notifications.apply {
-                    when{
-                        loadState.append is LoadState.Loading -> {
+                    when(val refresh = notifications.loadState.refresh) {
+                        is LoadState.Loading -> {
                             item { CircularProgressIndicator(
                                 color = OrangeDefault,
                                 modifier = Modifier.padding(16.dp)) }
                         }
-                        loadState.append is LoadState.Error -> {
+                        is LoadState.Error -> {
                             item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                        }
+                        is LoadState.NotLoading -> {
+                            if (notifications.itemCount == 0) {
+                                item {
+                                    Text(
+                                        text = "Không có thông báo nào",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = GreyDefault
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
 
-}
 
 @Composable
 fun NotificationItem(notification: NotificationResponse, viewModel: NotificationViewModel? = null) {

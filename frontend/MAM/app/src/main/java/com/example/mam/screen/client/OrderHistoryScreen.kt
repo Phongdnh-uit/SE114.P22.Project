@@ -123,8 +123,9 @@ LaunchedEffect(asc) {
             )
         }
         LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .weight(1f)
+                .fillMaxWidth()
                 .outerShadow(
                     color = GreyDark,
                     bordersRadius = 50.dp,
@@ -174,38 +175,40 @@ LaunchedEffect(asc) {
                     }
                 }
             }
-            if(orders.itemCount == 0) {
-                item {
-                    Text(
-                        text = "Không có đơn hàng nào",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = GreyDefault
-                        ),
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        textAlign = TextAlign.Center
+            items(orders.itemCount) { index ->
+                val order = orders[index]
+                order?.let {
+                    OrderHistoryItem(order,
+                        onClick = { onClick(order.id) }
                     )
                 }
             }
-            else {
-                items(orders.itemCount) { index ->
-                    val order = orders[index]
-                    order?.let {
-                        OrderHistoryItem(order,
-                            onClick = { onClick(order.id) }
-                        )
+            orders.apply {
+                when(val refresh = orders.loadState.refresh) {
+                    is LoadState.Loading -> {
+                        item { CircularProgressIndicator(
+                            color = OrangeDefault,
+                            modifier = Modifier.padding(16.dp)) }
                     }
-                }
-                orders.apply {
-                    when {
-                        loadState.append is LoadState.Loading -> {
-                            item { CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier.padding(16.dp)) }
-                        }
-                        loadState.append is LoadState.Error -> {
-                            item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                    is LoadState.Error -> {
+                        item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                    }
+                    is LoadState.NotLoading -> {
+                        if (orders.itemCount == 0) {
+                            item {
+                                Text(
+                                    text = "Không có đơn hàng nào",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = GreyDefault
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
@@ -213,6 +216,7 @@ LaunchedEffect(asc) {
         }
     }
 }
+
 
 
 @Composable
