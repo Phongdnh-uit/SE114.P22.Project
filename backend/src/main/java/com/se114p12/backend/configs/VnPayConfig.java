@@ -25,11 +25,7 @@ public class VnPayConfig {
   @Value("${vnpay.payUrl}")
   private String vnp_PayUrl;
 
-<<<<<<< HEAD
   private String vnp_ReturnUrl = AppConstant.BACKEND_URL + "/payment/return";
-=======
-    private String vnp_ReturnUrl = BACKEND_URL + "/payment/return";
->>>>>>> 385cd0302588c99f66047e44e981f71f0181c554
 
   public String getClientIp(HttpServletRequest request) {
     String ip = request.getHeader("X-Forwarded-For");
