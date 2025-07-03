@@ -1,8 +1,6 @@
 package com.se114p12.backend.neo4j.repositories;
 
-import com.se114p12.backend.neo4j.entities.OrderedRelationship;
 import com.se114p12.backend.neo4j.entities.ProductNode;
-import java.util.Collection;
 import java.util.List;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
