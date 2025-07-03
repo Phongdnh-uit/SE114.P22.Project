@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,11 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,11 +43,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.dto.order.OrderResponse
 import com.example.mam.gui.component.BasicOutlinedButton
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.OrangeDefault
@@ -75,7 +73,7 @@ onClick: (Long) -> Unit = { orderId ->  }
 
 val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
 val scrollState = rememberScrollState()
-val orders = viewModel.orders.collectAsStateWithLifecycle().value
+val orders = viewModel.orders.collectAsLazyPagingItems()
 val asc = viewModel.asc.collectAsStateWithLifecycle().value
 val orderStatus = viewModel.orderStatus.collectAsStateWithLifecycle().value
 val scope = rememberCoroutineScope()
@@ -83,7 +81,7 @@ val scope = rememberCoroutineScope()
 
 
 LaunchedEffect(asc) {
-    viewModel.loadOrders()
+    orders.refresh()
     viewModel.loadOrderStatus()
 }
     Column(
@@ -154,7 +152,7 @@ LaunchedEffect(asc) {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                var selectedStatus by remember { mutableStateOf("") }
+                val selectedStatus = viewModel.selectedOrderStatus.collectAsStateWithLifecycle().value
                 LazyRow(
                     modifier = Modifier
                         .clipToBounds()
@@ -166,12 +164,11 @@ LaunchedEffect(asc) {
                             text = status,
                             onClick = {
                                 scope.launch {
-                                    selectedStatus = if (selectedStatus == status) {
-                                        ""
+                                    if (selectedStatus == status) {
+                                        viewModel.setOrderStatus("")
                                     } else {
-                                        status
+                                        viewModel.setOrderStatus(selectedStatus)
                                     }
-                                    viewModel.loadOrders(status = selectedStatus)
                                 }
                             },
                             isEnable = selectedStatus != status,
@@ -181,7 +178,7 @@ LaunchedEffect(asc) {
                     }
                 }
             }
-            if(orders.isEmpty() ) {
+            if(orders.itemCount == 0) {
                 item {
                     Text(
                         text = "Không có đơn hàng nào",
@@ -196,20 +193,25 @@ LaunchedEffect(asc) {
                 }
             }
             else {
-                items(orders) { order ->
-                    OrderHistoryItem(order,
-                        onClick = { onClick(order.id) }
-                    )
+                items(orders.itemCount) { index ->
+                    val order = orders[index]
+                    order?.let {
+                        OrderHistoryItem(order,
+                            onClick = { onClick(order.id) }
+                        )
+                    }
                 }
-            }
-            if(isLoading) {
-                item {
-                    CircularProgressIndicator(
-                        color = OrangeDefault,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .size(40.dp)
-                    )
+                orders.apply {
+                    when {
+                        loadState.append is LoadState.Loading -> {
+                            item { CircularProgressIndicator(
+                                color = OrangeDefault,
+                                modifier = Modifier.padding(16.dp)) }
+                        }
+                        loadState.append is LoadState.Error -> {
+                            item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                        }
+                    }
                 }
             }
         }

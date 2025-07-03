@@ -73,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.example.mam.R
 import com.example.mam.dto.order.OrderResponse
@@ -80,6 +82,7 @@ import com.example.mam.dto.user.UserResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -106,16 +109,18 @@ fun ListOrderScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val orderList = viewModel.orders.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle()
+    val orderList = viewModel.orders.collectAsLazyPagingItems()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     LaunchedEffect(Unit){
-        viewModel.loadSortingOptions()
-        viewModel.loadData(isProcessing, isPreProcessing)
+        orderList.refresh() // Load the initial data
+        viewModel.setOrderState(
+            isProcessing = isProcessing,
+            isPreProcessing = isPreProcessing
+        )
     }
     Box(
         modifier = Modifier
@@ -250,7 +255,7 @@ fun ListOrderScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch {viewModel.searchOrder(isProcessing, isPreProcessing)}
+                                            viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -334,6 +339,7 @@ fun ListOrderScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             viewModel.setSelectedSortingOption(option)
+                                            viewModel.sort()
                                             sortExpanded = false
                                         }
                                     )
@@ -350,7 +356,7 @@ fun ListOrderScreen(
                             onClick = {
                                 scope.launch {
                                     viewModel.setASC()
-                                    viewModel.sortOrder(isProcessing, isPreProcessing)
+                                    viewModel.sort()
                                 }
                             },
                             modifier = Modifier.size(30.dp)
@@ -359,48 +365,42 @@ fun ListOrderScreen(
                         }
                     }
                 }
-                if (mockData != null) {
-                    items(mockData) { order ->
-                        OrderItem(
-                            order = order,
-                            onEditClick = onEditOrderClick,
-                            viewModel = viewModel,
+                if (orderList.itemCount == 0) {
+                    item {
+                        Text(
+                            text = "Không có đơn hàng " + if(isProcessing) "đang xử lý nào" else if(isPreProcessing) "chưa xử lý nào" else   "nào",
+                            color = GreyDefault,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
-                }
-                else {
-                    if (isLoading.value) {
-                        item {
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
+                } else {
+                    items(orderList.itemCount) { index ->
+                        val order= orderList[index]
+                        order?.let {
+                            OrderItem(
+                                order = order,
+                                onEditClick = onEditOrderClick,
+                                viewModel = viewModel
                             )
                         }
-                    } else
-                        if (orderList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Không có đơn hàng " + if(isProcessing) "đang xử lý nào" else if(isPreProcessing) "chưa xử lý nào" else   "nào",
-                                    color = GreyDefault,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
+                    }
+                    item{
+                        Spacer(Modifier.height(100.dp))
+                    }
+                    orderList.apply {
+                        when {
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
                             }
-                        } else {
-                            items(orderList) { order ->
-                                OrderItem(
-                                    order = order,
-                                    onEditClick = onEditOrderClick,
-                                    viewModel = viewModel
-                                )
-                            }
-                            item{
-                                Spacer(Modifier.height(100.dp))
+                            loadState.append is LoadState.Error -> {
+                                item { Text("Lỗi khi tải thêm", color = ErrorColor) }
                             }
                         }
+                    }
                 }
             }
         }

@@ -77,12 +77,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.dto.promotion.PromotionRequest
 import com.example.mam.dto.promotion.PromotionResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -109,15 +112,13 @@ fun ListPromotionScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val promoList = viewModel.promoList.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle()
+    val promoList = viewModel.promotions.collectAsLazyPagingItems()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     LaunchedEffect(Unit){
-        viewModel.loadSortingOptions()
-        viewModel.loadData()
+        promoList.refresh()
     }
     Box(
         modifier = Modifier
@@ -252,7 +253,7 @@ fun ListPromotionScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchPromotion() }
+                                            viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -337,10 +338,10 @@ fun ListPromotionScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-                                            scope.launch {
+
                                                 viewModel.setSelectedSortingOption(option)
-                                                viewModel.sortPromotion()
-                                            }
+                                                viewModel.sort()
+
                                         }
                                     )
                                 }
@@ -354,10 +355,8 @@ fun ListPromotionScreen(
                                 disabledContainerColor = WhiteDefault
                             ),
                             onClick = {
-                                scope.launch {
                                     viewModel.setASC()
-                                    viewModel.sortPromotion()
-                                }
+                                    viewModel.sort()
                             },
                             modifier = Modifier.size(30.dp)
                         ) {
@@ -365,51 +364,34 @@ fun ListPromotionScreen(
                         }
                     }
                 }
-                if (mockData != null) {
-                    items(mockData) { promo ->
-                        PromotionItem(
-                            promo = promo,
-                            onDeleteClick = {}
-                        )
-                    }
-                }
-                else{
-                    if (isLoading.value) {
+
+                    if (promoList.itemCount == 0) {
                         item {
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
+                            Text(
+                                text = "Không có khuyến mãi nào",
+                                color = GreyDefault,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(16.dp)
                             )
                         }
                     }
-                    else
-                        if (promoList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Không có khuyến mãi nào",
-                                    color = GreyDefault,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                        }
-                        else {
-                            items(promoList) { promo ->
+                    else {
+                        items(promoList.itemCount) { index ->
+                            val promo = promoList[index]
+                            promo?.let {
                                 var isShowDialog by remember { mutableStateOf(false) }
-                                if (isShowDialog){
+                                if (isShowDialog) {
                                     CustomDialog(
                                         title = "Xác nhận xóa",
                                         message = "Bạn có chắc muốn xóa Mã khuyến mãi ${promo.code}",
-                                        onDismiss = {isShowDialog = false},
+                                        onDismiss = { isShowDialog = false },
                                         onConfirm = {
                                             scope.launch {
                                                 val result = viewModel.deletePromo(promo.id)
                                                 Toast.makeText(
                                                     context,
-                                                    when(result){
+                                                    when (result) {
                                                         -1 -> "Không thể kết nối Server"
                                                         1 -> "Xóa thành công"
                                                         else -> "Xóa thất bại"
@@ -427,14 +409,26 @@ fun ListPromotionScreen(
                                         isShowDialog = true
                                     })
                             }
-                            //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
-                            item{
-                                Spacer(Modifier.height(100.dp))
+                        }
+                        promoList.apply {
+                            when {
+                                loadState.append is LoadState.Loading -> {
+                                    item { CircularProgressIndicator(
+                                        color = OrangeDefault,
+                                        modifier = Modifier.padding(16.dp)) }
+                                }
+                                loadState.append is LoadState.Error -> {
+                                    item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                                }
                             }
                         }
+                    }
+                    //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
+                    item{
+                        Spacer(Modifier.height(100.dp))
+                    }
                 }
             }
-        }
         IconButton(
             onClick = onAddClick,
             modifier = Modifier

@@ -48,7 +48,7 @@ class ListCategoryViewModel(
     val searchHistory: StateFlow<List<String>> get() = _searchHistory
 
     private val search = MutableStateFlow<String>("")
-    private val sort = MutableStateFlow<List<String>>(listOf("id,desc"))
+    private val sort = MutableStateFlow<List<String>>(listOf("id,asc"))
     fun search(){
         search.value = _searchQuery.value
         setSearchHistory(_searchQuery.value)
@@ -74,7 +74,11 @@ class ListCategoryViewModel(
         ) { page, size, s, f ->
             BaseRepository(userPreferencesRepository).productCategoryRepository.getCategories(
                 filter = "name ~~ '*${f}*' " +
-                        "or description ~~ '*${f}*'",
+                        "or description ~~ '*${f}*'" +
+                        "or id ~~ '*${f}*'" +
+                        "or create_at ~~ '*${f}*'" +
+                        "or update_at ~~ '*${f}*'"
+                ,
                 sort = s,
                 page = page,
                 size = size

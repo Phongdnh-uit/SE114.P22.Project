@@ -73,10 +73,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.dto.notification.NotificationResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -101,15 +104,14 @@ fun ListNotificationScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val notiList = viewModel.notiList.collectAsStateWithLifecycle().value
+    val notiList = viewModel.notifications.collectAsLazyPagingItems()
     val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
-    val desc = viewModel.desc.collectAsStateWithLifecycle().value
+    val asc = viewModel.asc.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
-        viewModel.loadSortingOptions()
-        viewModel.loadData()
+        notiList.refresh()
     }
     Box(
         modifier = Modifier
@@ -244,7 +246,7 @@ fun ListNotificationScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchNotification() }
+                                            viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -329,10 +331,9 @@ fun ListNotificationScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-                                            scope.launch {
-                                                viewModel.setSelectedSortingOption(option)
-                                                viewModel.sortNotification()
-                                            }
+                                            viewModel.setSelectedSortingOption(option)
+                                            viewModel.sort()
+
                                         }
                                     )
                                 }
@@ -347,60 +348,56 @@ fun ListNotificationScreen(
                             ),
                             onClick = {
                                 scope.launch {
-                                    viewModel.setDESC()
-                                    viewModel.sortNotification()
+                                    viewModel.setASC()
+                                    viewModel.sort()
                                 }
                             },
                             modifier = Modifier.size(30.dp)
                         ) {
                             Icon(
-                                if (desc) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                                if (asc) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward ,
                                 contentDescription = "DESC/ASC"
                             )
                         }
                     }
                 }
-                if (mockData != null) {
-                    items(mockData) { noti ->
-                        NotificationItem(
-                            notification = noti,
+                if (notiList.itemCount == 0) {
+                    item {
+                        Text(
+                            text = "Không có thông báo nào",
+                            color = GreyDefault,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
-                else{
-                    if (isLoading) {
-                        item {
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
+                else {
+                    items(notiList.itemCount) {index ->
+                        val noti = notiList[index]
+                        noti?.let { noti ->
+                            NotificationItem(
+                                notification = noti,
                             )
                         }
                     }
-                    else
-                        if (notiList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Không có thông báo nào",
-                                    color = GreyDefault,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
+                    item{
+                        Spacer(Modifier.height(100.dp))
+                    }
+                    notiList.apply {
+                        when {
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
+                            }
+                            loadState.append is LoadState.Error -> {
+                                item { Text("Lỗi khi tải thêm", color = ErrorColor) }
                             }
                         }
-                        else {
-                            items(notiList) { noti ->
-                                NotificationItem(
-                                    notification = noti,
-                                )
-                            }
-                            item{
-                                Spacer(Modifier.height(100.dp))
-                            }
-                        }
+                    }
                 }
+
             }
         }
         IconButton(

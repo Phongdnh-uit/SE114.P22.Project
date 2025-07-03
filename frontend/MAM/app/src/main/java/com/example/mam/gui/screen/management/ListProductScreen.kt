@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.R
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.outerShadow
@@ -107,8 +108,7 @@ fun ListProductScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val productList = viewModel.product.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle()
+    val productList = viewModel.products.collectAsLazyPagingItems()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
@@ -116,7 +116,7 @@ fun ListProductScreen(
     val isDeleting = viewModel.isDeleting.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit){
-        viewModel.loadData()
+        productList.refresh()
     }
     Box(
         modifier = Modifier
@@ -251,7 +251,7 @@ fun ListProductScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchProduct() }
+                                           viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -350,10 +350,10 @@ fun ListProductScreen(
                                 disabledContainerColor = WhiteDefault
                             ),
                             onClick = {
-                                scope.launch {
+
                                     viewModel.setASC()
-                                    viewModel.sortProduct()
-                                }
+                                    viewModel.sort()
+
                             },
                             modifier = Modifier.size(30.dp)
                         ) {
@@ -362,85 +362,57 @@ fun ListProductScreen(
                     }
                 }
 
-                if (mockData != null) {
-                    items(mockData) { product ->
-                        ProductItem(
-                            product = product,
-                            onProductClick = onProductClick,
-                            onEditProductClick = onEditProductClick,
-                            onDeleteProductClick = {  },
+                if (productList.itemCount == 0) {
+                    item {
+                        Text(
+                            text = "Không có sản phẩm nào",
+                            color = GreyDefault,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
-                else{
-                    if (isLoading.value) {
-                        item {
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
+                else {
+                    items(productList.itemCount) { index ->
+                        val product = productList[index]
+                        product?.let {
+                            var isShowDialog by remember { mutableStateOf(false) }
+                            if (isShowDialog){
+                                CustomDialog(
+                                    title = "Xác nhận xóa",
+                                    message = "Bạn có chắc muốn xóa Sản phẩm ${product.name}",
+                                    onDismiss = {isShowDialog = false},
+                                    onConfirm = {
+                                        scope.launch {
+                                            val result = viewModel.deleteProduct(product.id)
+                                            Toast.makeText(
+                                                context,
+                                                when(result){
+                                                    -1 -> "Không thể kết nối Server"
+                                                    1 -> "Xóa thành công"
+                                                    else -> "Xóa thất bại"
+                                                },
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            isShowDialog = false
+                                        }
+                                    }
+
+                                )
+                            }
+                            ProductItem(
+                                product = product,
+                                onProductClick = onProductClick,
+                                onEditProductClick = onEditProductClick,
+                                onDeleteProductClick = { isShowDialog = true },
                             )
                         }
                     }
-                    else
-                        if (productList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Không có sản phẩm nào",
-                                    color = GreyDefault,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                        }
-                        else {
-                            items(productList) { product ->
-                                var isShowDialog by remember { mutableStateOf(false) }
-                                if (isShowDialog){
-                                    CustomDialog(
-                                        title = "Xác nhận xóa",
-                                        message = "Bạn có chắc muốn xóa Sản phẩm ${product.name}",
-                                        onDismiss = {isShowDialog = false},
-                                        onConfirm = {
-                                            scope.launch {
-                                                val result = viewModel.deleteProduct(product.id)
-                                                Toast.makeText(
-                                                    context,
-                                                    when(result){
-                                                        -1 -> "Không thể kết nối Server"
-                                                        1 -> "Xóa thành công"
-                                                        else -> "Xóa thất bại"
-                                                    },
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                                isShowDialog = false
-                                            }
-                                        }
-
-                                    )
-                                }
-                                if (isDeleting)
-                                    CircularProgressIndicator(
-                                        color = OrangeDefault,
-                                        modifier = Modifier
-                                            .padding(16.dp)
-                                            .size(40.dp)
-                                    )
-                                else
-                                    ProductItem(
-                                        product = product,
-                                        onProductClick = onProductClick,
-                                        onEditProductClick = onEditProductClick,
-                                        onDeleteProductClick = { isShowDialog = true },
-                                    )
-                            }
-                            //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
-                            item{
-                                Spacer(Modifier.height(100.dp))
-                            }
-                        }
+                    //Them dong nay vao cuoi cac list (nhớ là else phải có ngoặc nhọn)
+                    item{
+                        Spacer(Modifier.height(100.dp))
+                    }
                 }
             }
         }

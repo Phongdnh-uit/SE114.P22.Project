@@ -75,6 +75,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.mam.R
@@ -84,6 +86,7 @@ import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -106,15 +109,14 @@ fun ListUserScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val userList = viewModel.user.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle()
+    val userList = viewModel.users.collectAsLazyPagingItems()
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
      LaunchedEffect(Unit) {
-         viewModel.loadData()
+         userList.refresh()
      }
     Box(
         modifier = Modifier
@@ -249,7 +251,7 @@ fun ListUserScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchUser() }
+                                            viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -333,10 +335,10 @@ fun ListUserScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-                                            scope.launch {
+
                                                 viewModel.setSelectedSortingOption(option)
-                                                viewModel.sortUser()
-                                            }
+                                                viewModel.sort()
+
                                         }
                                     )
                                 }
@@ -350,10 +352,8 @@ fun ListUserScreen(
                                 disabledContainerColor = WhiteDefault
                             ),
                             onClick = {
-                                scope.launch {
                                     viewModel.setASC()
-                                    viewModel.sortUser()
-                                }
+                                    viewModel.sort()
                             },
                             modifier = Modifier.size(30.dp)
                         ) {
@@ -361,32 +361,7 @@ fun ListUserScreen(
                         }
                     }
                 }
-                userList.let {
-                    items(userList) { user ->
-                        var isShowDialog by remember { mutableStateOf(false) }
-                        UserItem(
-                            user = user,
-                            onUserClick = {
-                                onUserClick(user.id)
-                            },
-                            onEditUserClick = onEditUserClick
-                        )
-                    }
-                }
-                item{
-                    Spacer(Modifier.height(100.dp))
-                }
-                if (isLoading.value) {
-                    item {
-                        CircularProgressIndicator(
-                            color = OrangeDefault,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(40.dp)
-                        )
-                    }
-                }
-                else if (userList.isEmpty()) {
+                if (userList.itemCount == 0) {
                     item {
                         Text(
                             text = "Không có người dùng nào",
@@ -395,6 +370,29 @@ fun ListUserScreen(
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp)
                         )
+                    }
+                } else {
+                    items(userList.itemCount) { index ->
+                        val user = userList[index]
+                        user?.let {
+                            UserItem(
+                                user = it,
+                                onUserClick = onUserClick,
+                                onEditUserClick = onEditUserClick
+                            )
+                        }
+                    }
+                    userList.apply {
+                        when {
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
+                            }
+                            loadState.append is LoadState.Error -> {
+                                item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                        }
                     }
                 }
             }

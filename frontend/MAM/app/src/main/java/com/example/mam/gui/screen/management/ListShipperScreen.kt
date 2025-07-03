@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -81,11 +82,15 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.mam.dto.shipper.ShipperResponse
 import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
+import com.example.mam.ui.theme.GreenDefault
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -110,8 +115,7 @@ fun ListShipperScreen(
     val sortOptions = viewModel.sortingOptions.collectAsStateWithLifecycle().value
     val selectedSortingOption = viewModel.selectedSortingOption.collectAsStateWithLifecycle().value
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
-    val shipperList = viewModel.shippers.collectAsStateWithLifecycle().value
-    val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
+    val shipperList = viewModel.shippers.collectAsLazyPagingItems()
     val isDeleting = viewModel.isDeleting.collectAsStateWithLifecycle().value
     val searchHistory = viewModel.searchHistory.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
@@ -119,7 +123,7 @@ fun ListShipperScreen(
     val asc = viewModel.asc.collectAsStateWithLifecycle().value
 
     LaunchedEffect(key1 = isDeleting) {
-        viewModel.loadData()
+        shipperList.refresh()
     }
 
     Box(
@@ -255,7 +259,7 @@ fun ListShipperScreen(
                                             disabledContainerColor = WhiteDefault
                                         ),
                                         onClick = {
-                                            scope.launch { viewModel.searchShipper() }
+                                            viewModel.search()
                                             focusManager.clearFocus()
                                         }) {
                                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -346,10 +350,10 @@ fun ListShipperScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-                                            scope.launch {
+
                                                 viewModel.setSelectedSortingOption(option)
-                                                viewModel.sortShipper()
-                                            }
+                                                viewModel.sort()
+
                                         }
                                     )
                                 }
@@ -363,10 +367,9 @@ fun ListShipperScreen(
                                 disabledContainerColor = WhiteDefault
                             ),
                             onClick = {
-                                scope.launch {
                                     viewModel.setASC()
-                                    viewModel.sortShipper()
-                                }
+                                    viewModel.sort()
+
                             },
                             modifier = Modifier.size(30.dp)
                         ) {
@@ -377,17 +380,7 @@ fun ListShipperScreen(
                         }
                     }
                 }
-                if (isLoading) {
-                    item {
-                        CircularProgressIndicator(
-                            color = OrangeDefault,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(40.dp)
-                        )
-                    }
-                }
-                else if (shipperList.isEmpty()) {
+                if (shipperList.itemCount == 0) {
                     item {
                         Text(
                             text = "Không có Shipper nào",
@@ -399,50 +392,57 @@ fun ListShipperScreen(
                     }
                 }
                 else {
-                    items(shipperList) { shipper ->
-                        var isShowDialog by remember { mutableStateOf(false) }
-                        if (isShowDialog){
-                            CustomDialog(
-                                title = "Xác nhận xóa",
-                                message = "Bạn có chắc muốn xóa Shipper ${shipper.fullname}",
-                                onDismiss = {isShowDialog = false},
-                                onConfirm = {
-                                    scope.launch {
-                                        val result = viewModel.deleteShipper(shipper.id)
-                                        Toast.makeText(
-                                            context,
-                                            when(result){
-                                                -1 -> "Không thể kết nối Server"
-                                                1 -> "Xóa thành công"
-                                                else -> "Xóa thất bại"
-                                            },
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        isShowDialog = false
+                    items(shipperList.itemCount) { id ->
+                        val shipper = shipperList[id]
+                        shipper?.let {
+                            var isShowDialog by remember { mutableStateOf(false) }
+                            if (isShowDialog) {
+                                CustomDialog(
+                                    title = "Xác nhận xóa",
+                                    message = "Bạn có chắc muốn xóa Shipper ${shipper.fullname}",
+                                    onDismiss = { isShowDialog = false },
+                                    onConfirm = {
+                                        scope.launch {
+                                            val result = viewModel.deleteShipper(shipper.id)
+                                            Toast.makeText(
+                                                context,
+                                                when (result) {
+                                                    -1 -> "Không thể kết nối Server"
+                                                    1 -> "Xóa thành công"
+                                                    else -> "Xóa thất bại"
+                                                },
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            isShowDialog = false
+                                        }
                                     }
+                                )
+                            }
+                            ShipperItem(
+                                shipper = shipper,
+                                onClick = onShipperClick,
+                                onEditClick = onEditShipperClick,
+                                onDeleteClick = {
+                                    isShowDialog = true
                                 }
                             )
                         }
-                        if (isDeleting)
-                            CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
-                            )
-                        else
-                        ShipperItem(
-                            shipper = shipper,
-                            onClick = onShipperClick,
-                            onEditClick = onEditShipperClick,
-                            onDeleteClick = {
-                                isShowDialog = true
+                    }
+                    shipperList.apply {
+                        when {
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
                             }
-                        )
+                            loadState.append is LoadState.Error -> {
+                                item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                        }
                     }
-                    item {
-                        Spacer(Modifier.height(100.dp))
-                    }
+                }
+                item {
+                    Spacer(Modifier.height(100.dp))
                 }
             }
         }
@@ -516,6 +516,7 @@ fun ListShipperScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+                    Icon(Icons.Default.Circle, contentDescription = "Status", tint = if (shipper.isAvailable) GreenDefault else GreyDark)
                     IconButton(onClick = { onEditClick(shipper.id) }) {
                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownDefault)
                     }
@@ -577,33 +578,3 @@ fun ListShipperScreen(
             }
         }
     }
-
-
-//@Preview
-//@Composable
-//fun ShipperItemPreview() {
-//    ShipperItem(
-//        shipper = Shipper(
-//            name = "Nguyễn Văn A",
-//            phoneNumber = "0123456789",
-//            licensePlate = "29A-123.45"
-//        ),
-//        onClick = {},
-//        onEditClick = {},
-//        onDeleteClick = {}
-//    )
-//}
-//
-//@Preview
-//@Composable
-//fun ShipperScreenPreview() {
-//    ListShipperScreen(
-//        viewModel = viewModel(factory = ListShipperViewModel.Factory),
-//        onBackClick = {},
-//        onShipperClick = {},
-//        onAddShipperClick = {},
-//        onEditShipperClick = {},
-//        mockData = listOf(
-//        )
-//    )
-//}

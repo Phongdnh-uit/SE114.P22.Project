@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.example.mam.dto.product.CategoryResponse
@@ -87,6 +88,7 @@ import com.example.mam.gui.component.CircleIconButton
 import com.example.mam.gui.component.CustomDialog
 import com.example.mam.gui.component.outerShadow
 import com.example.mam.ui.theme.BrownDefault
+import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
 import com.example.mam.ui.theme.GreyDefault
 import com.example.mam.ui.theme.GreyLight
@@ -368,7 +370,19 @@ fun ListCategoryScreen(
                         }
                     }
                 }
-                categoryList.let {
+
+                if (categoryList.itemCount == 0) {
+                    item {
+                        Text(
+                            text = "Không có danh mục nào",
+                            color = GreyDefault,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+                else {
                     items(categoryList.itemCount) { index ->
                         val category = categoryList[index]
                         category?.let {
@@ -396,37 +410,30 @@ fun ListCategoryScreen(
 
                                 )
                             }
-                            if (isDeleting)
-                                CircularProgressIndicator(
-                                    color = OrangeDefault,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .size(40.dp)
-                                )
-                            else
-                                CategoryItem(
-                                    category = category,
-                                    onEditClick = onEditCategoryClick,
-                                    onDeleteClick = {
-                                        isShowDialog = true
-                                        Log.d(
-                                            "Category",
-                                            "${category.id}, ${category.createdAt}, ${category.updatedAt}, ${category.imageUrl}"
-                                        )
-                                    }
-                                )
+                            CategoryItem(
+                                category = category,
+                                onEditClick = onEditCategoryClick,
+                                onDeleteClick = {
+                                    isShowDialog = true
+                                    Log.d(
+                                        "Category",
+                                        "${category.id}, ${category.createdAt}, ${category.updatedAt}, ${category.imageUrl}"
+                                    )
+                                }
+                            )
                         }
                     }
-                }
-                if (categoryList.itemCount == 0) {
-                    item {
-                        Text(
-                            text = "Không có danh mục nào",
-                            color = GreyDefault,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                    categoryList.apply {
+                        when {
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
+                            }
+                            loadState.append is LoadState.Error -> {
+                                item { Text("Lỗi khi tải thêm", color = ErrorColor) }
+                            }
+                        }
                     }
                 }
                 item{

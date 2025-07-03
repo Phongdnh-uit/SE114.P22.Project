@@ -130,11 +130,6 @@ fun MainNavHost(
             ) { backStackEntry ->
             val allParams = uri?.queryParameterNames?.joinToString(", ") { "$it=${uri.getQueryParameter(it)}" } ?: "No parameters"
             val keys = backStackEntry.savedStateHandle.keys()
-            Column {
-                Text(text = "🔑 Keys: ${keys.joinToString(", ")}")
-                Text(text = "🔗 URI: ${uri?.toString() ?: "null"}")
-                Text(text = "📦 Parameters:\n$allParams")
-            }
             PaymentResultScreen(
                 onBackHome = {
                     navController.navigate(route = HomeScreen.HomeSreen.name) {
@@ -461,7 +456,10 @@ fun MainNavHost(
             ){ backStackEntry ->
                 val viewModel: OrderViewModel = viewModel(backStackEntry, factory = OrderViewModel.Factory)
                 OrderScreen(
-                    onBackClicked = {navController.popBackStack()},
+                    onBackClicked = {
+                        navController.navigate(route = HomeScreen.HomeSreen.name) {
+                        popUpTo("Home") { inclusive = true }
+                    }},
                     viewModel = viewModel
                 )
             }

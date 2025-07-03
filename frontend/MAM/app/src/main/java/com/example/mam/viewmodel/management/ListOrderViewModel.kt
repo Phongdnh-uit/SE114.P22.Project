@@ -7,27 +7,32 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
+import com.example.mam.dto.notification.NotificationResponse
 import com.example.mam.dto.order.OrderRequest
 import com.example.mam.dto.order.OrderResponse
 import com.example.mam.dto.review.ReviewResponse
 import com.example.mam.dto.user.UserResponse
+import com.example.mam.repository.paging.createPagingFlow
 import com.example.mam.repository.retrofit.BaseRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class ListOrderViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _orders = MutableStateFlow<MutableList<OrderResponse>>(mutableListOf())
-    val orders: StateFlow<List<OrderResponse>> = _orders
-
+    private val _isProcessing = MutableStateFlow<Boolean>(false)
+    private val _isPreProcessing = MutableStateFlow<Boolean>(false)
     private val _sortingOptions = MutableStateFlow<MutableList<String>>(mutableListOf(
         "Tất cả",
         "Ngày đặt hàng",
@@ -49,8 +54,26 @@ class ListOrderViewModel(
 
     private val _searchHistory = MutableStateFlow<List<String>>(mutableListOf())
     val searchHistory: StateFlow<List<String>> get() = _searchHistory
+    private val search = MutableStateFlow<String>("")
+    private val sort = MutableStateFlow<List<String>>(listOf("id,desc"))
+    fun search(){
+        search.value = _searchQuery.value
+        setSearchHistory(_searchQuery.value)
+    }
 
-    //update search history if search query is not blank and not in history
+    fun sort(){
+        val sortOption = when(_selectedSortingOption.value){
+            "Ngày đặt hàng" -> "created_at"
+            "Giá tiền" -> "totalPrice"
+            else -> "id"
+        }
+        sort.value = if (_asc.value) listOf("$sortOption,asc") else listOf("$sortOption,desc")
+    }
+
+    fun setSelectedSortingOption(option: String) {
+        _selectedSortingOption.value = option
+    }
+
     fun setSearchHistory(query: String) {
         if (query.isNotBlank() && !_searchHistory.value.contains(query)) {
             val updatedHistory = _searchHistory.value.toMutableList().apply { add(query) }
@@ -62,100 +85,53 @@ class ListOrderViewModel(
         _searchQuery.value = query
     }
 
-    suspend fun searchOrder(isProcessing: Boolean, isUnProcessing: Boolean) {
-        _isLoading.value = true
-        var currentPage = 0
-        val allOrders = mutableListOf<OrderResponse>()
-        val filter = if (isUnProcessing) "orderStatus ~ '*PENDING*'"
-        else if (isProcessing) "orderStatus ~ '*CONFIRMED*' or orderStatus ~ '*PROCESSING*'"
-        else ""
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .orderRepository.getAllOrders(filter =
-                    "actualDeliveryTime ~~ '*${_searchQuery.value}*' " +
-                    "or shippingAddress ~~ '*${_searchQuery.value}*' " +
-                    "or note ~~ '*${_searchQuery.value}*' " +
-                    "or expectedDeliveryTime ~~ '*${_searchQuery.value}*' " +
-                    "or orderStatus ~~ '*${_searchQuery.value}*' " +
-                    "or orderDetails ~~ '*${_searchQuery.value}*'" + if(filter.isNotEmpty()) "or ${filter}" else "", page = currentPage)
-                if (response.isSuccessful) {
-                    setSearchHistory(_searchQuery.value)
-                    val page = response.body()
-                    if (page != null){
-                        allOrders.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        _orders.value = allOrders.toMutableList()
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-
-            _orders.value = allOrders.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-            Log.e("ListOrderViewModel", "Error searching orders: ${e.message}")
-            e.printStackTrace()
-        } finally {
-            _isLoading.value = false
-        }
+    fun setASC(){
+        _asc.value = !_asc.value
     }
 
-    suspend fun sortOrder(isProcessing: Boolean, isUnProcessing: Boolean){
-        _isLoading.value = true
-        var currentPage = 0
-        val allOrders = mutableListOf<OrderResponse>()
-        val sortOption = when(_selectedSortingOption.value){
-            "Ngày đặt hàng" -> "actualDeliveryTime"
-            "Giá tiền" -> "totalPrice"
-            else -> "id"
-        }
-        val filter = if (isUnProcessing) "orderStatus ~ '*PENDING*'"
-        else if (isProcessing) "orderStatus ~ '*CONFIRMED*' or orderStatus ~ '*PROCESSING*'"
-        else ""
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .orderRepository.getAllOrders(
-                        filter = filter,
-                        page = currentPage,
-                        sort = listOf("${sortOption}," + if (_asc.value) "asc" else "desc"))
-
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        allOrders.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        _orders.value = allOrders.toMutableList()
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-
-            _orders.value = allOrders.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-            Log.e("ListOrderViewModel", "Error sorting orders: ${e.message}")
-            e.printStackTrace()
-        } finally {
-            _isLoading.value = false
-        }
+    fun setOrderState(isProcessing: Boolean = false, isPreProcessing: Boolean = false) {
+        _isProcessing.value = isProcessing
+        _isPreProcessing.value = isPreProcessing
     }
-
-
-    fun setSelectedSortingOption(option: String) {
-        _selectedSortingOption.value = option
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val orders: Flow<PagingData<OrderResponse>> = combine(
+        search,
+        sort
+    ) { filter, sort ->
+        Pair(filter, sort)
+    }.flatMapLatest { (filter, sort) ->
+        createPagingFlow(
+            filter = filter,
+            sort = sort
+        ) { page, size, s, f ->
+            BaseRepository(userPreferencesRepository).orderRepository.getAllOrders(
+                filter = "actualDeliveryTime ~~ '*${f}*' " +
+                        "or shippingAddress ~~ '*${f}*' " +
+                        "or note ~~ '*${f}*' " +
+                        "or expectedDeliveryTime ~~ '*${f}*' "  +
+                        "or paymentStatus ~~ '*${f}*' " +
+                        "or totalPrice ~~ '*${f}*' " +
+                        "or txnRef ~~ '*${f}*' " +
+                        "or user.id ~~ '*${f}*' " +
+                        "or user.fullname ~~ '*${f}*' " +
+                        "or user.email ~~ '*${f}*' " +
+                        "or user.phone ~~ '*${f}*' " +
+                        "or review.rate ~~ '*${f}*' " +
+                        "or shipper.fullname ~~ '*${f}*' " +
+                        "or shipper.phone ~~ '*${f}*' " +
+                        "or shipper.licensePlate ~~ '*${f}*' " +
+                        "or id ~~ '*${f}*' " +
+                        "or createdAt ~~ '*${f}*' " +
+                        "or updatedAt ~~ '*${f}*' " +
+                        if(_isProcessing.value) "and orderStatus in ['CONFIRMED','PROCESSING'] "
+                        else if(_isPreProcessing.value) "and orderStatus : 'PENDING' "
+                        else "or orderStatus ~~ '*${f}*' ",
+                sort = s,
+                page = page,
+                size = size
+            ).body()?.content ?: emptyList()
+        }
+    }.cachedIn(viewModelScope)
 
     suspend fun loadOwnerOfOrder(id: Long): UserResponse {
         try{
@@ -189,67 +165,7 @@ class ListOrderViewModel(
         }
     }
 
-    fun setASC(){
-        _asc.value = !_asc.value
-    }
 
-    fun loadSortingOptions() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                // Simulate network call
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    suspend fun loadData(isProcessing: Boolean, isUnProcessing: Boolean) {
-        _isLoading.value = true
-        var currentPage = 0
-        val allOrders = mutableListOf<OrderResponse>()
-        val filter = if (isUnProcessing) "orderStatus ~ '*PENDING*'"
-        else if (isProcessing) "orderStatus ~ '*CONFIRMED*' or orderStatus ~ '*PROCESSING*'"
-        else ""
-
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .orderRepository.getAllOrders(filter = filter, page = currentPage)
-
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        allOrders.addAll(page.content)
-                        _orders.value = allOrders.toMutableList()
-                        Log.d("ListOrderViewModel", "Loaded page ${page.page} with ${page.content.size} orders")
-                        for (order in page.content) {
-                            Log.d("ListOrderViewModel", "Order ID: ${order.id}, Status: ${order.orderStatus}, Total Price: ${order.getPriceToString()}")
-                        }
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-
-
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-            _asc.value = true // Reset sorting order to ascending
-            _orders.value = allOrders.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-            Log.e("ListOrderViewModel", "Error loading orders: ${e.message}")
-            e.printStackTrace()
-        } finally {
-            _isLoading.value = false
-        }
-    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

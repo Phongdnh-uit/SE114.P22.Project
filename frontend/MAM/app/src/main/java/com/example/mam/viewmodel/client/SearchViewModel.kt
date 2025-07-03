@@ -75,7 +75,10 @@ class SearchViewModel(
             BaseRepository(userPreferencesRepository).productRepository.getAllProducts(
                 filter = "name ~~ '*${f}*' " +
                         "or shortDescription ~~ '*${f}*'" +
-                        "or detailDescription ~~ '*${f}*'",
+                        "or detailDescription ~~ '*${f}*'" +
+                        "or id ~~ '*${f}*'"+
+                        "or originalPrice ~~ '*${f}*'" +
+                        "or category.name ~~ '*${f}*'",
                 sort = s,
                 page = page,
                 size = size

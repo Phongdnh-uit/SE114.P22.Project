@@ -48,7 +48,12 @@ fun <T : Any> createPagingFlow(
     sort: List<String> = emptyList(),
     fetch: suspend (page: Int, size: Int, sort: List<String>, filter: String) -> List<T>
 ): Flow<PagingData<T>> {
-    return Pager(PagingConfig(pageSize = 20)) {
+    return Pager(PagingConfig(
+        pageSize = 20,             // mỗi trang 20 item
+        prefetchDistance = 20,     // khi còn 20 item thì tự fetch tiếp → giữ thêm trang sau
+        initialLoadSize = 40,      // lần đầu load 2 trang để cuộn mượt
+        enablePlaceholders = false // tránh hiển thị chỗ trống
+        )) {
         GenericPagingSource(
             sort = sort,
             filter = filter,

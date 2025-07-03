@@ -6,5 +6,6 @@ import java.time.Instant
 data class ShipperResponse(
     val fullname: String,
     val phone: String,
-    val licensePlate: String
+    val licensePlate: String,
+    val isAvailable: Boolean,
 ): BaseResponse()
