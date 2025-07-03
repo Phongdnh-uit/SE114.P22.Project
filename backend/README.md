@@ -188,8 +188,9 @@ resources
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
 ## Thành viên phát triển
-
+### Back-end
 - [**Đặng Nguyễn Huy Phong - 23521159**](https://github.com/Phongdnh-uit)
 - [**Phạm Trần Tuấn Khang - 23520707**](https://github.com/KhangPham205)
+### Front-end
 - [**Đinh Thanh Tùng - 23521738**](https://github.com/tungdt312)
 - [**Trần Chân Trâu - 23520174**](https://github.com/CaHoiAu)
