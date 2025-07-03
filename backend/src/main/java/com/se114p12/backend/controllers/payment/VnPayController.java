@@ -68,8 +68,8 @@ public class VnPayController {
             Long orderId = orderService.markPaymentCompleted(txnRef);
             redirectUrl += "?success=true&orderId=" + orderId;
         } else {
-            orderService.markPaymentFailed(txnRef);
-            redirectUrl += "?success=false";
+            Long orderId = orderService.markPaymentFailed(txnRef);
+            redirectUrl += "?success=false&orderId=" + orderId;
         }
 
         return new RedirectView(redirectUrl);

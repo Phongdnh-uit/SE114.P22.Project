@@ -202,6 +202,7 @@ public class OrderServiceImpl implements OrderService {
 
     cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
+
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
@@ -351,16 +352,19 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void markPaymentFailed(String txnRef) {
+  public Long markPaymentFailed(String txnRef) {
     Order order =
         orderRepository
             .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-    order.setPaymentStatus(PaymentStatus.FAILED);
-    orderRepository.save(order);
+    if (order.getPaymentStatus() == PaymentStatus.PENDING || order.getPaymentStatus() != PaymentStatus.COMPLETED) {
+      order.setPaymentStatus(PaymentStatus.FAILED);
+      orderRepository.save(order);
+      sendPaymentStatusNotification(order);
+    }
 
-    sendPaymentStatusNotification(order);
+    return order.getId();
   }
 
   // ============================ SUPPORT METHOD ============================
