@@ -29,7 +29,7 @@ public interface OrderService {
   void markOrderAsDelivered(Long orderId);
 
 
-  void markPaymentFailed(String txnRef);
+  Long markPaymentFailed(String txnRef);
 
   Long markPaymentCompleted(String txnRef);
 }

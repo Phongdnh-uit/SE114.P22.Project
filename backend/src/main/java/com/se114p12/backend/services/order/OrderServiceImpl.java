@@ -352,7 +352,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void markPaymentFailed(String txnRef) {
+  public Long markPaymentFailed(String txnRef) {
     Order order =
         orderRepository
             .findByTxnRef(txnRef)
@@ -363,6 +363,8 @@ public class OrderServiceImpl implements OrderService {
       orderRepository.save(order);
       sendPaymentStatusNotification(order);
     }
+
+    return order.getId();
   }
 
   // ============================ SUPPORT METHOD ============================
