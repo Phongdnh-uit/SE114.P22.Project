@@ -1,4 +1,4 @@
-![Logo](/src/main/resources/static/images/banner.png)
+![Logo](https://github.com/Phongdnh-uit/SE114.P22.Project/blob/deployment/backend/backend/src/main/resources/static/images/banner.png)
 
 # Măm - Hệ thống bán đồ ăn nhanh
 
@@ -16,18 +16,13 @@ toán (giả lập) cũng được xây dựng nhằm mô phỏng hệ thống b
 
 ## Công nghệ sử dụng
 
-**Mobile:**
-
-- Ngôn ngữ: Kotlin
-- Thư viện: Jetpack Compose
-
 **Backend:**
 
 - Ngôn ngữ: Java 23
 - Framework: Spring Boot 3.4.3
 - Thư viện: Spring Security (OAuth2), Spring Data JPA, Spring Web, Swagger (OpenAPI), Turkraft Spring Filter
 - Cơ sở dữ liệu: MySQL, Neo4J, Redis
-- Tích hợp: Twillio, VNPay
+- Tích hợp: Twillio, VNPay, Mailjet, Firebase, Mapbox.
 
 ## Yêu cầu cơ bản
 
@@ -63,15 +58,13 @@ toán (giả lập) cũng được xây dựng nhằm mô phỏng hệ thống b
     <tr>
         <td rowspan="3">Twilio</td>
         <td>SID</td>
-        <td>https://www.twilio.com</td>
+        <td rowspan="3">https://www.twilio.com</td>
     </tr>
     <tr>
         <td>Auth ID</td>
-        <td>https://www.twilio.com</td>
     </tr>
     <tr>
         <td>Verify Sid</td>
-        <td>https://www.twilio.com</td>
     </tr>
     <tr>
         <td>Firebase</td>
@@ -81,19 +74,27 @@ toán (giả lập) cũng được xây dựng nhằm mô phỏng hệ thống b
     <tr>
         <td rowspan="4">Map box</td>
         <td>Access Token</td>
-        <td>https://www.mapbox.com</td>
+        <td rowspan="4">https://www.mapbox.com</td>
     </tr>
     <tr>
         <td>Base Url</td>
-        <td>https://www.mapbox.com</td>
     </tr>
     <tr>
         <td>Location Lat</td>
-        <td>https://www.mapbox.com</td>
     </tr>
     <tr>
         <td>Location Lng</td>
-        <td>https://www.mapbox.com</td>
+    </tr>
+    <tr>
+        <td rowspan="3">VNPay</td>
+        <td>TMP Code</td>
+        <td>https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html</td>
+    </tr>
+    <tr>
+        <td>Hash Secret</td>
+    </tr>
+    <tr>
+        <td>Pay URL</td>
     </tr>
 </table>
 
@@ -115,52 +116,46 @@ cd backend
 
 - Bước 2: Chạy hệ thống backend
 
-    - Cách 1: Chạy thông qua docker
-        - Bước 1: truy cập folder **_/docker/pro_**, dựa vào file .example.env, ta bổ sung thông tin API key và các
-          thông tin mới vào file mới đặt tên là .env trong cùng thư mục.
-      ```
-      cd docker/pro
-      cp .example.env .env
-      ```
-        - Bước 2: Chạy hệ thống backend thông qua docker
-      ```
-      docker compose -f docker-compose.yaml up -d
-      ```
-    - Cách 2: Chạy thông qua local trên máy
+  - Cách 1: Chạy thông qua docker
+    - Bước 1: truy cập folder **_/docker/pro_**, dựa vào file .example.env, ta bổ sung thông tin API key và các
+      thông tin mới vào file mới đặt tên là .env trong cùng thư mục.
+    ```
+    cd docker/pro
+    cp .example.env .env
+    ```
+    - Bước 2: Chạy hệ thống backend thông qua docker
+    ```
+    docker compose -f docker-compose.yaml up -d
+    ```
+  - Cách 2: Chạy thông qua local trên máy
 
-        - Khi chạy thông qua local, ta cần có đủ các yêu cầu về môi trường và cơ sở dữ liệu để chạy.
+    - Khi chạy thông qua local, ta cần có đủ các yêu cầu về môi trường và cơ sở dữ liệu để chạy.
 
-            - JDK 23
-            - MYSQL 8
-            - NEO4J
-            - REDIS
+      - JDK 23
+      - MYSQL 8
+      - NEO4J
+      - REDIS
 
-        - Bước 1: Kiểm tra phiên bản java hiện tại và chạy các cơ sở dữ liệu cần thiết
+    - Bước 1: Kiểm tra phiên bản java hiện tại và chạy các cơ sở dữ liệu cần thiết
 
-      ```java
-      java -version
-      ```
+    ```java
+    java -version
+    ```
 
-        - Bước 2: Cài đặt các thư viện cần thiết
+    - Bước 2: Cài đặt các thư viện cần thiết
 
-      ```java
-      ./gradlew --refresh-dependencies
-      ```
+    ```java
+    ./gradlew --refresh-dependencies
+    ```
 
-        - Bước 3: Build và chạy ứng dụng
+    - Bước 3: Build và chạy ứng dụng
 
-      ```java
-      ./gradlew clean build
-      ./gradlew bootRun
-      ```
+    ```java
+    ./gradlew clean build
+    ./gradlew bootRun
+    ```
 
 ## Cấu trúc thư mục
-
-### Mobile
-
-```
-
-```
 
 ### Backend
 
@@ -175,24 +170,27 @@ backend/
 ├── enums/                      # Các khai báo enum
 ├── exceptions/                 # Chứa các exception tùy chỉnh và xử lý lỗi
 ├── mappers/                    # Chứa các logic ánh xạ dữ liệu
+├── neo4j/                      # Chứa logic nghiệp vụ liên quan đến Neo4J (hệ thống đề xuất sản phẩm)
 ├── repositories/               # Chứa các interface giao tiếp với cơ sở dữ liệu
+├── seeders/                    # Chứa logic khởi tạo dữ liệu mẫu
 ├── services/                   # Chứa logic nghiệp vụ
+├── util/                       # Chứa các tiện ích và hàm hỗ trợ
+├── vo/                         # Chứa các Value Object
 resources
-├── static                      # Lưu trữ các tài nguyên tĩnh
-├── templates                   # Các template html
-└── application.properties
+├── data/                       # Lưu trữ các tập tin dữ liệu mẫu
+├── static/                     # Lưu trữ các tài nguyên tĩnh
+├── templates/                  # Các template html
+├── application-pro.properties  # Cấu hình ứng dụng cho môi trường production
+└── application.properties      # Cấu hình chung cho các môi trường
 ```
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshots](https://github.com/Phongdnh-uit/SE114.P22.Project/blob/deployment/backend/backend/src/main/resources/static/images/demo_screenshot.png)
+
 
 ## Thành viên phát triển
 
 **Đặng Nguyễn Huy Phong - 23521159**
 
 **Phạm Trần Tuấn Khang - 23520707**
-
-**Đinh Thanh Tùng - 23521738**
-
-**Trần Chân Trâu - 23520174**
