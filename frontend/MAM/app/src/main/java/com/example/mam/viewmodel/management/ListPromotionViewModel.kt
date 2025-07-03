@@ -6,32 +6,38 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
+import com.example.mam.dto.notification.NotificationResponse
 import com.example.mam.dto.promotion.PromotionResponse
+import com.example.mam.repository.paging.createPagingFlow
 import com.example.mam.repository.retrofit.BaseRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class ListPromotionViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    private val _promoList = MutableStateFlow<MutableList<PromotionResponse>>(mutableListOf())
-    val promoList: StateFlow<List<PromotionResponse>> = _promoList
-
     private val _sortingOptions = MutableStateFlow<MutableList<String>>(mutableListOf(
         "Tất cả",
-        "Mã khuyến mãi",
+        "Ngày bắt đầu",
+        "Ngày kết thúc",
+        "Mã giảm giá",
+        "Giá trị giảm giá",
+        "Giá trị áp dụng" // Thêm tùy chọn sắp xếp mới
     ))
     val sortingOptions: StateFlow<List<String>> = _sortingOptions
 
     private val _selectedSortingOption = MutableStateFlow<String>(_sortingOptions.value[0])
-    val selectedSortingOption: StateFlow<String> = _selectedSortingOption
+    val selectedSortingOption = _selectedSortingOption.asStateFlow()
 
     private val _asc = MutableStateFlow(true)
     val asc = _asc.asStateFlow()
@@ -41,6 +47,52 @@ class ListPromotionViewModel(
 
     private val _searchHistory = MutableStateFlow<List<String>>(mutableListOf())
     val searchHistory: StateFlow<List<String>> get() = _searchHistory
+
+    private val search = MutableStateFlow<String>("")
+    private val sort = MutableStateFlow<List<String>>(listOf("id,desc"))
+    fun search(){
+        search.value = _searchQuery.value
+        setSearchHistory(_searchQuery.value)
+    }
+
+    fun sort(){
+        val sortOption = when(_selectedSortingOption.value){
+            "Ngày bắt đầu" -> "startDate"
+            "Ngày kết thúc" -> "endDate"
+            "Mã giảm giá" -> "code"
+            "Giá trị giảm giá" -> "discountValue"
+            "Giá trị áp dụng" -> "minValue"
+            else -> "id"
+        }
+        sort.value = if (_asc.value) listOf("$sortOption,asc") else listOf("$sortOption,desc")
+    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val promotions: Flow<PagingData<PromotionResponse>> = combine(
+        search,
+        sort
+    ) { filter, sort ->
+        Pair(filter, sort)
+    }.flatMapLatest { (filter, sort) ->
+        createPagingFlow(
+            filter = filter,
+            sort = sort
+        ) { page, size, s, f ->
+            BaseRepository(userPreferencesRepository).promotionRepository.getAllPromotions(
+                filter = "discountValue ~~ '*${f}*' " +
+                        "or minValue ~~ '*${f}*' " +
+                        "or code ~~ '*${f}*' " +
+                        "or startDate ~~ '*${f}*' " +
+                        "or endDate ~~ '*${f}*' " +
+                        "or description ~~ '*${f}*'" +
+                        "or createdAt ~~ '*${f}*'"+
+                        "or updatedAt ~~ '*${f}*'"+
+                        "or id ~~ '*${f}*'",
+                sort = s,
+                page = page,
+                size = size
+            ).body()?.content ?: emptyList()
+        }
+    }.cachedIn(viewModelScope)
 
     //update search history if search query is not blank and not in history
     fun setSearchHistory(query: String) {
@@ -54,107 +106,17 @@ class ListPromotionViewModel(
         _searchQuery.value = query
     }
 
-    suspend fun searchPromotion() {
-        //search and save history
-        _isLoading.value = true
-        var currentPage = 0
-        val allPromotions = mutableListOf<PromotionResponse>()
-
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .promotionRepository.getAllPromotions(filter = "code ~~ '*${_searchQuery.value}*' or description ~~ '*${_searchQuery.value}*'", page = currentPage)
-
-                if (response.isSuccessful) {
-                    setSearchHistory(_searchQuery.value)
-                    val page = response.body()
-                    if (page != null){
-                        allPromotions.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        _promoList.value = allPromotions.toMutableList()
-
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-
-            _promoList.value = allPromotions.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-        } finally {
-            _isLoading.value = false
-        }
-    }
-
-    suspend fun sortPromotion(){
-        _isLoading.value = true
-        var currentPage = 0
-        val allPromotions = mutableListOf<PromotionResponse>()
-        val sortOption = when(_selectedSortingOption.value){
-            "Mã khuyến mãi" -> "code"
-            else -> "id"
-        }
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .promotionRepository.getAllPromotions(
-                        filter = "",
-                        page = currentPage,
-                        sort = listOf("${sortOption}," + if (_asc.value) "asc" else "desc"))
-
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        allPromotions.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        _promoList.value = allPromotions.toMutableList()
-
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-            _promoList.value = allPromotions.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-        } finally {
-            _isLoading.value = false
-        }
-    }
-    fun setASC(){
-        _asc.value = !_asc.value
-    }
     fun setSelectedSortingOption(option: String) {
         _selectedSortingOption.value = option
     }
-
-    fun loadSortingOptions() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                // Simulate network call
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
-            }
-        }
+    fun setASC(){
+        _asc.value = !_asc.value
     }
 
     suspend fun deletePromo(id: Long): Int{
         try {
             val response = BaseRepository(userPreferencesRepository).promotionRepository.deletePromotion(id)
             return if (response.isSuccessful){
-                _promoList.value = _promoList.value.filter {it.id != id}.toMutableList()
                 1
             } else 0
         }
@@ -162,42 +124,6 @@ class ListPromotionViewModel(
             return 0
         }
     }
-
-    suspend fun loadData() {
-        _isLoading.value = true
-        var currentPage = 0
-        val allPromotions = mutableListOf<PromotionResponse>()
-
-        try {
-            while (true) { // Loop until the last page
-                val response = BaseRepository(userPreferencesRepository)
-                    .promotionRepository.getAllPromotions(filter = "", page = currentPage)
-
-                if (response.isSuccessful) {
-                    val page = response.body()
-                    if (page != null){
-                        allPromotions.addAll(page.content)
-                        if (page.page >= (page.totalPages - 1)) {
-                            break // Stop looping when the last page is reached
-                        }
-                        currentPage++ // Move to the next page
-                        _promoList.value = allPromotions.toMutableList()
-
-                    }
-                    else break
-                } else {
-                    break // Stop loop on failure
-                }
-            }
-            _asc.value = true // Reset sorting order to ascending
-            _promoList.value = allPromotions.toMutableList() // Update UI with all categories
-
-        } catch (e: Exception) {
-        } finally {
-            _isLoading.value = false
-        }
-    }
-
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

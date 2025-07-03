@@ -73,8 +73,13 @@ class CheckOutViewModel(
     }
 
     private fun setTotal(){
-        val total = _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
-            ?: BigDecimal.ZERO)
+        val total = when(_cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
+            ?: BigDecimal.ZERO) <= BigDecimal.ZERO)  // If total is zero, set to zero
+            {
+            true -> BigDecimal.ZERO
+            else -> _cart.value.cartItems.sumOf { it.price * it.quantity.toBigDecimal() } - (_discount.value?.discountValue
+                ?: BigDecimal.ZERO)
+            }
         val format = DecimalFormat("#,###")
         Log.d("CheckOutViewModel", "Total price calculated: $total")
         _orderTotal.value = "${format.format(total)} VND"

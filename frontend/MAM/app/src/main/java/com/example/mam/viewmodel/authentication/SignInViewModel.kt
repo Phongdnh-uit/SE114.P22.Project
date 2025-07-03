@@ -12,6 +12,7 @@ import com.example.mam.dto.authentication.FirebaseLoginRequest
 import com.example.mam.dto.authentication.SendVerifyEmailRequest
 import com.example.mam.dto.authentication.SignInRequest
 import com.example.mam.dto.user.UserResponse
+import com.example.mam.dto.vo.HandleError
 import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +53,7 @@ class SignInViewModel(
         _isLoading.value = false
     }
 
-    suspend fun SignIn(): Int {
+    suspend fun SignIn(): Pair<String,String> {
         try {
             val request = _signInState.value
             Log.d("LOGIN", "CredentialID: ${request.credentialId}")
@@ -75,26 +76,21 @@ class SignInViewModel(
                 Log.d("LOGIN", "DSAccessToken: ${accessToken.first()}")
                 Log.d("LOGIN", "DSRefreshToken: ${refreshToken.first()}")
                 _isLoading.value = false
-                return if (_me.value.status == "DELETED") -1
-                else if (_me.value.status == "BLOCKED") -2
-                else if (_me.value.status == "PENDING") -3
-                else if (_me.value.role.name == "ADMIN") 1
-                else if (_me.value.role.name == "USER") 2
-                else 0
+                return Pair(_me.value.role.name,_me.value.status)
             }
             else{
                 Log.e("LOGIN", "Đăng nhập thất bại với mã lỗi: ${response.errorBody()?.string()}")
                 _isLoading.value = false
-                return 0
+                return Pair("ERROR",HandleError(response.errorBody()?.string()))
             }
         } catch (e: Exception) {
             Log.e("LOGIN", "Lỗi khi đăng nhập: ${e.message}")
             _isLoading.value = false
-            return 0
+            return Pair("ERROR","Đăng nhập thất bại. Vui lòng thử lại sau.")
         }
     }
 
-    suspend fun signInWithFirebase(idToken: String): Int {
+    suspend fun signInWithFirebase(idToken: String): Pair<String,String> {
         Log.d("LOGIN", "ID Token: $idToken")
         try {
             val request = FirebaseLoginRequest(idToken)
@@ -116,21 +112,17 @@ class SignInViewModel(
                 Log.d("LOGIN", "DSAccessToken: ${accessToken.first()}")
                 Log.d("LOGIN", "DSRefreshToken: ${refreshToken.first()}")
                 _isLoading.value = false
-                return if (_me.value.status == "DELETED") -1
-                else if (_me.value.status == "BLOCKED") -2
-                else if (_me.value.status == "PENDING") -3
-                else if (_me.value.role.name == "ADMIN") 1
-                else if (_me.value.role.name == "USER") 2
-                else 0
-            } else {
+                return Pair(_me.value.role.name,_me.value.status)
+            }
+            else{
                 Log.e("LOGIN", "Đăng nhập thất bại với mã lỗi: ${response.errorBody()?.string()}")
                 _isLoading.value = false
-                return 0
+                return Pair("ERROR",HandleError(response.errorBody()?.string()))
             }
         } catch (e: Exception) {
-            Log.e("LOGIN", "Lỗi khi đăng nhập với Firebase: ${e.message}")
+            Log.e("LOGIN", "Lỗi khi đăng nhập: ${e.message}")
             _isLoading.value = false
-            return 0
+            return Pair("ERROR","Đăng nhập thất bại. Vui lòng thử lại sau.")
         }
     }
 

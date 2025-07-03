@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mam.MAMApplication
 import com.example.mam.data.UserPreferencesRepository
 import com.example.mam.dto.authentication.SignUpRequest
+import com.example.mam.dto.vo.HandleError
 import com.example.mam.repository.retrofit.BaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -105,7 +106,7 @@ class SignUpViewModel(
                 && isEmailValid())
     }
 
-    suspend fun signUp(): Int {
+    suspend fun signUp(): String {
         try {
             val request = _signUpState.value
 
@@ -116,15 +117,15 @@ class SignUpViewModel(
 
             if (response.isSuccessful) {
                 val user = response.body()
-                return 1
+                return "SUCCESS"
             }
             else{
                 Log.e("SignUp", "Đăng ky thất bại với mã lỗi: ${response.errorBody()?.string()}")
-                return 0
+                return HandleError(response.errorBody()?.string())
             }
         } catch (e: Exception) {
             Log.e("SignUp", "Lỗi khi đăng ky: ${e.message}")
-            return 0
+            return "Đăng ký thất bại. Vui lòng thử lại sau"
         }
     }
     companion object {
