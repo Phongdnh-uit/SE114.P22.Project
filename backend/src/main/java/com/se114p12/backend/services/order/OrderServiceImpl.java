@@ -15,7 +15,6 @@ import com.se114p12.backend.entities.shipper.Shipper;
 import com.se114p12.backend.entities.variation.VariationOption;
 import com.se114p12.backend.enums.NotificationType;
 import com.se114p12.backend.enums.OrderStatus;
-import com.se114p12.backend.enums.PaymentMethod;
 import com.se114p12.backend.enums.PaymentStatus;
 import com.se114p12.backend.exceptions.BadRequestException;
 import com.se114p12.backend.exceptions.ResourceNotFoundException;
@@ -143,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
 
     // Gán trạng thái cho đơn hàng tùy vào phương thức thanh toán
-    OrderStatus initialStatus =  OrderStatus.PENDING;
+    OrderStatus initialStatus = OrderStatus.PENDING;
 
     order.setOrderStatus(initialStatus);
 
@@ -333,7 +332,9 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Long markPaymentCompleted(String txnRef) {
-    Order order = orderRepository.findByTxnRef(txnRef)
+    Order order =
+        orderRepository
+            .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
     // chỉ ghi nếu chưa ghi
@@ -355,7 +356,8 @@ public class OrderServiceImpl implements OrderService {
             .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-    if (order.getPaymentStatus() == PaymentStatus.PENDING || order.getPaymentStatus() != PaymentStatus.COMPLETED) {
+    if (order.getPaymentStatus() == PaymentStatus.PENDING
+        || order.getPaymentStatus() != PaymentStatus.COMPLETED) {
       order.setPaymentStatus(PaymentStatus.FAILED);
       orderRepository.save(order);
       sendPaymentStatusNotification(order);
@@ -445,54 +447,82 @@ public class OrderServiceImpl implements OrderService {
                   return newUser;
                 });
 
-    Map<Long, OrderedRelationship> orderedMap =
+    // 2. ---- Get all products need ----
+    List<Long> productIds =
+        order.getOrderDetails().stream()
+            .map(OrderDetail::getProductId)
+            .collect(Collectors.toList());
+
+    List<ProductNode> productNodes = productNeo4jRepository.findAllById(productIds);
+
+    // 3. ---- Map products ----
+    Map<Long, ProductNode> productNodeMap =
+        productNodes.stream()
+            .collect(Collectors.toMap(ProductNode::getId, productNode -> productNode));
+
+    // 4. ---- Get ordered relationship ----
+    List<OrderedRelationship> rels =
         userNode.getOrderedProducts().stream()
-            .collect(Collectors.toMap(rel -> rel.getProductNode().getId(), rel -> rel));
-    Map<Long, ProductNode> productNodeMap = new HashMap<>();
+            .filter(rel -> productIds.contains(rel.getProductNode().getId()))
+            .collect(Collectors.toList());
+
+    Map<Long, OrderedRelationship> orderedMap =
+        rels.stream().collect(Collectors.toMap(rel -> rel.getProductNode().getId(), rel -> rel));
 
     for (OrderDetail detail : order.getOrderDetails()) {
       Long productId = detail.getProductId();
-      ProductNode productNode =
-          productNeo4jRepository
-              .findById(productId)
-              .orElseGet(
-                  () -> {
-                    ProductNode newProductNode = new ProductNode();
-                    newProductNode.setId(productId);
-                    CategoryNode categoryNode = new CategoryNode();
-                    categoryNode.setId(detail.getCategoryId());
-                    newProductNode.setCategory(categoryNode);
-                    return productNeo4jRepository.save(newProductNode);
-                  });
-      productNodeMap.put(productId, productNode);
 
-      OrderedRelationship rel = orderedMap.get(productId);
-      if (rel != null) {
-        rel.setCount(rel.getCount() + detail.getQuantity());
-      } else {
-        OrderedRelationship newRel = new OrderedRelationship();
-        newRel.setProductNode(productNode);
-        newRel.setCount(detail.getQuantity());
-        userNode.getOrderedProducts().add(newRel);
-      }
+      productNodeMap.computeIfAbsent(
+          productId,
+          id -> {
+            ProductNode newProductNode = new ProductNode();
+            newProductNode.setId(id);
+            CategoryNode categoryNode = new CategoryNode();
+            categoryNode.setId(detail.getCategoryId());
+            newProductNode.setCategory(categoryNode);
+            productIds.add(productId);
+            return newProductNode;
+          });
+
+      orderedMap.compute(
+          productId,
+          (id, rel) -> {
+            if (rel == null) {
+              OrderedRelationship newRel = new OrderedRelationship();
+              newRel.setProductNode(productNodeMap.get(id));
+              newRel.setCount(detail.getQuantity());
+              userNode.getOrderedProducts().add(newRel);
+              return newRel;
+            } else {
+              rel.setCount(rel.getCount() + detail.getQuantity());
+              return rel;
+            }
+          });
     }
     userNeo4jRepository.save(userNode);
 
+    List<ProductNode> savedProductNodes = productNeo4jRepository.saveAll(productNodeMap.values());
+
     // 2.bought with relationship
-    List<ProductNode> productNodes = new ArrayList<>(productNodeMap.values());
-    int n = productNodes.size();
+    updateBoughtWith(savedProductNodes);
+  }
+
+  @Async
+  private void updateBoughtWith(List<ProductNode> savedProductNodes) {
+    int n = savedProductNodes.size();
     for (int i = 0; i < n; i++) {
       for (int j = i + 1; j < n; j++) {
-        ProductNode p1 = productNodes.get(i);
-        ProductNode p2 = productNodes.get(j);
+        ProductNode p1 = savedProductNodes.get(i);
+        ProductNode p2 = savedProductNodes.get(j);
 
         upsertBoughtWith(p1, p2);
         upsertBoughtWith(p2, p1);
       }
     }
-    productNeo4jRepository.saveAll(productNodes);
+    productNeo4jRepository.saveAll(savedProductNodes);
   }
 
+  @Async
   private void upsertBoughtWith(ProductNode source, ProductNode target) {
     for (BoughtWithRelationship rel : source.getCoPurchasedProducts()) {
       if (rel.getProduct().getId().equals(target.getId())) {
