@@ -88,7 +88,7 @@ toán (giả lập) cũng được xây dựng nhằm mô phỏng hệ thống b
     <tr>
         <td rowspan="3">VNPay</td>
         <td>TMP Code</td>
-        <td>https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html</td>
+        <td rowspan="3">https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html</td>
     </tr>
     <tr>
         <td>Hash Secret</td>
