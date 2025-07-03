@@ -153,7 +153,9 @@ public class OrderServiceImpl implements OrderService {
 
     BigDecimal totalPrice = BigDecimal.ZERO;
 
-    for (CartItem cartItem : cart.getCartItems()) {
+    List<CartItem> cartItems = cart.getCartItems();
+
+    for (CartItem cartItem : cartItems) {
       Product product = cartItem.getProduct();
       OrderDetail orderDetail = new OrderDetail();
       orderDetail.setOrder(order);
@@ -173,7 +175,8 @@ public class OrderServiceImpl implements OrderService {
       cartItem.getVariationOptions().clear();
     }
 
-    cartItemRepository.deleteAll(cart.getCartItems());
+    cart.getCartItems().clear();
+    cartItemRepository.deleteAll(cartItems);
 
     // Trừ giá trị Order theo Promotion
     if (orderRequestDTO.getPromotionId() != null) {
