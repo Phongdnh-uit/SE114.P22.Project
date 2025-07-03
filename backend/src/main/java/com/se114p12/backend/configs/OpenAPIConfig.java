@@ -1,15 +1,14 @@
 package com.se114p12.backend.configs;
 
+import com.se114p12.backend.constants.AppConstant;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
-import static com.se114p12.backend.constants.AppConstant.DOMAIN;
 
 @Configuration
 public class OpenAPIConfig {
@@ -26,12 +25,17 @@ public class OpenAPIConfig {
 
   @Bean
   public OpenAPI myOpenAPI() {
+    Server remoteServer = new Server();
+    remoteServer.setUrl(AppConstant.DOMAIN);
+    Server localServer = new Server();
+    localServer.setUrl("http://localhost:8080");
+
     return new OpenAPI()
-            .info(createInfo())
-            .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-            .components(
-                    new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
-            .addServersItem(new io.swagger.v3.oas.models.servers.Server()
-                    .url(DOMAIN));
+        .info(createInfo())
+        .addServersItem(localServer)
+        .addServersItem(remoteServer)
+        .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+        .components(
+            new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
   }
 }

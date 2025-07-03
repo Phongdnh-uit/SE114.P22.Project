@@ -3,9 +3,10 @@ package com.se114p12.backend.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se114p12.backend.entities.product.ProductCategory;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,11 +26,12 @@ public class JsonLoader {
    * @return an object of type T
    */
   public List<ProductCategory> loadCategoriesFromJson() {
-    try {
-
-      Path path = Paths.get("src/main/resources/data/mock_data.json");
-      System.out.println("Loading categories from: " + path.toAbsolutePath());
-      return objectMapper.readValue(path.toFile(), new TypeReference<List<ProductCategory>>() {});
+    try (InputStream inputStream =
+        getClass().getClassLoader().getResourceAsStream("data/mock_data.json")) {
+      if (inputStream == null) {
+        throw new FileNotFoundException("data/mock_data.json not found in classpath");
+      }
+      return objectMapper.readValue(inputStream, new TypeReference<List<ProductCategory>>() {});
     } catch (IOException e) {
       throw new RuntimeException("Failed to load categories from JSON", e);
     }

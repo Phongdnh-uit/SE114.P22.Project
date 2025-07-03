@@ -12,7 +12,7 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @RelationshipProperties
 public class BoughtWithRelationship {
 
-  @Id @GeneratedValue private Long id;
+  @Id @GeneratedValue private String id;
 
   private Long count;
 

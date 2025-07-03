@@ -5,10 +5,13 @@ import com.se114p12.backend.dtos.variation.VariationOptionResponseDTO;
 import com.se114p12.backend.entities.variation.Variation;
 import com.se114p12.backend.entities.variation.VariationOption;
 import com.se114p12.backend.exceptions.DataConflictException;
+import com.se114p12.backend.exceptions.ResourceNotFoundException;
 import com.se114p12.backend.mappers.variation.VariationOptionMapper;
 import com.se114p12.backend.repositories.variation.VariationOptionRepository;
 import com.se114p12.backend.repositories.variation.VariationRepository;
 import com.se114p12.backend.vo.PageVO;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,11 +42,12 @@ public class VariationOptionServiceImpl implements VariationOptionService {
     Variation variation =
         variationRepository
             .findById(dto.getVariationId())
-            .orElseThrow(() -> new DataConflictException("Variation not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Variation not found"));
 
     if (variationOptionRepository.existsByValueAndVariationId(
         dto.getValue(), dto.getVariationId())) {
-      throw new DataConflictException("Duplicate option value within the same variation.");
+      Map<String, String> errorDetails = new HashMap<>();
+      errorDetails.put("value", "Duplicate option value within the same variation.");
     }
 
     VariationOption entity = variationOptionMapper.toEntity(dto);
@@ -57,12 +61,14 @@ public class VariationOptionServiceImpl implements VariationOptionService {
     VariationOption existing =
         variationOptionRepository
             .findById(id)
-            .orElseThrow(() -> new DataConflictException("Variation option not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Variation option not found"));
 
     if (!existing.getValue().equals(dto.getValue())
         && variationOptionRepository.existsByValueAndVariationId(
             dto.getValue(), dto.getVariationId())) {
-      throw new DataConflictException("Duplicate option value within the same variation.");
+      Map<String, String> errorDetails = new HashMap<>();
+      errorDetails.put("value", "Duplicate option value within the same variation.");
+      throw new DataConflictException(errorDetails);
     }
 
     existing.setValue(dto.getValue());
@@ -71,7 +77,7 @@ public class VariationOptionServiceImpl implements VariationOptionService {
     Variation variation =
         variationRepository
             .findById(dto.getVariationId())
-            .orElseThrow(() -> new DataConflictException("Variation not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Variation not found"));
     existing.setVariation(variation);
 
     existing
@@ -89,7 +95,7 @@ public class VariationOptionServiceImpl implements VariationOptionService {
     VariationOption option =
         variationOptionRepository
             .findById(id)
-            .orElseThrow(() -> new DataConflictException("Variation option not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Variation option not found"));
     option.getCartItems().forEach(cartItem -> cartItem.setAvailable(false));
     option = variationOptionRepository.save(option);
     variationOptionRepository.delete(option);

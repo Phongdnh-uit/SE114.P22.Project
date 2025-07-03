@@ -49,6 +49,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -126,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
             .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
     if (cart.getCartItems().isEmpty()) {
-      throw new IllegalArgumentException("Cart is empty");
+      throw new BadRequestException("Cart is empty");
     }
 
     Order order = new Order();
@@ -142,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
     order.setPaymentMethod(orderRequestDTO.getPaymentMethod());
 
     // Gán trạng thái cho đơn hàng tùy vào phương thức thanh toán
-    OrderStatus initialStatus =  OrderStatus.PENDING;
+    OrderStatus initialStatus = OrderStatus.PENDING;
 
     order.setOrderStatus(initialStatus);
 
@@ -153,7 +154,9 @@ public class OrderServiceImpl implements OrderService {
 
     BigDecimal totalPrice = BigDecimal.ZERO;
 
-    for (CartItem cartItem : cart.getCartItems()) {
+    List<CartItem> cartItems = cart.getCartItems();
+
+    for (CartItem cartItem : cartItems) {
       Product product = cartItem.getProduct();
       OrderDetail orderDetail = new OrderDetail();
       orderDetail.setOrder(order);
@@ -171,8 +174,10 @@ public class OrderServiceImpl implements OrderService {
       order.getOrderDetails().add(orderDetail);
 
       cartItem.getVariationOptions().clear();
-      cartItemRepository.delete(cartItem);
     }
+
+    cart.getCartItems().clear();
+    cartItemRepository.deleteAll(cartItems);
 
     // Trừ giá trị Order theo Promotion
     if (orderRequestDTO.getPromotionId() != null) {
@@ -183,8 +188,6 @@ public class OrderServiceImpl implements OrderService {
       // Trừ giảm giá nếu có
       BigDecimal discount = appliedPromotion.getDiscountValue();
       totalPrice = totalPrice.subtract(discount);
-      userPromotionService.markPromotionAsUsed(
-          jwtUtil.getCurrentUserId(), appliedPromotion.getId());
     }
 
     order.setTotalPrice(
@@ -198,10 +201,8 @@ public class OrderServiceImpl implements OrderService {
       sendOrderStatusNotification(order);
     }
 
-    cart.getCartItems().clear();
     cartRepository.deleteById(cart.getId());
-// Gửi thông báo trạng thái
-    sendOrderStatusNotification(order);
+
     updateRecommend(order);
     return orderMapper.entityToResponseDTO(order);
   }
@@ -267,6 +268,10 @@ public class OrderServiceImpl implements OrderService {
 
     order.setOrderStatus(OrderStatus.COMPLETED);
     order.setActualDeliveryTime(Instant.now());
+
+    if (order.getPaymentMethod() == PaymentMethod.CASH_ON_DELIVERY) {
+      order.setPaymentStatus(PaymentStatus.COMPLETED);
+    }
 
     // Cập nhật shipper: đánh dấu là available
     if (order.getShipper() != null) {
@@ -335,16 +340,17 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Long markPaymentCompleted(String txnRef) {
-    Order order = orderRepository.findByTxnRef(txnRef)
+    Order order =
+        orderRepository
+            .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
     // chỉ ghi nếu chưa ghi
     if (order.getPaymentStatus() != PaymentStatus.COMPLETED) {
       order.setPaymentStatus(PaymentStatus.COMPLETED);
-      order.setOrderStatus(OrderStatus.PENDING);     // giao hàng chưa bắt đầu
+      order.setOrderStatus(OrderStatus.PENDING); // giao hàng chưa bắt đầu
       orderRepository.save(order);
       sendPaymentStatusNotification(order);
-      sendOrderStatusNotification(order);
     }
 
     return order.getId();
@@ -352,14 +358,20 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void markPaymentFailed(String txnRef) {
-    Order order = orderRepository.findByTxnRef(txnRef)
+  public Long markPaymentFailed(String txnRef) {
+    Order order =
+        orderRepository
+            .findByTxnRef(txnRef)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-    order.setPaymentStatus(PaymentStatus.FAILED);
-    orderRepository.save(order);
+    if (order.getPaymentStatus() == PaymentStatus.PENDING
+        || order.getPaymentStatus() != PaymentStatus.COMPLETED) {
+      order.setPaymentStatus(PaymentStatus.FAILED);
+      orderRepository.save(order);
+      sendPaymentStatusNotification(order);
+    }
 
-    sendPaymentStatusNotification(order);
+    return order.getId();
   }
 
   // ============================ SUPPORT METHOD ============================
@@ -375,25 +387,28 @@ public class OrderServiceImpl implements OrderService {
     notificationService.pushNotification(notification);
   }
 
+  @Async
   private void sendOrderStatusNotification(Order order) {
-    NotificationType type = switch (order.getOrderStatus()) {
-      case PENDING -> NotificationType.ORDER_PLACED;
-      case CONFIRMED -> NotificationType.ORDER_RECEIVED;
-      case PROCESSING -> NotificationType.ORDER_PREPARING;
-      case SHIPPING -> NotificationType.ORDER_DELIVERING;
-      case COMPLETED -> NotificationType.ORDER_DELIVERED;
-      case CANCELED -> NotificationType.ORDER_CANCELLED;
-    };
+    NotificationType type =
+        switch (order.getOrderStatus()) {
+          case PENDING -> NotificationType.ORDER_PLACED;
+          case CONFIRMED -> NotificationType.ORDER_RECEIVED;
+          case PROCESSING -> NotificationType.ORDER_PREPARING;
+          case SHIPPING -> NotificationType.ORDER_DELIVERING;
+          case COMPLETED -> NotificationType.ORDER_DELIVERED;
+          case CANCELED -> NotificationType.ORDER_CANCELLED;
+        };
 
     sendNotificationForOrder(order, type);
   }
 
   private void sendPaymentStatusNotification(Order order) {
-    NotificationType type = switch (order.getPaymentStatus()) {
-      case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
-      case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
-      default -> null;
-    };
+    NotificationType type =
+        switch (order.getPaymentStatus()) {
+          case COMPLETED -> NotificationType.ORDER_PAYMENT_SUCCEEDED;
+          case FAILED -> NotificationType.ORDER_PAYMENT_FAILED;
+          default -> null;
+        };
 
     sendNotificationForOrder(order, type);
   }
@@ -405,24 +420,25 @@ public class OrderServiceImpl implements OrderService {
 
     // Đảm bảo thứ tự Variation
     return cartItem.getVariationOptions().stream()
-            .filter(vo -> vo.getVariation() != null)
-            .collect(Collectors.groupingBy(VariationOption::getVariation))
-            .entrySet()
-            .stream()
-            .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
-            .map(
-                    entry -> {
-                      String variationName = entry.getKey().getName();
-                      String values =
-                              entry.getValue().stream()
-                                      .map(VariationOption::getValue)
-                                      .collect(Collectors.joining(", "));
-                      return variationName + ": " + values;
-                    })
-            .collect(Collectors.joining(", "));
+        .filter(vo -> vo.getVariation() != null)
+        .collect(Collectors.groupingBy(VariationOption::getVariation))
+        .entrySet()
+        .stream()
+        .sorted(Comparator.comparing(entry -> entry.getKey().getId())) // Đảm bảo thứ tự Variation
+        .map(
+            entry -> {
+              String variationName = entry.getKey().getName();
+              String values =
+                  entry.getValue().stream()
+                      .map(VariationOption::getValue)
+                      .collect(Collectors.joining(", "));
+              return variationName + ": " + values;
+            })
+        .collect(Collectors.joining(", "));
   }
 
   // ============================ NEO4J RECOMMEND SYSTEM ============================
+  @Async
   private void updateRecommend(Order order) {
     // Neo4j recommendation systemAdd commentMore actions
 
@@ -439,54 +455,82 @@ public class OrderServiceImpl implements OrderService {
                   return newUser;
                 });
 
-    Map<Long, OrderedRelationship> orderedMap =
+    // 2. ---- Get all products need ----
+    List<Long> productIds =
+        order.getOrderDetails().stream()
+            .map(OrderDetail::getProductId)
+            .collect(Collectors.toList());
+
+    List<ProductNode> productNodes = productNeo4jRepository.findAllById(productIds);
+
+    // 3. ---- Map products ----
+    Map<Long, ProductNode> productNodeMap =
+        productNodes.stream()
+            .collect(Collectors.toMap(ProductNode::getId, productNode -> productNode));
+
+    // 4. ---- Get ordered relationship ----
+    List<OrderedRelationship> rels =
         userNode.getOrderedProducts().stream()
-            .collect(Collectors.toMap(rel -> rel.getProductNode().getId(), rel -> rel));
-    Map<Long, ProductNode> productNodeMap = new HashMap<>();
+            .filter(rel -> productIds.contains(rel.getProductNode().getId()))
+            .collect(Collectors.toList());
+
+    Map<Long, OrderedRelationship> orderedMap =
+        rels.stream().collect(Collectors.toMap(rel -> rel.getProductNode().getId(), rel -> rel));
 
     for (OrderDetail detail : order.getOrderDetails()) {
       Long productId = detail.getProductId();
-      ProductNode productNode =
-          productNeo4jRepository
-              .findById(productId)
-              .orElseGet(
-                  () -> {
-                    ProductNode newProductNode = new ProductNode();
-                    newProductNode.setId(productId);
-                    CategoryNode categoryNode = new CategoryNode();
-                    categoryNode.setId(detail.getCategoryId());
-                    newProductNode.setCategory(categoryNode);
-                    return productNeo4jRepository.save(newProductNode);
-                  });
-      productNodeMap.put(productId, productNode);
 
-      OrderedRelationship rel = orderedMap.get(productId);
-      if (rel != null) {
-        rel.setCount(rel.getCount() + detail.getQuantity());
-      } else {
-        OrderedRelationship newRel = new OrderedRelationship();
-        newRel.setProductNode(productNode);
-        newRel.setCount(detail.getQuantity());
-        userNode.getOrderedProducts().add(newRel);
-      }
+      productNodeMap.computeIfAbsent(
+          productId,
+          id -> {
+            ProductNode newProductNode = new ProductNode();
+            newProductNode.setId(id);
+            CategoryNode categoryNode = new CategoryNode();
+            categoryNode.setId(detail.getCategoryId());
+            newProductNode.setCategory(categoryNode);
+            productIds.add(productId);
+            return newProductNode;
+          });
+
+      orderedMap.compute(
+          productId,
+          (id, rel) -> {
+            if (rel == null) {
+              OrderedRelationship newRel = new OrderedRelationship();
+              newRel.setProductNode(productNodeMap.get(id));
+              newRel.setCount(detail.getQuantity());
+              userNode.getOrderedProducts().add(newRel);
+              return newRel;
+            } else {
+              rel.setCount(rel.getCount() + detail.getQuantity());
+              return rel;
+            }
+          });
     }
     userNeo4jRepository.save(userNode);
 
+    List<ProductNode> savedProductNodes = productNeo4jRepository.saveAll(productNodeMap.values());
+
     // 2.bought with relationship
-    List<ProductNode> productNodes = new ArrayList<>(productNodeMap.values());
-    int n = productNodes.size();
+    updateBoughtWith(savedProductNodes);
+  }
+
+  @Async
+  private void updateBoughtWith(List<ProductNode> savedProductNodes) {
+    int n = savedProductNodes.size();
     for (int i = 0; i < n; i++) {
       for (int j = i + 1; j < n; j++) {
-        ProductNode p1 = productNodes.get(i);
-        ProductNode p2 = productNodes.get(j);
+        ProductNode p1 = savedProductNodes.get(i);
+        ProductNode p2 = savedProductNodes.get(j);
 
         upsertBoughtWith(p1, p2);
         upsertBoughtWith(p2, p1);
       }
     }
-    productNeo4jRepository.saveAll(productNodes);
+    productNeo4jRepository.saveAll(savedProductNodes);
   }
 
+  @Async
   private void upsertBoughtWith(ProductNode source, ProductNode target) {
     for (BoughtWithRelationship rel : source.getCoPurchasedProducts()) {
       if (rel.getProduct().getId().equals(target.getId())) {

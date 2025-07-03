@@ -6,15 +6,20 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
-    ports:
-      - "3306:3306"
     networks:
       - app_network
+    volumes:
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
 
 networks:
   app_network:

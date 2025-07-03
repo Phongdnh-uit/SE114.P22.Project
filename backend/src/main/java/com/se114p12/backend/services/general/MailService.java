@@ -1,5 +1,7 @@
 package com.se114p12.backend.services.general;
 
+import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
+
 import com.se114p12.backend.exceptions.BadRequestException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
@@ -11,8 +13,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import static com.se114p12.backend.constants.AppConstant.BACKEND_URL;
 
 @Service
 @RequiredArgsConstructor

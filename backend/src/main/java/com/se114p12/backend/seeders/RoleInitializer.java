@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -14,6 +15,7 @@ public class RoleInitializer {
 
   private final RoleRepository roleRepository;
 
+  @Transactional
   public void initializeRoles() {
     List<Role> roles = new ArrayList<>();
     for (RoleName roleName : RoleName.values()) {
