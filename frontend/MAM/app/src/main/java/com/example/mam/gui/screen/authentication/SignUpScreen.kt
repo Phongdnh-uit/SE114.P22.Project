@@ -221,7 +221,7 @@ fun SignUpScreen(
                             viewModel.triggerLoading()
                             scope.launch{
                                 val result = viewModel.signUp()
-                                if (result == 1){
+                                if (result == "SUCCESS"){
                                     Toast.makeText(
                                         context,
                                         "Đăng ký thành công! Vui lòng xác thực qua mail để tiếp tục",
@@ -233,7 +233,7 @@ fun SignUpScreen(
                                 else {
                                     Toast.makeText(
                                         context,
-                                        "Đăng ký thất bại",
+                                        result,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     viewModel.resetLoading()

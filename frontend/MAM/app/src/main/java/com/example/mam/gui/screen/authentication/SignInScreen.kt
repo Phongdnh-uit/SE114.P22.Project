@@ -219,8 +219,8 @@ fun SignInScreen(
                 onClick = {
                     scope.launch {
                         viewModel.triggerLoading()
-                        val result = viewModel.SignIn()
-                        if (result == 2) {
+                        val message = viewModel.SignIn()
+                        if (message.first == "USER" && message.second == "ACTIVE") {
                             Toast.makeText(
                             context,
                             "Đăng nhập thành công",
@@ -228,34 +228,34 @@ fun SignInScreen(
                         ).show()
                             onSignInClicked()
 
-                        } else if (result == 1) {
+                        } else if (message.first == "ADMIN" && message.second == "ACTIVE") {
                             Toast.makeText(
                             context,
                             "Đăng nhập thành công",
                             Toast.LENGTH_SHORT
                         ).show()
                             onSignInManager()
-                        } else if (result == -1) {
+                        } else if (message.second == "DELETED") {
                             Toast.makeText(
                                 context,
                                 "Tài khoản của bạn đã bị xóa",
                                 Toast.LENGTH_SHORT
                             ).show()
                             isShowDeletedDialog = true
-                        } else if (result == -2) {
+                        } else if (message.second == "BLOCKED") {
                             Toast.makeText(
                                 context,
                                 "Tài khoản của bạn đã bị khóa",
                                 Toast.LENGTH_SHORT
                             ).show()
                             isShowBlockedDialog = true
-                        } else if (result == -3) {
+                        } else if (message.second == "PENDING") {
                             isShowPendingDialog = true
                         }
                         else {
                             Toast.makeText(
                                 context,
-                                "Đăng nhập thất bại",
+                                message.second,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -280,8 +280,8 @@ fun SignInScreen(
                         },
                         handle = { idToken ->
                             scope.launch {
-                                val result = viewModel.signInWithFirebase(idToken)
-                                if (result == 2) {
+                                val message = viewModel.signInWithFirebase(idToken)
+                                if (message.first == "USER" && message.second == "ACTIVE") {
                                     Toast.makeText(
                                         context,
                                         "Đăng nhập thành công",
@@ -289,34 +289,34 @@ fun SignInScreen(
                                     ).show()
                                     onSignInClicked()
 
-                                } else if (result == 1) {
+                                } else if (message.first == "ADMIN" && message.second == "ACTIVE") {
                                     Toast.makeText(
                                         context,
                                         "Đăng nhập thành công",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     onSignInManager()
-                                } else if (result == -1) {
+                                } else if (message.second == "DELETED") {
                                     Toast.makeText(
                                         context,
                                         "Tài khoản của bạn đã bị xóa",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     isShowDeletedDialog = true
-                                } else if (result == -2) {
+                                } else if (message.second == "BLOCKED") {
                                     Toast.makeText(
                                         context,
                                         "Tài khoản của bạn đã bị khóa",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     isShowBlockedDialog = true
-                                } else if (result == -3) {
+                                } else if (message.second == "PENDING") {
                                     isShowPendingDialog = true
                                 }
                                 else {
                                     Toast.makeText(
                                         context,
-                                        "Đăng nhập thất bại",
+                                        message.second,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }

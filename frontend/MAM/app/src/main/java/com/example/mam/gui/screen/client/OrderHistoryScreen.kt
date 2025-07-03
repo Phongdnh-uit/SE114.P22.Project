@@ -71,7 +71,6 @@ onBackClicked: () -> Unit = {},
 onClick: (Long) -> Unit = { orderId ->  }
 ){
 
-val isLoading = viewModel.isLoading.collectAsStateWithLifecycle().value
 val scrollState = rememberScrollState()
 val orders = viewModel.orders.collectAsLazyPagingItems()
 val asc = viewModel.asc.collectAsStateWithLifecycle().value
