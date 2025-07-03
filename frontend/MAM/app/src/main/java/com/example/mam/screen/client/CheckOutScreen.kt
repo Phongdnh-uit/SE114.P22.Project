@@ -462,6 +462,7 @@ fun CheckOutScreen(
                         OuterShadowFilledButton(
                             text = "Đặt hàng",
                             onClick = {
+                                if (address.isNotEmpty())
                                 scope.launch {
                                     val result = viewModel.checkOut()
                                     if (result != -1) {
@@ -480,7 +481,10 @@ fun CheckOutScreen(
                                         onHomeClicked()
                                     }
 
-                                } },
+                                }else {
+                                    Toast.makeText(context, "Đặt hàng thất bại. Vui lòng chọn địa chỉ.", Toast.LENGTH_SHORT).show()
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )
                     }

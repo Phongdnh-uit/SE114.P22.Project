@@ -335,10 +335,8 @@ fun ListPromotionScreen(
                                         text = { Text(option, color = BrownDefault) },
                                         onClick = {
                                             sortExpanded = false
-
-                                                viewModel.setSelectedSortingOption(option)
-                                                viewModel.sort()
-
+                                            viewModel.setSelectedSortingOption(option)
+                                            viewModel.sort()
                                         }
                                     )
                                 }

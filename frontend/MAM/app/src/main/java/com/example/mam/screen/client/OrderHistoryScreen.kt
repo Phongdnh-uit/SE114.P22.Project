@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,7 +31,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +54,7 @@ import com.example.mam.dto.order.OrderResponse
 import com.example.mam.component.BasicOutlinedButton
 import com.example.mam.component.CircleIconButton
 import com.example.mam.component.outerShadow
+import com.example.mam.data.Constant.DELAY_TIME
 import com.example.mam.ui.theme.BrownDefault
 import com.example.mam.ui.theme.ErrorColor
 import com.example.mam.ui.theme.GreyDark
@@ -58,6 +64,7 @@ import com.example.mam.ui.theme.OrangeLighter
 import com.example.mam.ui.theme.Variables
 import com.example.mam.ui.theme.WhiteDefault
 import com.example.mam.viewmodel.client.OrderHistoryViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -76,11 +83,29 @@ val orders = viewModel.orders.collectAsLazyPagingItems()
 val asc = viewModel.asc.collectAsStateWithLifecycle().value
 val orderStatus = viewModel.orderStatus.collectAsStateWithLifecycle().value
 val scope = rememberCoroutineScope()
+     var isFirstTime by remember { mutableStateOf(true)}
+
+     val listState = rememberLazyListState()
+     LaunchedEffect(Unit) {
+         while (true) {
+             val isAtTop = listState.firstVisibleItemIndex <= 20
+
+             if (
+                 orders.loadState.refresh is LoadState.NotLoading &&
+                 orders.loadState.prepend is LoadState.NotLoading &&
+                 orders.loadState.append is LoadState.NotLoading &&
+                 orders.itemCount > 0 &&
+                 isAtTop
+             ) {
+                 orders.refresh()
+             }
+             delay(DELAY_TIME)
+         }
+
+     }
 
 
-
-LaunchedEffect(asc) {
-    orders.refresh()
+LaunchedEffect(Unit) {
     viewModel.loadOrderStatus()
 }
     Column(
@@ -168,8 +193,10 @@ LaunchedEffect(asc) {
                                 } else {
                                     viewModel.setOrderStatus(status)
                                 }
+                                isFirstTime = true
                             },
-                            modifier = if (selectedStatus == status) Modifier.background(WhiteDefault) else Modifier
+                            foregroundColor = if (selectedStatus == status) OrangeDefault else BrownDefault,
+                            modifier = Modifier
                         )
                         Spacer(Modifier.width(5.dp))
                     }
@@ -186,9 +213,29 @@ LaunchedEffect(asc) {
             orders.apply {
                 when(val refresh = orders.loadState.refresh) {
                     is LoadState.Loading -> {
-                        item { CircularProgressIndicator(
-                            color = OrangeDefault,
-                            modifier = Modifier.padding(16.dp)) }
+                        if (orders.itemCount == 0){
+                            if (isFirstTime){
+                                item { CircularProgressIndicator(
+                                    color = OrangeDefault,
+                                    modifier = Modifier.padding(16.dp)) }
+                                isFirstTime = false
+                            }
+                            else item {
+                                Text(
+                                    text = "Không có đơn hàng nào",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = GreyDefault
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
                     }
                     is LoadState.Error -> {
                         item { Text("Lỗi khi tải thêm", color = ErrorColor) }
@@ -212,6 +259,9 @@ LaunchedEffect(asc) {
                         }
                     }
                 }
+            }
+            item{
+                Spacer(Modifier.height(100.dp))
             }
         }
     }

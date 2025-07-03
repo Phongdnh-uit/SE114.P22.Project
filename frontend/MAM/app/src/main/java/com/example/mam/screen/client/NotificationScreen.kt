@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,7 +38,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,11 +86,22 @@ fun NotificationScreen(
     val notifications =  viewModel.notifications.collectAsLazyPagingItems()
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-
+    var isFirstTime by remember { mutableStateOf(true) }
+    val listState = rememberLazyListState()
     LaunchedEffect(Unit) {
         while (true) {
-            notifications.refresh()
-            delay(DELAY_TIME) // 10s = 10,000 milliseconds
+            val isAtTop = listState.firstVisibleItemIndex <= 20
+
+            if (
+                notifications.loadState.refresh is LoadState.NotLoading &&
+                notifications.loadState.prepend is LoadState.NotLoading &&
+                notifications.loadState.append is LoadState.NotLoading &&
+                notifications.itemCount > 0 &&
+                isAtTop
+            ) {
+                notifications.refresh()
+            }
+            delay(DELAY_TIME)
         }
 
     }
@@ -130,6 +146,7 @@ fun NotificationScreen(
                 )
             }
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .weight(1f)
                     .outerShadow(
@@ -189,10 +206,28 @@ fun NotificationScreen(
                 notifications.apply {
                     when(val refresh = notifications.loadState.refresh) {
                         is LoadState.Loading -> {
-                            if(notifications.itemCount == 0)
-                            item { CircularProgressIndicator(
-                                color = OrangeDefault,
-                                modifier = Modifier.padding(16.dp)) }
+                            if (notifications.itemCount == 0){
+                                if (isFirstTime){
+                                    item { CircularProgressIndicator(
+                                        color = OrangeDefault,
+                                        modifier = Modifier.padding(16.dp)) }
+                                    isFirstTime = false
+                                }
+                                else item {
+                                    Text(
+                                        text = "Không có thông báo nào",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = GreyDefault
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
                         }
                         is LoadState.Error -> {
                             item { Text("Lỗi khi tải thêm", color = ErrorColor) }
@@ -216,6 +251,9 @@ fun NotificationScreen(
                             }
                         }
                     }
+                }
+                item{
+                    Spacer(Modifier.height(100.dp))
                 }
             }
         }
