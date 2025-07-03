@@ -191,6 +191,6 @@ resources
 
 ## Thành viên phát triển
 
-**Đặng Nguyễn Huy Phong - 23521159**
+- [**Đặng Nguyễn Huy Phong - 23521159**](https://github.com/Phongdnh-uit)
 
-**Phạm Trần Tuấn Khang - 23520707**
+- [**Phạm Tuấn Khang - 23520707**](https://github.com/KhangPham205)
