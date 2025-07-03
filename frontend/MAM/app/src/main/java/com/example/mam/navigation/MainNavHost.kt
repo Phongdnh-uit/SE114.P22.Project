@@ -1,9 +1,7 @@
 package com.example.mam.navigation
 
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -11,18 +9,13 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.util.fastCbrt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -30,38 +23,38 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.example.mam.gui.screen.authentication.ForgetPasswordScreen
-import com.example.mam.gui.screen.authentication.OTPScreen
-import com.example.mam.gui.screen.authentication.SignInScreen
-import com.example.mam.gui.screen.authentication.SignUpScreen
-import com.example.mam.gui.screen.authentication.StartScreen
-import com.example.mam.gui.screen.client.CartScreen
-import com.example.mam.gui.screen.client.CheckOutScreen
-import com.example.mam.gui.screen.client.HomeScreen
-import com.example.mam.gui.screen.client.ItemScreen
-import com.example.mam.gui.screen.client.MapScreen
-import com.example.mam.gui.screen.client.OrderHistoryScreen
-import com.example.mam.gui.screen.client.OrderScreen
-import com.example.mam.gui.screen.client.PaymentResultScreen
-import com.example.mam.gui.screen.client.ProfileScreen
-import com.example.mam.gui.screen.client.SearchScreen
-import com.example.mam.gui.screen.management.DashboardScreen
-import com.example.mam.gui.screen.management.ListCategoryScreen
-import com.example.mam.gui.screen.management.ListNotificationScreen
-import com.example.mam.gui.screen.management.ListOrderScreen
-import com.example.mam.gui.screen.management.ListProductScreen
-import com.example.mam.gui.screen.management.ListPromotionScreen
-import com.example.mam.gui.screen.management.ListShipperScreen
-import com.example.mam.gui.screen.management.ListUserScreen
-import com.example.mam.gui.screen.management.ManageCategoryScreen
-import com.example.mam.gui.screen.management.ManageNotificationScreen
-import com.example.mam.gui.screen.management.ManageOrderScreen
-import com.example.mam.gui.screen.management.ManageProductScreen
-import com.example.mam.gui.screen.management.ManagePromotionScreen
-import com.example.mam.gui.screen.management.ManageShipperScreen
-import com.example.mam.gui.screen.management.ManageUserScreen
+import com.example.mam.screen.authentication.ForgetPasswordScreen
+import com.example.mam.screen.authentication.OTPScreen
+import com.example.mam.screen.authentication.SignInScreen
+import com.example.mam.screen.authentication.SignUpScreen
+import com.example.mam.screen.authentication.StartScreen
+import com.example.mam.screen.client.CartScreen
+import com.example.mam.screen.client.CheckOutScreen
+import com.example.mam.screen.client.HomeScreen
+import com.example.mam.screen.client.ItemScreen
+import com.example.mam.screen.client.MapScreen
+import com.example.mam.screen.client.OrderHistoryScreen
+import com.example.mam.screen.client.OrderScreen
+import com.example.mam.screen.client.PaymentResultScreen
+import com.example.mam.screen.client.ProfileScreen
+import com.example.mam.screen.client.SearchScreen
+import com.example.mam.screen.management.DashboardScreen
+import com.example.mam.screen.management.ListCategoryScreen
+import com.example.mam.screen.management.ListNotificationScreen
+import com.example.mam.screen.management.ListOrderScreen
+import com.example.mam.screen.management.ListProductScreen
+import com.example.mam.screen.management.ListPromotionScreen
+import com.example.mam.screen.management.ListShipperScreen
+import com.example.mam.screen.management.ListUserScreen
+import com.example.mam.screen.management.ManageCategoryScreen
+import com.example.mam.screen.management.ManageNotificationScreen
+import com.example.mam.screen.management.ManageOrderScreen
+import com.example.mam.screen.management.ManageProductScreen
+import com.example.mam.screen.management.ManagePromotionScreen
+import com.example.mam.screen.management.ManageShipperScreen
+import com.example.mam.screen.management.ManageUserScreen
 import com.example.mam.viewmodel.authentication.ForgetPasswordViewModel
-import com.example.mam.viewmodel.authentication.NotificationViewModel
+import com.example.mam.viewmodel.client.NotificationViewModel
 import com.example.mam.viewmodel.authentication.SignInViewModel
 import com.example.mam.viewmodel.authentication.SignUpViewModel
 import com.example.mam.viewmodel.authentication.StartViewModel
@@ -94,9 +87,6 @@ import com.yourapp.ui.notifications.NotificationScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -138,11 +128,6 @@ fun MainNavHost(
             ) { backStackEntry ->
             val allParams = uri?.queryParameterNames?.joinToString(", ") { "$it=${uri.getQueryParameter(it)}" } ?: "No parameters"
             val keys = backStackEntry.savedStateHandle.keys()
-            Column {
-                Text(text = "🔑 Keys: ${keys.joinToString(", ")}")
-                Text(text = "🔗 URI: ${uri?.toString() ?: "null"}")
-                Text(text = "📦 Parameters:\n$allParams")
-            }
             PaymentResultScreen(
                 onBackHome = {
                     navController.navigate(route = HomeScreen.HomeSreen.name) {
@@ -469,7 +454,10 @@ fun MainNavHost(
             ){ backStackEntry ->
                 val viewModel: OrderViewModel = viewModel(backStackEntry, factory = OrderViewModel.Factory)
                 OrderScreen(
-                    onBackClicked = {navController.popBackStack()},
+                    onBackClicked = {
+                        navController.navigate(route = HomeScreen.HomeSreen.name) {
+                        popUpTo("Home") { inclusive = true }
+                    }},
                     viewModel = viewModel
                 )
             }

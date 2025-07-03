@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.mam"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 7
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -89,4 +89,8 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    implementation("androidx.paging:paging-compose:1.0.0-alpha20")
+    implementation ("androidx.paging:paging-runtime:3.3.6")
+    implementation ("androidx.paging:paging-compose:3.3.6")
 }
