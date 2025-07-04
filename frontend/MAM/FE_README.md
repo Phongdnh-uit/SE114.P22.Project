@@ -50,7 +50,8 @@ Cách 1:
           <string name="mapbox_access_token" translatable="false" tools:ignore="UnusedResources"> MAP_BOX_KEY </string>
       </resources>
 Cách 2:
-     1. Tải và cài đặt [.apk](https://drive.google.com/file/d/1j4WTpwQsxMQEsaBxa2c3VKABAwbppCWa/view?usp=drive_link)
+     1. Clone dự án
+     2. Tải và cài đặt file apk tại frontend\MAM\app\release\app-release.apk
 # 📁Cấu trúc thư mục
   - Kiến trúc hệ thống: MVVM
   ```
