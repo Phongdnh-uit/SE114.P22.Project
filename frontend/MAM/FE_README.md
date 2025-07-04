@@ -35,6 +35,7 @@ SE114 MAM là ứng dụng đặt món ăn, phát triển bằng Kotlin với Je
   - Biểu đồ: MPAndroidChart / YChart
 
 # 🛠️Cài đặt và chạy ứng dụng
+Cách 1:
   1. Clone dự án
   2. Mở bằng Android Studio
     - [Hướng dẫn cách cài đặt Android Studio](https://developer.android.com/studio)
@@ -48,7 +49,8 @@ SE114 MAM là ứng dụng đặt món ăn, phát triển bằng Kotlin với Je
       <resources xmlns:tools="http://schemas.android.com/tools">
           <string name="mapbox_access_token" translatable="false" tools:ignore="UnusedResources"> MAP_BOX_KEY </string>
       </resources>
-
+Cách 2:
+     1. Tải và cài đặt [.apk](https://drive.google.com/file/d/1j4WTpwQsxMQEsaBxa2c3VKABAwbppCWa/view?usp=drive_link)
 # 📁Cấu trúc thư mục
   - Kiến trúc hệ thống: MVVM
   ```
