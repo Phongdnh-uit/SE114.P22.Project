@@ -37,6 +37,7 @@
 - kotlinx.coroutines: xử lý bất đồng bộ
 
 # Cài đặt và chạy ứng dụng
+Cách 1: 
 1. Clone dự án
 2. Mở bằng Android Studio
 - [Hướng dẫn cách cài đặt Android Studio](https://developer.android.com/studio)
@@ -46,6 +47,8 @@
 4. Cấu hình Mapbox
 - [Hướng dẫn lấy APIKey](https://docs.mapbox.com/android/maps/guides/) 
 
+Cách 2:
+1. Tải và cài đặt file [apk](https://drive.google.com/file/d/1j4WTpwQsxMQEsaBxa2c3VKABAwbppCWa/view?usp=drive_link)
 # Cấu trúc thư mục
 
 
