@@ -1,4 +1,4 @@
-![Logo](https://github.com/Phongdnh-uit/SE114.P22.Project/blob/deployment/backend/backend/src/main/resources/static/images/banner.png)
+<img src="https://github.com/Phongdnh-uit/SE114.P22.Project/blob/deployment/backend/backend/src/main/resources/static/images/banner.png?raw=true" style="width: 100%;" />
 
 # Măm - Hệ thống bán đồ ăn nhanh
 
