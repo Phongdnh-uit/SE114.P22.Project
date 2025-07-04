@@ -123,37 +123,51 @@ cd backend
     cd docker/pro
     cp .example.env .env
     ```
-    - Bước 2: Chạy hệ thống backend thông qua docker
+    - Bước 2: Build và chạy hệ thống backend thông qua docker
     ```
+    docker compose -f docker-compose.yaml build
     docker compose -f docker-compose.yaml up -d
     ```
   - Cách 2: Chạy thông qua local trên máy
 
     - Khi chạy thông qua local, ta cần có đủ các yêu cầu về môi trường và cơ sở dữ liệu để chạy.
-
       - JDK 23
       - MYSQL 8
       - NEO4J
       - REDIS
+  - Có thể chạy cơ sở dữ liệu thông qua docker trong thư mục docker/dev.
+      ```
+      cd docker/dev
+      docker compose -f docker-compose.db.yaml up -d
+      ```
 
     - Bước 1: Kiểm tra phiên bản java hiện tại và chạy các cơ sở dữ liệu cần thiết
 
     ```java
     java -version
     ```
+    - Bước 2: Truy cập thư mục src/main/resources, từ file application-pro.properties ta copy thêm file application-dev.properties và bổ sung các thông tin cần thiết
 
-    - Bước 2: Cài đặt các thư viện cần thiết
+    ```java
+    cd src/main/resources
+    cp application-pro.properties application-dev.properties
+    ```
+    - Bước 3: Cài đặt các thư viện cần thiết
 
     ```java
     ./gradlew --refresh-dependencies
     ```
 
-    - Bước 3: Build và chạy ứng dụng
+    - Bước 4: Build và chạy ứng dụng
 
     ```java
     ./gradlew clean build
     ./gradlew bootRun
     ```
+  - Bước 3: Truy cập đường dẫn http://localhost:8080/swagger-ui/index.html để mở giao diện api hệ thống.
+    ```
+    http://localhost:8080/swagger-ui/index.html
+    ``` 
 
 ## Cấu trúc thư mục
 
